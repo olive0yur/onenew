@@ -1,4 +1,4 @@
-# robots.txt for digsoho - 跨境电商服务平台
+# robots.txt for ONEW -
 
 # 允许所有主要搜索引擎爬取
 User-agent: *
@@ -69,4 +69,3 @@ Allow: /sitemap.xml
 Crawl-delay: 1
 
 # 站点地图位置
-Sitemap: https://digsoho.com/sitemap.xml

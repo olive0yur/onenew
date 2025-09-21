@@ -27,7 +27,7 @@ export default defineNuxtConfig({
             "专业的网站制造商，提供网站设计、网站制作、网站开发、网站优化、网站推广等全方位网站解决方案，助力中国制造业和外贸企业拓展全球市场。",
         },
         { property: "og:type", content: "website" },
-        { property: "og:site_name", content: "digsoho" },
+        { property: "og:site_name", content: "ONEW" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "ONEW - 专业网站制造商" },
         {

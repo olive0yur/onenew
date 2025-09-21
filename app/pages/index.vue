@@ -650,7 +650,7 @@ onUnmounted(() => {
 
 const describes = ref([
   {
-    title: "Brand Analysis & Insight",
+    title: "Brand Analysis & Insight ",
     description: "品牌分析洞察",
     image1: "/static/add.svg",
     image2: "/static/add.svg",

@@ -1,0 +1,72 @@
+# robots.txt for digsoho - 跨境电商服务平台
+
+# 允许所有主要搜索引擎爬取
+User-agent: *
+Allow: /
+
+# 特别允许主要搜索引擎
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+# 允许社交媒体爬虫
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# 阻止一些不必要的爬虫
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# 阻止垃圾邮件机器人
+User-agent: EmailCollector
+Disallow: /
+
+User-agent: EmailSiphon
+Disallow: /
+
+User-agent: WebBandit
+Disallow: /
+
+# 阻止可能的管理后台路径（如果有的话）
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /node_modules/
+
+# 允许重要页面
+Allow: /about
+Allow: /contact
+Allow: /sitemap.xml
+
+# 爬取延迟设置（减少服务器负载）
+Crawl-delay: 1
+
+# 站点地图位置
+Sitemap: https://digsoho.com/sitemap.xml

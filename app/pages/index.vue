@@ -178,7 +178,7 @@ const initLenis = () => {
     // 最短的持续时间，几乎无延迟
     duration: 0.1,
     // 最高敏感度，直接响应
-    wheelMultiplier: 0.2,
+    wheelMultiplier: 1,
     touchMultiplier: 1,
     // 关闭平滑滚动
     smoothWheel: true,
@@ -187,7 +187,7 @@ const initLenis = () => {
     // 线性缓动，无阻尼
     easing: (t) => t,
     // 最小插值，几乎无平滑
-    lerp: 1.5,
+    lerp: 0.5,
   });
   lenis.value.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((time) => {
@@ -269,7 +269,7 @@ const renderIndex = () => {
         },
         x: 0,
         opacity: 1,
-        duration: 1, // 更长的动画时间
+        duration: 0.5, // 更长的动画时间
         ease: "power2.out", // 更自然的缓动效果
       });
     });

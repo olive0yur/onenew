@@ -153,7 +153,7 @@ const onEnter = (el: Element, done: () => void) => {
   element.style.opacity = "0";
   element.offsetHeight; // 强制重排
 
-  element.style.transition = "height 0.3s ease-out, opacity 0.3s ease-out";
+  element.style.transition = "height 0.2s ease-out, opacity 0.3s ease-out";
   element.style.height = element.scrollHeight + "px";
   element.style.opacity = "1";
 
@@ -352,7 +352,7 @@ const describes = ref([
   left: 0;
   width: 100%;
   height: 1px;
-  background: #a4a3a3;
+  background: #3b4eff;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);

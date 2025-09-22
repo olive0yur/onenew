@@ -153,11 +153,11 @@ const onEnter = (el: Element, done: () => void) => {
   element.style.opacity = "0";
   element.offsetHeight; // 强制重排
 
-  element.style.transition = "height 0.5s ease-out, opacity 0.5s ease-out";
+  element.style.transition = "height 0.3s ease-out, opacity 0.3s ease-out";
   element.style.height = element.scrollHeight + "px";
   element.style.opacity = "1";
 
-  setTimeout(done, 250);
+  setTimeout(done, 50);
 };
 
 // 展开离开动画
@@ -166,7 +166,7 @@ const onLeave = (el: Element, done: () => void) => {
   element.style.height = element.scrollHeight + "px";
   element.offsetHeight; // 强制重排
 
-  element.style.transition = "height 0.5s ease-in, opacity 0.5s ease-in";
+  element.style.transition = "height 0.3s ease-in, opacity 0.2s ease-in";
   element.style.height = "0";
   element.style.opacity = "0";
 

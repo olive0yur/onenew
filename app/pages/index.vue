@@ -280,7 +280,7 @@ const renderIndex = () => {
     describeRefs.value.forEach((el: any) => {
       gsap.set(el, {
         transformOrigin: "50% 50%",
-        x: "30%",
+        x: "35%",
       });
 
       gsap.to(el, {

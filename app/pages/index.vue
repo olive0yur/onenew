@@ -85,28 +85,46 @@
       </section>
       <!-- section-2  -->
       <section
-        class="section-2 min-h-[100vh] bg-[#F3F3F3] relative flex justify-center items-center gap-[20px]"
+        class="section-2 h-[400vh] w-[100vw] bg-[#F3F3F3] overflow-hidden"
       >
-        <div class="flex flex-col items-end justify-center">
-          <span
-            class="section2-text font-['Inter'] text-[64px] text-[#000] leading-[64px] mb-[40px]"
-            >The Work</span
+        <div
+          class="section-2-wrap h-[100vh] flex justify-center items-center gap-[16px] relative"
+        >
+          <!-- 左侧文字 -->
+          <div
+            class="section2-text-left flex flex-col items-end justify-center z-10"
           >
-          <span
-            class="section2-text font-['Noto'] text-[32px] text-[#000] leading-[32px]"
-            >看作品</span
+            <span
+              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            >
+              The Work
+            </span>
+            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]">
+              看作品
+            </span>
+          </div>
+
+          <!-- 中央图片 -->
+
+          <img
+            src="/images/index/shoes.png"
+            class="expand-image h-[100vh] absolute object-cover right-[10px]"
+            alt=""
+          />
+
+          <!-- 右侧文字 -->
+          <div
+            class="section2-text-right flex flex-col items-start justify-center z-10"
           >
-        </div>
-        <img src="/images/index/shoes.png" class="w-[0px]" alt="" />
-        <div class="flex flex-col items-start justify-center">
-          <span
-            class="section2-text font-['Inter'] text-[64px] text-[#000] leading-[64px] mb-[40px]"
-            >Can Speak</span
-          >
-          <span
-            class="section2-text font-['Noto'] text-[32px] text-[#000] leading-[32px]"
-            >见实力</span
-          >
+            <span
+              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            >
+              Can Speak
+            </span>
+            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+              >见实力</span
+            >
+          </div>
         </div>
       </section>
     </div>
@@ -116,8 +134,10 @@
 <script setup lang="ts">
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
+
 const ctx: any = ref(null);
 const lenis: any = ref(null);
 const describeRefs: any = ref([]);
@@ -199,80 +219,120 @@ const initLenis = () => {
 
 const renderIndex = () => {
   ctx.value = gsap.context(() => {
-    // 创建时间轴动画
-    const tl = gsap.timeline();
-    // 设置初始状态：从中间位置向下偏移，带初始旋转
-    gsap.set(".bg-image", {
-      transformOrigin: "50% 50%", // 以中心为旋转原点
-      x: "-5vw",
-      y: "60vh", // 从屏幕下方开始
-      rotation: 5, // 初始旋转角度
-    });
-    // 动画：从中间位置垂直推上来，带旋转效果
-    tl.to(".bg-image", {
+    // 初始动画可以用 timeline（因为是顺序播放的）
+    const initialTl = gsap.timeline();
+    // bg-image 入场动画
+    initialTl.to(".bg-image", {
       x: 0,
-      y: 0, // 推到正常位置
-      rotation: 0, // 旋转到正常角度
+      y: 0,
+      rotation: 0,
       duration: 1,
-      ease: "power2.inOut", // 先快后慢再快，无回弹效果
+      ease: "power2.inOut",
     });
 
-    // logo-container 和 blue-mask 一起滚动动画
+    // 设置 bg-image 初始状态
+    gsap.set(".bg-image", {
+      transformOrigin: "50% 50%",
+      x: "-5vw",
+      y: "60vh",
+      rotation: 5,
+    });
+
+    // ScrollTrigger 动画应该独立使用，不加入 timeline
+    // logo-container 和 blue-mask 滚动动画
     gsap.to([".logo-container", ".blue-mask"], {
       scrollTrigger: {
-        trigger: "body", // 以整个页面作为触发器
-        start: "top top", // 从页面顶部开始
-        end: "100vh top", // 滚动到第二个section（透明div）完全显示
-        scrub: 1.5, // 增加延迟，让动画更润滑
+        trigger: "body",
+        start: "top top",
+        end: "100vh top",
+        scrub: 1.5,
       },
       x: "-10vw",
-      y: "-100vh", // 向上移动一个屏幕高度
-      rotation: -15, // 逆时针旋转15度
-      ease: "sine.inOut", // 使用最润滑的缓动函数
+      y: "-100vh",
+      rotation: -15,
+      ease: "sine.inOut",
     });
 
-    // 设置 section-1 初始状态：从远处快速撞过来
+    // 设置 section-1 初始状态
     gsap.set(".section-1", {
-      transformOrigin: "50% 50%", // 以中心为旋转原点
-      x: "-10vw", // 从更远的左边开始
-      rotation: 5, // 更大的初始旋转角度
+      transformOrigin: "50% 50%",
+      x: "-10vw",
+      y: "0",
+      rotation: 5,
     });
-    // section-1 撞击式入场动画
+
+    // section-1 滚动动画
     gsap.to(".section-1", {
       scrollTrigger: {
         trigger: ".section-1",
-        start: "top 75%",
-        end: "top 80%", // 立即触发，不跟随滚动
+        start: "top 100%",
+        end: "top 50%",
         scrub: 1,
         toggleActions: "play none none reverse",
       },
       x: 0,
-      y: 0, // 推到正常位置
-      rotation: 0, // 旋转到正常角度
-      duration: 1, // 更短的撞击时间
+      y: 0,
+      rotation: 0,
       ease: "sine.inOut",
     });
 
-    describeRefs.value.forEach((el: any, index: number) => {
+    // describe 元素动画
+    describeRefs.value.forEach((el: any) => {
       gsap.set(el, {
         transformOrigin: "50% 50%",
         x: "50%",
-        opacity: 1,
+        opacity: 0, // 应该是从 0 开始
       });
+
       gsap.to(el, {
         scrollTrigger: {
           trigger: el,
-          start: "top 85%", // 更早开始动画
-          end: "top 70%", // 更长的动画距离
-          scrub: 2, // 更紧密跟随滚动
-          toggleActions: "play none none reverse", // 支持反向动画
+          start: "top 85%",
+          end: "bottom 80%",
+          scrub: 1.5,
+          toggleActions: "play none none reverse",
         },
         x: 0,
         opacity: 1,
-        duration: 0.5, // 更长的动画时间
-        ease: "power2.out", // 更自然的缓动效果
+        ease: "sine.inOut",
       });
     });
+
+    // Section 2 文字和图片动画 - 应该同时进行
+    const section2Tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5,
+        toggleActions: "restart none none reverse",
+        pin: ".section-2-wrap", // 如果需要固定，应该固定 section-2 本身
+      },
+    });
+
+    // 左侧文字动画
+    section2Tl.fromTo(
+      ".section2-text-left",
+      { opacity: 1 },
+      { x: "-60vw", opacity: 1, ease: "power2.out" },
+      0 // 从时间点 0 开始
+    );
+
+    // 右侧文字动画
+    section2Tl.fromTo(
+      ".section2-text-right",
+      { opacity: 1 },
+      { x: "60vw", opacity: 1, ease: "power2.out" },
+      0 // 从时间点 0 开始，与左侧文字同时进行
+    );
+
+    // 图片放大动画
+    section2Tl.fromTo(
+      ".expand-image",
+      { scale: 0 },
+      { scale: 1, ease: "power2.out" },
+      0 // 从时间点 0 开始，与文字动画同时进行
+    );
   });
 };
 
@@ -369,5 +429,8 @@ const describes = ref([
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+.expand-image {
+  scale: 0;
 }
 </style>

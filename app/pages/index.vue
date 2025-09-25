@@ -85,10 +85,10 @@
       </section>
       <!-- section-2  -->
       <section
-        class="section-2 h-[400vh] w-[100vw] bg-[#F3F3F3] overflow-hidden"
+        class="section-2 h-[300vh] w-[100vw] bg-[#F3F3F3] overflow-hidden"
       >
         <div
-          class="section-2-wrap h-[100vh] flex justify-center items-center gap-[16px] relative"
+          class="section-2-wrap h-[100vh] flex justify-center items-center gap-[16px] relative]"
         >
           <!-- 左侧文字 -->
           <div
@@ -108,7 +108,7 @@
 
           <img
             src="/images/index/shoes.png"
-            class="expand-image h-[100vh] absolute object-cover right-[10px]"
+            class="expand-image h-[100vh] absolute object-cover"
             alt=""
           />
 
@@ -298,6 +298,57 @@ const renderIndex = () => {
       });
     });
 
+    // Section2 单词出现动画
+    // 分割左侧文字为单词
+    const splitTextLeft = new SplitText(".section2-text-left", {
+      type: "words",
+    });
+    const splitTextRight = new SplitText(".section2-text-right", {
+      type: "words",
+    });
+
+    // 设置初始状态
+    gsap.set(splitTextLeft.words, {
+      y: "80px",
+      opacity: 0,
+    });
+    gsap.set(splitTextRight.words, {
+      y: "80px",
+      opacity: 0,
+    });
+
+    // 左侧文字单词动画
+    gsap.to(splitTextLeft.words, {
+      y: 0,
+      opacity: 1,
+      ease: "sine.out",
+      duration: 0.8,
+      stagger: 0.1, // 每个单词间隔0.2秒
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top 40%",
+        end: "top 70%",
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // 右侧文字单词动画（稍微延迟）
+    gsap.to(splitTextRight.words, {
+      y: 0,
+      opacity: 1,
+      ease: "sine.out",
+      duration: 0.8,
+      stagger: 0.1, // 每个单词间隔0.2秒
+      delay: 0.3, // 延迟0.4秒开始
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top 40%",
+        end: "top 70%",
+        markers: true,
+        toggleActions: "restart none none reverse",
+      },
+    });
+
     // Section 2 文字和图片动画 - 应该同时进行
     const section2Tl = gsap.timeline({
       scrollTrigger: {
@@ -329,8 +380,8 @@ const renderIndex = () => {
     // 图片放大动画
     section2Tl.fromTo(
       ".expand-image",
-      { scale: 0 },
-      { scale: 1, ease: "power2.out" },
+      { scale: 0, right: "15px" },
+      { scale: 1, right: "0", left: "0", ease: "power2.out" },
       0 // 从时间点 0 开始，与文字动画同时进行
     );
   });

@@ -258,7 +258,7 @@ const renderIndex = () => {
       transformOrigin: "50% 50%",
       x: "-10vw",
       y: "0",
-      rotation: 5,
+      rotation: 10,
     });
 
     // section-1 滚动动画
@@ -267,7 +267,7 @@ const renderIndex = () => {
         trigger: ".section-1",
         start: "top 100%",
         end: "top 50%",
-        scrub: 1,
+        scrub: true,
         toggleActions: "play none none reverse",
       },
       x: 0,
@@ -280,20 +280,18 @@ const renderIndex = () => {
     describeRefs.value.forEach((el: any) => {
       gsap.set(el, {
         transformOrigin: "50% 50%",
-        x: "50%",
-        opacity: 0, // 应该是从 0 开始
+        x: "30%",
       });
 
       gsap.to(el, {
         scrollTrigger: {
           trigger: el,
           start: "top 85%",
-          end: "bottom 80%",
-          scrub: 1.5,
-          toggleActions: "play none none reverse",
+          end: "bottom 85%",
+          scrub: 1,
+          toggleActions: "restart none none reverse",
         },
         x: 0,
-        opacity: 1,
         ease: "sine.inOut",
       });
     });
@@ -344,7 +342,7 @@ const renderIndex = () => {
         trigger: ".section-2",
         start: "top 40%",
         end: "top 70%",
-        markers: true,
+        // markers: true,
         toggleActions: "restart none none reverse",
       },
     });

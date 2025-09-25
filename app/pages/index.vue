@@ -256,7 +256,7 @@ const renderIndex = () => {
     // 设置 section-1 初始状态
     gsap.set(".section-1", {
       transformOrigin: "50% 50%",
-      x: "-10vw",
+      x: "-14vw",
       y: "0",
       rotation: 10,
     });

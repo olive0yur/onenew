@@ -47,3 +47,29 @@ html {
     scroll-behavior: smooth;
     overflow-x: hidden;
 }
+
+
+/* 针对Webkit浏览器（如Chrome、Safari） */
+
+::-webkit-scrollbar {
+    width: 2px;
+    /* 垂直滚动条宽度 */
+    height: 0;
+    /* 水平滚动条高度 */
+}
+
+
+/* 针对Firefox浏览器 */
+
+
+/* html {
+    scrollbar-width: none;
+} */
+
+
+/* 针对旧版IE浏览器 */
+
+
+/* body {
+    -ms-overflow-style: none;
+} */

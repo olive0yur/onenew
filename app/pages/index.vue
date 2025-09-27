@@ -37,7 +37,7 @@
             v-for="(describe, index) in describes"
             :key="describe.index"
             :ref="(el: any) => setDescribeRef(el, index)"
-            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] py-[40px] w-full max-w-[1318px] cursor-pointer relative"
+            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] py-[40px] pr-[39px] w-full max-w-[1318px] cursor-pointer relative"
           >
             <!-- index -->
             <span
@@ -87,46 +87,46 @@
       <section
         class="section-2 h-[300vh] w-[100vw] bg-[#F3F3F3] overflow-hidden"
       >
-        <div
-          class="section-2-wrap h-[100vh] flex justify-center items-center gap-[16px] relative]"
-        >
-          <!-- 左侧文字 -->
+        <div class="section-2-wrap h-[100vh]">
           <div
-            class="section2-text-left flex flex-col items-end justify-center z-10"
+            class="img-warp h-[100vh] flex justify-center items-center gap-[16px] relative"
           >
-            <span
-              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            <!-- 左侧文字 -->
+            <div
+              class="section2-text-left flex flex-col items-end justify-center w-[400px] z-10"
             >
-              The Work
-            </span>
-            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]">
-              看作品
-            </span>
-          </div>
+              <span
+                class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+              >
+                The Work
+              </span>
+              <span
+                class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+              >
+                看作品
+              </span>
+            </div>
 
-          <!-- 中央图片 -->
+            <!-- 中央图片 -->
+            <img src="/images/index/shoes.png" class="expand-image" alt="" />
 
-          <img
-            src="/images/index/shoes.png"
-            class="expand-image h-[100vh] absolute object-cover"
-            alt=""
-          />
-
-          <!-- 右侧文字 -->
-          <div
-            class="section2-text-right flex flex-col items-start justify-center z-10"
-          >
-            <span
-              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            <!-- 右侧文字 -->
+            <div
+              class="section2-text-right w-[400px] flex flex-col items-start justify-center z-10"
             >
-              Can Speak
-            </span>
-            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
-              >见实力</span
-            >
+              <span
+                class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+              >
+                Can Speak
+              </span>
+              <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+                >见实力</span
+              >
+            </div>
           </div>
         </div>
       </section>
+      <section class="section-3 h-[500vh] w-[100vw]"></section>
     </div>
   </div>
 </template>
@@ -135,6 +135,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import Lenis from "lenis";
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -190,13 +191,13 @@ const onLeave = (el: Element, done: () => void) => {
   element.style.height = "0";
   element.style.opacity = "0";
 
-  setTimeout(done, 500);
+  setTimeout(done, 300);
 };
 
 const initLenis = () => {
   lenis.value = new Lenis({
     // 最短的持续时间，几乎无延迟
-    duration: 0.1,
+    duration: 0.2,
     // 最高敏感度，直接响应
     wheelMultiplier: 1,
     touchMultiplier: 1,
@@ -276,23 +277,25 @@ const renderIndex = () => {
       ease: "sine.inOut",
     });
 
+    const describeTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section-1",
+        scrub: true,
+      },
+    });
+
     // describe 元素动画
     describeRefs.value.forEach((el: any) => {
-      gsap.set(el, {
-        transformOrigin: "50% 50%",
-        x: "35%",
-      });
-
-      gsap.to(el, {
+      describeTl.to(el, {
         scrollTrigger: {
           trigger: el,
           start: "top 85%",
-          end: "bottom 85%",
+          end: "bottom 90%",
           scrub: 1,
-          toggleActions: "restart none none reverse",
         },
         x: 0,
-        ease: "sine.inOut",
+        opacity: 1,
+        ease: "power1.out",
       });
     });
 
@@ -362,7 +365,7 @@ const renderIndex = () => {
     // 左侧文字动画
     section2Tl.fromTo(
       ".section2-text-left",
-      { opacity: 1 },
+      { opacity: 1, x: 0 },
       { x: "-60vw", opacity: 1, ease: "power2.out" },
       0 // 从时间点 0 开始
     );
@@ -370,7 +373,7 @@ const renderIndex = () => {
     // 右侧文字动画
     section2Tl.fromTo(
       ".section2-text-right",
-      { opacity: 1 },
+      { opacity: 1, x: 0 },
       { x: "60vw", opacity: 1, ease: "power2.out" },
       0 // 从时间点 0 开始，与左侧文字同时进行
     );
@@ -378,8 +381,15 @@ const renderIndex = () => {
     // 图片放大动画
     section2Tl.fromTo(
       ".expand-image",
-      { scale: 0, right: "15px" },
-      { scale: 1, right: "0", left: "0", ease: "power2.out" },
+      { scale: 0 },
+      {
+        scale: 1,
+        right: "0",
+        top: "0",
+        left: "0",
+        bottom: "0",
+        ease: "power2.out",
+      },
       0 // 从时间点 0 开始，与文字动画同时进行
     );
   });
@@ -451,7 +461,9 @@ const describes = ref([
 /* describe-item 悬浮边框渐变效果 */
 .describe-item {
   position: relative;
-  transition: all 0.3s ease;
+  /* transition: all 0.3s ease; */
+  transform: translateX(400px);
+  opacity: 0;
 }
 
 .describe-item::after {
@@ -479,7 +491,11 @@ const describes = ref([
   transform-origin: right;
   transition: transform 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
+
 .expand-image {
   scale: 0;
+  position: fixed !important;
+  width: 100vw;
+  height: 100vh;
 }
 </style>

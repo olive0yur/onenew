@@ -123,6 +123,8 @@
                 >见实力</span
               >
             </div>
+
+            <!-- 线条 -->
           </div>
         </div>
       </section>
@@ -197,18 +199,18 @@ const onLeave = (el: Element, done: () => void) => {
 const initLenis = () => {
   lenis.value = new Lenis({
     // 最短的持续时间，几乎无延迟
-    duration: 0.2,
+    duration: 0,
     // 最高敏感度，直接响应
     wheelMultiplier: 1,
     touchMultiplier: 1,
     // 关闭平滑滚动
     smoothWheel: true,
     // 关闭触摸平滑
-    syncTouch: true,
+    syncTouch: false,
     // 线性缓动，无阻尼
     easing: (t) => t,
     // 最小插值，几乎无平滑
-    lerp: 0.5,
+    lerp: 0.1,
   });
   lenis.value.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((time) => {
@@ -379,15 +381,15 @@ const renderIndex = () => {
     );
 
     // 图片放大动画
-    section2Tl.fromTo(
+    section2Tl.to(
       ".expand-image",
-      { scale: 0 },
       {
         scale: 1,
         right: "0",
         top: "0",
         left: "0",
         bottom: "0",
+        position: "fixed",
         ease: "power2.out",
       },
       0 // 从时间点 0 开始，与文字动画同时进行

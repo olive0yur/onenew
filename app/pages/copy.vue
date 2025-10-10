@@ -1,0 +1,592 @@
+<template>
+  <div class="overflow-x-hidden">
+    <div>
+      <section class="relative w-[100vw] h-[100vh]">
+        <div class="w-full h-[100vh] bg-[#3B4EFF]/50 blue-mask"></div>
+        <div class="px-[40px] absolute bottom-0 left-0 right-0 logo-container">
+          <img src="/static/oneNew.svg" alt="" class="w-[100%]" />
+        </div>
+        <img
+          src="/images/index/bg.jpg"
+          alt=""
+          class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
+        />
+      </section>
+      <!-- section-1 关于我们 -->
+      <section
+        class="section-1 w-[100vw] min-h-[100vh] bg-[#F8F8F8] p-[40px] overflow-hidden rotate-[0deg] mt-[30vh]"
+      >
+        <div class="text-[16px] text-[#000]">
+          <span class="mr-[4px]"> /</span>
+          <span style="font-family: 'Noto'">关于我们</span>
+        </div>
+        <div
+          class="text-[#0B0B0B] font-['Inter'] text-[160px] font-normal capitalize leading-[160px] mb-[40px]"
+        >
+          creativity
+        </div>
+        <div
+          class="text-[16px] pl-[20px] border-l-[2px] border-[#000] flex items-center h-[48px] mb-[36px]"
+        >
+          <span class="font-['Inter'] mr-[5px]">ABOUT</span>
+          <span class="font-['Noto'] mr-[16px]">关于</span>
+          <img src="/static/Frame.svg" alt="" class="w-[20px] h-[20px]" />
+        </div>
+        <div class="flex flex-col items-end overflow-hidden">
+          <div
+            v-for="(describe, index) in describes"
+            :key="describe.index"
+            :ref="(el: any) => setDescribeRef(el, index)"
+            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] py-[40px] pr-[39px] w-full max-w-[1318px] cursor-pointer relative"
+          >
+            <!-- index -->
+            <span
+              class="font-['Inter'] text-[16px] text-[#3B4EFF] absolute top-[40px] left-[-64px] uppercase font-[400]"
+              >/ {{ 0 + describe.index }}</span
+            >
+            <!-- 主要内容行 -->
+            <div class="flex items-center justify-between w-full">
+              <div class="flex items-center">
+                <span
+                  class="font-['Inter'] text-[64px] font-normal leading-[64px] text-[#000] mr-[16px]"
+                  >{{ describe.title }}</span
+                >
+                <span class="font-['Noto'] text-[32px]">{{
+                  describe.description
+                }}</span>
+              </div>
+              <img
+                :src="
+                  expandedItems[describe.index]
+                    ? '/static/minus.svg'
+                    : '/static/add.svg'
+                "
+                alt=""
+                class="w-[24px] h-[24px] cursor-pointer transition-transform duration-300 hover:scale-110"
+                @click="toggleExpand(describe.index)"
+              />
+            </div>
+            <!-- 展开的remark内容 -->
+            <transition name="expand" @enter="onEnter" @leave="onLeave">
+              <div
+                v-if="expandedItems[describe.index]"
+                class="remark-content w-full overflow-hidde"
+              >
+                <p class="h-[40px]"></p>
+                <p
+                  class="font-['Noto'] text-[16px] leading-[32px] text-[#666] whitespace-pre-line max-w-[935px]"
+                >
+                  {{ describe.remark }}
+                </p>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </section>
+      <!-- section-2  -->
+      <section class="section-2 h-[300vh] w-[100vw] bg-[#F3F3F3] relative">
+        <div
+          class="sticky-element absolute h-[100vh] w-[100vw] flex justify-center items-center gap-[16px] z-[1]"
+        >
+          <!-- 左侧文字 -->
+          <div
+            class="section2-text-left flex flex-col items-end justify-center w-[400px] z-10"
+          >
+            <span
+              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            >
+              The Work
+            </span>
+            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]">
+              看作品
+            </span>
+          </div>
+
+          <!-- 中央图片 -->
+          <img src="/images/index/shoes.png" class="expand-image" alt="" />
+
+          <!-- 右侧文字 -->
+          <div
+            class="section2-text-right w-[400px] flex flex-col items-start justify-center z-10"
+          >
+            <span
+              class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+            >
+              Can Speak
+            </span>
+            <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+              >见实力</span
+            >
+          </div>
+          <!-- 线条 -->
+          <div class="text-test absolute text-[50px]">215415125</div>
+          <img
+            src="/images/index/shoes.png"
+            class="h-[90px] absolute scroll-img1"
+            alt=""
+          />
+          <img
+            src="/images/index/shoes.png"
+            class="h-[90px] absolute scroll-img2"
+            alt=""
+          />
+          <img
+            src="/images/index/shoes.png"
+            class="h-[90px] absolute scroll-img3"
+            alt=""
+          />
+        </div>
+      </section>
+      <section
+        class="section-3 h-[500vh] w-[100vw] bg-[red] z-[2] relative"
+      ></section>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+import Lenis from "lenis";
+gsap.registerPlugin(ScrollTrigger, SplitText);
+
+const ctx: any = ref(null);
+const lenis: any = ref(null);
+const describeRefs: any = ref([]);
+// 用于跟踪每个item的展开状态
+const expandedItems: any = ref({});
+
+// 设置每个describe item的ref
+const setDescribeRef = (el: any, index: number) => {
+  if (el) {
+    describeRefs.value[index] = el;
+  }
+};
+
+// 切换展开状态的函数（手风琴效果 - 同时只能展开一个）
+const toggleExpand = (index: string) => {
+  // 如果当前item已经展开，则收起它
+  if (expandedItems.value[index]) {
+    expandedItems.value[index] = false;
+  } else {
+    // 先收起所有其他item
+    Object.keys(expandedItems.value).forEach((key) => {
+      expandedItems.value[key] = false;
+    });
+    // 然后展开当前item
+    expandedItems.value[index] = true;
+  }
+};
+
+// 展开进入动画
+const onEnter = (el: Element, done: () => void) => {
+  const element = el as HTMLElement;
+  element.style.height = "0";
+  element.style.opacity = "0";
+  element.offsetHeight; // 强制重排
+
+  element.style.transition = "height 0.2s ease-out, opacity 0.3s ease-out";
+  element.style.height = element.scrollHeight + "px";
+  element.style.opacity = "1";
+
+  setTimeout(done, 50);
+};
+
+// 展开离开动画
+const onLeave = (el: Element, done: () => void) => {
+  const element = el as HTMLElement;
+  element.style.height = element.scrollHeight + "px";
+  element.offsetHeight; // 强制重排
+
+  element.style.transition = "height 0.3s ease-in, opacity 0.2s ease-in";
+  element.style.height = "0";
+  element.style.opacity = "0";
+
+  setTimeout(done, 300);
+};
+
+const initLenis = () => {
+  lenis.value = new Lenis({
+    // 最短的持续时间，几乎无延迟
+    duration: 0,
+    // 最高敏感度，直接响应
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    // 关闭平滑滚动
+    smoothWheel: true,
+    // 关闭触摸平滑
+    syncTouch: false,
+    // 线性缓动，无阻尼
+    easing: (t) => t,
+    // 最小插值，几乎无平滑
+    lerp: 0.05,
+  });
+
+  // 获取 sticky 元素和容器
+  const stickyEl = document.querySelector(".sticky-element") as HTMLElement;
+  const container = stickyEl?.parentElement;
+
+  // 添加滚动事件监听
+  lenis.value.on("scroll", ({ scroll }: { scroll: number }) => {
+    ScrollTrigger.update();
+
+    // sticky-element 控制逻辑
+    if (stickyEl && container) {
+      const containerTop = container.offsetTop;
+      const stickyElHeight = stickyEl.offsetHeight; // 获取 sticky 元素高度
+
+      // 直接用 translateY 让 sticky 元素一直粘在父容器顶部
+      let translateY = scroll - containerTop;
+      if (translateY < 0) translateY = 0;
+
+      // 当滚动超过 100vh 或者 sticky 元素本身高度时，设置背景色
+      const threshold = stickyElHeight; // 取 100vh 和 sticky 高度的较大值
+      if (translateY >= threshold) {
+        container.style.background = "#000319";
+      } else {
+        container.style.background = "#F3F3F3"; // 恢复原始背景色
+      }
+
+      stickyEl.style.transform = `translateY(${translateY}px)`;
+    }
+  });
+
+  // 使用 requestAnimationFrame 循环
+  function raf(time: number) {
+    lenis.value.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+};
+
+const renderIndex = () => {
+  ctx.value = gsap.context(() => {
+    // 初始动画可以用 timeline（因为是顺序播放的）
+    const initialTl = gsap.timeline();
+    // bg-image 入场动画
+    initialTl.to(".bg-image", {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      duration: 1,
+      ease: "power2.inOut",
+    });
+
+    // 设置 bg-image 初始状态
+    gsap.set(".bg-image", {
+      transformOrigin: "50% 50%",
+      x: "-5vw",
+      y: "60vh",
+      rotation: 5,
+    });
+
+    // ScrollTrigger 动画应该独立使用，不加入 timeline
+    // logo-container 和 blue-mask 滚动动画
+    gsap.to([".logo-container", ".blue-mask"], {
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "100vh top",
+        scrub: 1.5,
+      },
+      x: "-10vw",
+      y: "-100vh",
+      rotation: -15,
+      ease: "sine.inOut",
+    });
+
+    // 设置 section-1 初始状态
+    gsap.set(".section-1", {
+      transformOrigin: "50% 50%",
+      x: "-14vw",
+      y: "0",
+      rotation: 10,
+    });
+
+    // section-1 滚动动画
+    gsap.to(".section-1", {
+      scrollTrigger: {
+        trigger: ".section-1",
+        start: "top 100%",
+        end: "top 50%",
+        scrub: true,
+        toggleActions: "play none none reverse",
+      },
+      x: 0,
+      y: 0,
+      rotation: 0,
+      ease: "sine.inOut",
+    });
+
+    const describeTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section-1",
+        scrub: true,
+      },
+    });
+
+    // describe 元素动画
+    describeRefs.value.forEach((el: any) => {
+      describeTl.to(el, {
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          end: "bottom-=50px 100%",
+          scrub: 2,
+        },
+        x: 0,
+        opacity: 1,
+        ease: "power1.out",
+      });
+    });
+
+    // Section2 单词出现动画
+    // 分割左侧文字为单词
+    const splitTextLeft = new SplitText(".section2-text-left", {
+      type: "words",
+    });
+    const splitTextRight = new SplitText(".section2-text-right", {
+      type: "words",
+    });
+
+    // 设置初始状态
+    gsap.set(splitTextLeft.words, {
+      y: "80px",
+      opacity: 0,
+    });
+    gsap.set(splitTextRight.words, {
+      y: "80px",
+      opacity: 0,
+    });
+
+    // 左侧文字单词动画
+    gsap.to(splitTextLeft.words, {
+      y: 0,
+      opacity: 1,
+      ease: "sine.out",
+      duration: 0.8,
+      stagger: 0.1, // 每个单词间隔0.2秒
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top 40%",
+        end: "top 70%",
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // 右侧文字单词动画（稍微延迟）
+    gsap.to(splitTextRight.words, {
+      y: 0,
+      opacity: 1,
+      ease: "sine.out",
+      duration: 0.8,
+      stagger: 0.1, // 每个单词间隔0.2秒
+      delay: 0.3, // 延迟0.4秒开始
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top 40%",
+        end: "top 70%",
+        // markers: true,
+        toggleActions: "restart none none reverse",
+      },
+    });
+
+    // Section 2 文字和图片动画 - 应该同时进行
+    const section2Tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section-2",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5,
+        toggleActions: "restart none none reverse",
+      },
+    });
+
+    // 左侧文字动画
+    section2Tl.fromTo(
+      ".section2-text-left",
+      { opacity: 1, x: 0 },
+      { x: "-60vw", opacity: 1, ease: "power2.out" },
+      0 // 从时间点 0 开始
+    );
+
+    // 右侧文字动画
+    section2Tl.fromTo(
+      ".section2-text-right",
+      { opacity: 1, x: 0 },
+      { x: "60vw", opacity: 1, ease: "power2.out" },
+      0 // 从时间点 0 开始，与左侧文字同时进行
+    );
+
+    // 图片放大动画
+    section2Tl.to(
+      ".expand-image",
+      {
+        scale: 1,
+        right: "0",
+        top: "0",
+        left: "0",
+        bottom: "0",
+        ease: "power2.out",
+      },
+      0 // 从时间点 0 开始，与文字动画同时进行
+    );
+
+    section2Tl.to(".text-test", {
+      opacity: 1,
+      ease: "power2.out",
+    });
+
+    section2Tl
+      .to(".scroll-img1", {
+        opacity: 1,
+        y: "25vh",
+        x: "95px",
+        ease: "power2.out",
+      })
+      .to(".scroll-img1", {
+        opacity: 1,
+        y: "50vh",
+        x: "30px",
+        ease: "power2.out",
+      })
+      .to(".scroll-img3", {
+        opacity: 1,
+        y: "75vh",
+        x: "-20px",
+        ease: "power2.out",
+      });
+  });
+};
+
+onMounted(() => {
+  initLenis(); // 初始化 Lenis 平滑滚动
+  renderIndex();
+});
+
+onUnmounted(() => {
+  // 清理 Lenis
+  if (lenis.value) {
+    lenis.value.destroy();
+  }
+  // 清理 GSAP context
+  if (ctx.value) {
+    ctx.value.revert();
+  }
+});
+
+const describes = ref([
+  {
+    title: "Brand Analysis & Insight ",
+    description: "品牌分析洞察",
+    image1: "/static/add.svg",
+    image2: "/static/add.svg",
+    remark:
+      "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
+    index: "1",
+  },
+  {
+    title: "Visual Creative Design",
+    description: "设计视觉创意",
+    image1: "/static/add.svg",
+    image2: "/static/add.svg",
+    remark:
+      "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
+    index: "2",
+  },
+  {
+    title: "Interactive Development",
+    description: "开发交互体验",
+    image1: "/static/add.svg",
+    image2: "/static/add.svg",
+    remark:
+      "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
+    index: "3",
+  },
+  {
+    title: "Maintenance and Optimization",
+    description: "持续优化维护",
+    image1: "/static/add.svg",
+    image2: "/static/add.svg",
+    remark:
+      "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
+    index: "4",
+  },
+]);
+</script>
+<style scoped>
+/* remark内容样式优化 */
+.remark-content {
+  transform: translateZ(0); /* 启用GPU加速 */
+  backface-visibility: hidden; /* 防止闪烁 */
+  will-change: height, opacity; /* 提示浏览器这些属性会改变 */
+}
+
+/* describe-item 悬浮边框渐变效果 */
+.describe-item {
+  position: relative;
+  /* transition: all 0.3s ease; */
+  transform: translateX(500px);
+  opacity: 0;
+}
+
+.describe-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #3b4eff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1;
+}
+
+.describe-item:hover::after {
+  transform: scaleX(1);
+  transform-origin: right;
+}
+
+/* 当悬浮离开时，从右边收回 - 使用不同的缓动函数 */
+.describe-item:not(:hover)::after {
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+
+.expand-image {
+  scale: 0;
+  position: fixed !important;
+  width: 100vw;
+  height: 100vh;
+}
+
+.text-test {
+  opacity: 0;
+}
+
+.scroll-img1 {
+  opacity: 0;
+  top: -90px;
+  right: 20vw;
+  position: absolute;
+  z-index: 1;
+}
+.scroll-img2 {
+  opacity: 0;
+  top: 0;
+  right: 20vw;
+  position: absolute;
+  z-index: 1;
+}
+.scroll-img3 {
+  opacity: 0;
+  top: 0;
+  right: 20vw;
+  position: absolute;
+  z-index: 1;
+}
+</style>

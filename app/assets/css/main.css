@@ -71,3 +71,14 @@ body {
 ::-webkit-scrollbar-thumb {
     display: none;
 }
+
+
+/* 禁用滚动 */
+
+html.no-scroll,
+html.no-scroll body {
+    /* overflow: hidden !important; */
+    /* height: 100vh !important; */
+    /* position: fixed !important;
+    width: 100% !important; */
+}

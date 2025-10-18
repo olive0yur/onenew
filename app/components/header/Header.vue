@@ -2,21 +2,24 @@
   <header
     :style="{
       opacity: opacityValue,
+      color: headerColor,
+      backgroundColor: headerBgColor,
     }"
-    class="fixed top-0 left-0 right-0 z-[1000] bg-transparent pt-[24px] px-[40px] text-white flex justify-between items-center transition-opacity duration-300 ease-in-out"
+    class="fixed top-0 left-0 right-0 z-[1000] pt-[24px] px-[40px] flex justify-between items-center transition-all duration-500 ease-in-out"
   >
     <div>
       <img
-        src="/static/logo.svg"
+        :src="logoUrl"
         alt=""
-        class="w-auto h-[17px] cursor-pointer"
+        class="w-auto h-[17px] cursor-pointer "
       />
     </div>
     <div
-      class="nav flex items-center gap-[120px] text-[16px] text-[#EEE] font-[400] leading-[16px]"
+      class="nav flex items-center gap-[120px] text-[16px] font-[400] leading-[16px]"
+      :style="{ color: headerColor }"
     >
-      <span @click="openMenu" class="nav-button flex items-center">
-        MENU 菜单
+      <span @click="openMenu" class="nav-button flex items-center cursor-pointer hover:underline underline-offset-4">
+        <GlitchText text="MENU 菜单" :speed="30" :iterations="3" />
         <!-- <button
           @click="value = !value"
           class="relative inline-flex h-[22px] w-[44px] items-center rounded-full transition-colors duration-500 ease-in-out focus:outline-none"
@@ -30,27 +33,27 @@
           ></span>
         </button> -->
       </span>
-      <!-- <USwitch v-model="value" /> -->
-      <span
+      <GlitchText
+        text="WORKS 案例"
         class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1"
-        >WORKS 案例</span
-      >
-      <span
+        :speed="30"
+        :iterations="3"
+      />
+      <GlitchText
+        text="ABOUT 关于"
         class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-2"
-        >ABOUT 关于</span
-      >
-      <span
+        :speed="30"
+        :iterations="3"
+      />
+      <GlitchText
+        text="CONTACT 联系"
         class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-3"
-        >CONTACT 联系</span
-      >
-
-      <!-- <span
-        class="cursor-pointer hover:underline underline-offset-4 nav-item-menu absolute right-[40px]"
-        >MENU</span
-      > -->
+        :speed="30"
+        :iterations="3"
+      />
     </div>
 
-    <div class="menu fixed z-[1001] w-[100vw] top-0 left-0 bg-[rgba(255,255,255,0.6)]">
+    <div class="menu fixed z-[1001] w-[100vw] top-0 left-0 bg-[rgba(0,0,0,0.3)]">
       <div class="bg-[#3B4EFF] px-[40px] pt-[25px] menu-content relative">
         <div class="flex justify-between items-center text-[16px] text-[#EEE]">
             <img
@@ -127,17 +130,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import GlitchText from "~/components/ui/GlitchText.vue";
+import { useLenis } from "~/composables/useLenis";
 
 const opacity = ref(1);
 const value = ref(false);
+const logoUrl = ref('/static/logo.svg');
 const currentTime = ref("");
 const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
 const menuItemRefs: (HTMLElement | null)[] = [];
 let timeInterval: NodeJS.Timeout | null = null;
+
+// 使用 lenis composable
+const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
+
+// Header 颜色状态
+const headerColor = ref('#ffffff');
+const headerBgColor = ref('transparent');
+
+onMounted(() => {
+  // 使用更密集的阈值，让监听更连续（每 5% 触发一次）
+  observeSections('section', {
+    threshold: Array.from({ length: 21 }, (_, i) => i * 0.05)
+  });
+  titleOpcity();
+  navItemsDisappear();
+  // 立即更新一次时间
+  updateTime();
+  // 每秒更新时间
+  timeInterval = setInterval(updateTime, 1000);
+});
+
+onUnmounted(() => {
+  // 清理定时器
+  if (timeInterval) {
+    clearInterval(timeInterval);
+  }
+});
+
+
+// 监听当前激活区域
+watch([activeSection, scrollY], ([section, scrollY]) => {
+  if (section) {
+    // console.log('滚动距离:', scrollY);
+    // // console.log('可见度:', section.intersectionRatio);
+    // // console.log('是否到达顶部:', section.isAtTop);
+    // if(section.id === 'section-5'){
+    //   console.log('当前区域:', section.id);
+    //   console.log('距离顶部:', section.distanceFromTop, 'px');
+    // }
+    if(section.id === 'section-0') {
+      headerColor.value = '#ffffff';
+      logoUrl.value = '/static/logo.svg';
+    }
+    if(section.id === 'section-1' && section.distanceFromTop > 70) {
+      headerColor.value = '#ffffff';
+      logoUrl.value = '/static/logo.svg';
+    }
+    if(section.id === 'section-1' && section.distanceFromTop < 60) {
+      headerColor.value = 'rgba(0, 0, 0)';
+      logoUrl.value = '/static/logo-b.svg';
+    }
+    if(section.id === 'section-3' && section.distanceFromTop > -700) {
+      headerColor.value = 'rgba(0, 0, 0)';
+      logoUrl.value = '/static/logo-b.svg';
+    }
+     if(section.id === 'section-3' && section.distanceFromTop < -701) {
+      headerColor.value = '#ffffff';
+      logoUrl.value = '/static/logo.svg';
+    }
+    if(section.id === 'section-4' && section.distanceFromTop > 200) {
+      headerColor.value = '#000';
+      logoUrl.value = '/static/logo-b.svg';
+    }
+    if(section.id === 'section-4' && section.distanceFromTop < 100) {
+      headerColor.value = '#ffffff';
+      logoUrl.value = '/static/logo.svg';
+    }
+    if(section.id === 'section-5' && section.distanceFromTop > 33) {
+      headerColor.value = '#fff';
+      logoUrl.value = '/static/logo.svg'; 
+    }
+    if(section.id === 'section-5' && section.distanceFromTop < 30) {
+      headerColor.value = '#000';
+      logoUrl.value = '/static/logo-b.svg'; 
+    }
+  }
+});
 
 // 菜单项数据
 const menuItems = [
@@ -177,21 +260,6 @@ const updateTime = () => {
   currentTime.value = `${hours}:${minutes}:${seconds}`;
 };
 
-onMounted(() => {
-  titleOpcity();
-  navItemsDisappear();
-  // 立即更新一次时间
-  updateTime();
-  // 每秒更新时间
-  timeInterval = setInterval(updateTime, 1000);
-});
-
-onUnmounted(() => {
-  // 清理定时器
-  if (timeInterval) {
-    clearInterval(timeInterval);
-  }
-});
 
 const navItemsDisappear = () => {
   gsap.registerPlugin(ScrollTrigger);
@@ -254,21 +322,12 @@ const navItemsDisappear = () => {
       .to(
         ".nav-button",
         {
-          x: moveDistance-30, // 移动到最右边span的位置
+          x: moveDistance-0, // 移动到最右边span的位置
           duration: 0.8,
           ease: "power2.inOut",
         },
         0 // 与整个动画同时开始
       )
-      // .to(
-      //   ".nav-item-menu",
-      //   {
-      //     x: 0,
-      //     opacity: 1,
-      //     duration: 0.5,
-      //     ease: "power2.out",
-      //   },
-      // );
   }
 };
 
@@ -299,7 +358,9 @@ const closeMenu = () => {
     duration: 0.5,
     ease: "power2.inOut",
   });
-  // 恢复页面滚动
+  // 恢复页面滚动 - 使用 lenis API
+  startScroll();
+  // 也可以保留 CSS 类作为备用
   document.documentElement.classList.remove("no-scroll");
 };
 
@@ -315,7 +376,9 @@ const openMenu = () => {
     duration: 0.5,
     ease: "power2.inOut",
   });
-  // 禁用页面滚动
+  // 禁用页面滚动 - 使用 lenis API
+  stopScroll();
+  // 也可以保留 CSS 类作为备用
   document.documentElement.classList.add("no-scroll");
 };
 </script>

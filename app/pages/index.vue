@@ -1,8 +1,7 @@
 <template>
   <div class="overflow-hidden">
     <div>
-      <!-- section-0 -->
-      <section class="section-0 relative w-[100vw] h-[100vh]">
+      <section id="section-0" class="section-0 relative w-[100vw] h-[100vh]">
         <div 
           class="section-0-warp w-full h-[100vh] bg-[#3B4EFF]/50 blue-mask"
           @mouseenter="handleSection0MouseEnter"
@@ -31,8 +30,8 @@
         />
       </section>
 
-      <!-- section-1 关于我们 -->
       <section
+        id="section-1"
         class="section-1 w-[100vw] min-h-[100vh] bg-[#F8F8F8] p-[40px] overflow-hidden rotate-[0deg] mt-[30vh]"
       >
         <div class="text-[16px] text-[#000]">
@@ -102,8 +101,8 @@
         </div>
       </section>
 
-      <!-- section-2  -->
       <section
+        id="section-2"
         class="section-2 h-[500vh] w-[100vw] bg-[#F3F3F3] relative overflow-hidden"
         style="
           clip-path: inset(0 0 -100vh 0);
@@ -178,6 +177,7 @@
              <div class="cover-mask absolute h-[100vh] w-[100vw] z-[30] translate-y-[100vh] rotate-[45deg] flex flex-col">
                 <!-- 覆盖卡片 -->
                 <section
+                  id="section-3"
                   class="section-3 w-[100vw] min-h-[100vh] bg-[#F8F8F8] p-[40px] overflow-hidden rotate-[0deg]"
                 >
                   <div class="text-[16px] text-[#000]">
@@ -212,19 +212,15 @@
                     </div>
                     </div>
                   </div>
-                  <!-- <div class="bg-[red] flex-1">
-                    1111
-                  </div> -->
                 </section>
              </div>
           </div>
         </div>
       </section>
 
-      <!-- 卡片 -->
-      <section class="cover section-4 h-[300vh] w-[100vw] relative">
+      <section id="section-4" class="cover section-4 h-[300vh] w-[100vw] relative z-[31]">
         <div class="relative h-[100vh] w-[100vw] section-4-wrap            overflow-hidden">
-          <!-- Canvas 替代图片 -->
+
           <canvas 
             ref="imageCanvas" 
             class="w-[100vw] h-[100vh] absolute top-0 left-0"
@@ -232,20 +228,19 @@
             :height="canvasHeight"
           ></canvas>
 
-          <!-- 线条 -->
           <div class="section-4-line-top absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh-10px)] rotate-[-45deg] origin-left z-[22]"></div>
           <div class="section-4-line-bottom absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh+10px)] rotate-[45deg] origin-left z-[22]"></div>
 
           <div class="redbook absolute top-[50%] translate-y-[-50%] left-[352px] z-[10] text-[#fff] text-[16px] flex flex-col">
-            <span class="text-[64px] leading-[64px] mb-[24px]">{{imagesList[currentImageIndex]?.mark}}</span>
-            <span class="text-[32px] leading-[32px]">{{imagesList[currentImageIndex]?.title}}</span>
+            <span class="text-[64px] leading-[64px] mb-[24px] redbook-mark">{{imagesList[currentImageIndex]?.mark}}</span>
+            <span class="text-[32px] leading-[32px] redbook-title">{{imagesList[currentImageIndex]?.title}}</span>
           </div>
 
           <div class="redbook-desc absolute top-[70%] translate-y-[-50%] right-[40px] z-[10] text-[#fff] text-[16px] flex flex-col w-[690px]">
             <span class="text-[16px] leading-[32px]">{{imagesList[currentImageIndex]?.description}}</span>
           </div>
 
-          <!-- 文字 -->
+
           <span class="section-4-text absolute top-[50%] translate-y-[-50%]  z-[10] text-[#fff] text-[16px] left-[40px]">FOLLOW US</span>
 
           <div class="absolute z-[11] inset-0 flex">
@@ -253,7 +248,6 @@
           <div @click="handleClick('right')" class="flex-1 section-4-right" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter('right')" @mouseleave="handleMouseLeave"></div>
           </div>
 
-          <!-- 跟随鼠标的图标 - 显示在抓手下方 -->
           <div 
             ref="followIcon" 
             class="follow-icon absolute z-[12] pointer-events-none opacity-0 transition-opacity duration-300"
@@ -266,14 +260,12 @@
             />
           </div>
          
-          <!-- 当前图片组容器 -->
           <div
             ref="currentImagesContainer"
             :style="{ width: `${306 + (imagesList.length - 1) * 40}px` }"
             class="flex absolute bottom-[40px] right-[40px]">
           </div>
 
-          <!-- 上一组图片容器 -->
           <div 
             ref="previousImagesContainer"
             :style="{ width: `${306 + (imagesList.length - 1) * 40}px` }"
@@ -281,9 +273,8 @@
           >
           </div>
 
-
           <!-- Let's talk -->
-          <section class="section-5 h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[100vh] z-[31] bg-[#fff] overflow-hidden" style="grid-template-rows: 1fr 1.4fr;">
+          <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" style="grid-template-rows: 1fr 1.4fr;">
               <div class="lets-talk-top-left bg-[#fff] overflow-hidden relative">
                 <div class="flex items-center hover-container-left">
                   <img src="/static/right.png" class="right-img hover-img-left" alt=""></img>
@@ -342,6 +333,10 @@
           </section>
         </div>
       </section>
+
+      <section id="section-6" class="section-6 relative mt-[-40vh] z-[30]">
+        <Footer />
+      </section>
     </div>
   </div>
 </template>
@@ -353,6 +348,7 @@ import { SplitText } from "gsap/SplitText";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 
 import Lenis from "lenis";
+import { useLenis } from "~/composables/useLenis";
 gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
 
 const ctx: any = ref(null);
@@ -364,7 +360,7 @@ const expandedItems: any = ref({});
 // 跟随图标相关状态
 const followIcon: any = ref(null);
 const showFollowIcon = ref(false);
-const currentIcon = ref('/static/cursor-left.png'); // 默认图标
+const currentIcon = ref('/static/cursor-left.svg'); // 默认图标
 const mousePosition = ref({ x: 0, y: 0 });
 const targetPosition = ref({ x: 0, y: 0 });
 const animationId = ref(0);
@@ -708,7 +704,7 @@ const toggleExpand = (index: string) => {
 const handleMouseEnter = (side: 'left' | 'right') => {
   showFollowIcon.value = true;
   // 根据左右区域设置不同的图标
-  currentIcon.value = side === 'left' ? '/static/cursor-left.png' : '/static/cursor-right.png';
+  currentIcon.value = side === 'left' ? '/static/cursor-left.svg' : '/static/cursor-right.svg';
   
   // 开始跟随动画
   startFollowAnimation();
@@ -822,6 +818,8 @@ const onLeave = (el: Element, done: () => void) => {
 };
 
 // ===== 平滑滚动初始化 =====
+const { setLenis } = useLenis();
+
 const initLenis = () => {
   lenis.value = new Lenis({
     duration: 0,
@@ -832,6 +830,9 @@ const initLenis = () => {
     easing: (t) => t,
     lerp: 0.1,
   });
+
+  // 注册到全局 composable
+  setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((time) => {
@@ -948,7 +949,7 @@ const initSection2TextAnimations = () => {
     y: 0,
     opacity: 1,
     ease: "sine.out",
-    duration: 0.3,
+    duration: 0.2,
     stagger: 0.1,
     scrollTrigger: {
       trigger: ".section-2",
@@ -963,7 +964,7 @@ const initSection2TextAnimations = () => {
     y: 0,
     opacity: 1,
     ease: "sine.out",
-    duration: 0.3,
+    duration: 0.2,
     stagger: 0.1,
     delay: 0.3,
     scrollTrigger: {
@@ -1152,6 +1153,23 @@ const renderPreviousImages = () => {
 const reRenderAllImages = () => {
   renderCurrentImages();
   renderPreviousImages();
+};
+
+// 只触发右下角小图动画演示（不触发Canvas转场，不改变图片索引）
+const triggerSmallImagesAnimation = () => {
+  // // 临时计算下一张图片的索引（用于动画，但不会真正切换）
+  // const tempNextIndex = side === 'left' 
+  //   ? (currentImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length
+  //   : (currentImageIndex.value + 1) % imagesList.value.length;
+  
+  // // 临时设置nextImageIndex用于动画
+  // nextImageIndex.value = tempNextIndex;
+  
+  // // 执行小图动画，但不更新currentImageIndex
+  // currentImgAnimations().then(() => {
+  //   lastImgAnimations();
+  //   // 注意：这里不更新 currentImageIndex，保持原有图片不变
+  // });
 };
 
 const handleClick = (side: 'left' | 'right') => {
@@ -1417,33 +1435,37 @@ const section4Timeline = () => {
     },
   });
 
-  timeline.to([".section-4-line-top", ".section-4-line-bottom", ".section-4-text"], {
-    scrollTrigger: {
-      trigger: ".section-4",
-      start: "top top",
-      end: "top top",
-      scrub: 1,
-      toggleActions: "play none none reverse",
-    },
+  gsap.to([".section-4-line-top", ".section-4-line-bottom", ".section-4-text"], {
+    duration: 2,
     width: "80vw",
     opacity: 1,
-  });
-
-  timeline.to([".redbook", ".redbook-desc"], {
-    opacity: 1,
-    // duration: 0.5,
-    ease: "none",
     scrollTrigger: {
       trigger: ".section-4",
-      start: "top top",
-      end: "top top",
-      scrub: 1,
-      toggleActions: "play none none reverse",
+      start: "top 20%", // 当 section-4 的顶部到达视口 80% 位置时触发
+      toggleActions: "play none none reverse", // 进入时播放，退出时反向
     },
   });
+
+  gsap.to([".redbook", ".redbook-desc"], {
+    opacity: 1,
+    duration: 0.5,
+    ease: "none",
+    y: -60,
+    scrollTrigger: {
+      trigger: ".section-4",
+      start: "top 20%", // 当 section-4 的顶部到达视口 80% 位置时触发
+      toggleActions: "play none none reverse", // 进入时播放，退出时反向
+    },
+  });
+
+  timeline.call(() => {
+    triggerSmallImagesAnimation();
+  }, [], "+=0.5"); // 在 redbook 动画完成后延迟 0.5 秒执行
 
   timeline.to(".section-5", {
     y: 0,
+    x:0,
+    rotate:0,
     duration: 2,
     delay: 1,
     ease: "power2.inOut",
@@ -2005,10 +2027,12 @@ onUnmounted(() => {
 
 .redbook {
   opacity: 0;
+  transform: translateY(20px);
 }
 
 .redbook-desc {
   opacity: 0;
+  transform: translateY(20px);
 }
 
 .section-4-text {
@@ -2214,6 +2238,10 @@ onUnmounted(() => {
   width: auto;
   transition: transform 0.4s ease, width 0.4s ease;
 }
+
+/* .section-5{
+  transform: translateX(-12vw);
+} */
 
 /* 左右联动效果 - 使用section容器来检测hover状态 */
 /* 左边hover时，右边图片隐藏 */

@@ -1118,16 +1118,18 @@ const renderCurrentImages = () => {
   });
 };
 
-// 渲染上一组图片
-const renderPreviousImages = () => {
+// 渲染上一组图片（可选：强制指定组索引，仅用于首次动画）
+const renderPreviousImages = (overrideIndex?: number) => {
   if (!previousImagesContainer.value) return;
   
   // 清空容器
   previousImagesContainer.value.innerHTML = '';
   
-  const prevIndex = currentImageIndex.value === 0 
-    ? imagesListGroup.value.length - 1 
-    : currentImageIndex.value - 1;
+  const prevIndex = typeof overrideIndex === 'number'
+    ? overrideIndex
+    : (currentImageIndex.value === 0 
+      ? imagesListGroup.value.length - 1 
+      : currentImageIndex.value - 1);
   
   const images = imagesListGroup.value[prevIndex]?.images || [];
   
@@ -1155,21 +1157,15 @@ const reRenderAllImages = () => {
   renderPreviousImages();
 };
 
-// 只触发右下角小图动画演示（不触发Canvas转场，不改变图片索引）
+// 只触发右下角小图动画演示（首次进入时从底部滑上来）
 const triggerSmallImagesAnimation = () => {
-  // // 临时计算下一张图片的索引（用于动画，但不会真正切换）
-  // const tempNextIndex = side === 'left' 
-  //   ? (currentImageIndex.value - 1 + imagesList.value.length) % imagesList.value.length
-  //   : (currentImageIndex.value + 1) % imagesList.value.length;
-  
-  // // 临时设置nextImageIndex用于动画
-  // nextImageIndex.value = tempNextIndex;
-  
-  // // 执行小图动画，但不更新currentImageIndex
-  // currentImgAnimations().then(() => {
-  //   lastImgAnimations();
-  //   // 注意：这里不更新 currentImageIndex，保持原有图片不变
-  // });
+  // 若容器为空（如滑回去后被清空），先渲染第一组再执行首次动画
+  const hasLastImgs = document.querySelector('.last-imgs');
+  if (!hasLastImgs) {
+    renderPreviousImages(0);
+  }
+  // 首次进入时，直接执行滑上来的动画，传入 isFirstTime = true
+  lastImgAnimations(true);
 };
 
 const handleClick = (side: 'left' | 'right') => {
@@ -1195,7 +1191,7 @@ const handleClick = (side: 'left' | 'right') => {
   });
 };
 
-const lastImgAnimations = () => {
+const lastImgAnimations = (isFirstTime = false) => {
   const items = gsap.utils.toArray(".last-imgs");
   
   if (items.length === 0) {
@@ -1206,7 +1202,14 @@ const lastImgAnimations = () => {
   const tl = gsap.timeline({
     onComplete: () => {
       // 动画完成后重新渲染所有图片，让GSAP可以更新新的元素
-      reRenderAllImages();
+      if (!isFirstTime) {
+        reRenderAllImages();
+      } else {
+        // 首次动画结束后恢复到正常映射（prevIndex 与 currentIndex），避免首次点击时卡顿
+        nextTick(() => {
+          reRenderAllImages();
+        });
+      }
     }
   });
   
@@ -1214,7 +1217,7 @@ const lastImgAnimations = () => {
   items.forEach((item: any, index: number) => {
     tl.to(item, {
       bottom: "40px",
-      duration: 0.1, // 🎯 动画时长（底部上升）
+      duration: 0.4, // 🎯 动画时长（底部上升）
       ease: "power2.out",
     }, index * 0.1); // 🎯 间隔时间（底部上升的stagger）
   });
@@ -1227,10 +1230,28 @@ const lastImgAnimations = () => {
     const reverseIndex = items.length - 1 - index; // 反转顺序
     tl.to(item, {
       x: `${(index)*40}px`,
-      duration: 0.4, // 🎯 动画时长（横向展开）
+      duration: 0.5, // 🎯 动画时长（横向展开）
       ease: "power2.out",
     }, `expand+=${reverseIndex * 0.1}`); // 🎯 间隔时间（横向展开的stagger，反向）
   });
+};
+
+// 隐藏右下角小图（用于滚动回到上方时复位）
+const hideSmallImages = () => {
+  const items = gsap.utils.toArray(".last-imgs");
+  if (items.length === 0) {
+    // 若无元素，确保容器也为空
+    previousImagesContainer.value && (previousImagesContainer.value.innerHTML = '');
+  } else {
+    // 清空容器，确保“啥也没有”
+    if (previousImagesContainer.value) {
+      previousImagesContainer.value.innerHTML = '';
+    }
+  }
+  // 同步清空当前小图容器，避免回退时仍显示细窄列
+  if (currentImagesContainer.value) {
+    currentImagesContainer.value.innerHTML = '';
+  }
 };
 
 const currentImgAnimations = () => {
@@ -1257,6 +1278,7 @@ const currentImgAnimations = () => {
     });
   });
 }
+
 // 图片悬停展开处理函数
 const handleImageHover = (index: number) => {
   hoveredImageIndex.value = index;
@@ -1432,6 +1454,10 @@ const section4Timeline = () => {
       scrub: 1,
       toggleActions: "play none none reverse",
       pin: ".section-4-wrap",
+      onLeaveBack: () => {
+        // 滑回去：隐藏右下角小图，待下次进入再触发显示动画
+        hideSmallImages();
+      },
     },
   });
 
@@ -1459,7 +1485,10 @@ const section4Timeline = () => {
   });
 
   timeline.call(() => {
-    triggerSmallImagesAnimation();
+    // 仅在正向播放时触发首次小图动画，反向回退不重复触发
+    if (timeline.time() >= 0 && gsap.getProperty(timeline, "reversed") !== 1) {
+      triggerSmallImagesAnimation();
+    }
   }, [], "+=0.5"); // 在 redbook 动画完成后延迟 0.5 秒执行
 
   timeline.to(".section-5", {
@@ -1544,9 +1573,9 @@ onMounted(() => {
   nextTick(() => {
     setupHoverEffects();
     initCanvas(); // 初始化Canvas
-    // 初始化渲染图片
-    renderCurrentImages();
-    renderPreviousImages();
+    // 初始化时只渲染 previousImages（.last-imgs），它们会从底部滑上来
+    // 不渲染 currentImages，因为首次进入时还没有当前图片
+    renderPreviousImages(0);
   });
 });
 

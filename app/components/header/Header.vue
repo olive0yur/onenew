@@ -94,8 +94,12 @@
         <div class="mt-[84px] h-[1px] bg-[#fff] opacity-20"></div>
 
         <div class="h-[72px] flex justify-end items-center text-[24px] text-[#EEE]">
-          <span class="mr-[60px]">X 推特</span>
-          <span>RED BOOK 小红书</span>
+          <span class="mr-[60px]">
+            <GlitchText text="X 推特" :speed="30" :iterations="3" />
+          </span>
+          <span>
+            <GlitchText text="RED BOOK 小红书" :speed="30" :iterations="3" />
+          </span>
         </div>
 
         <!-- 右侧文字 -->

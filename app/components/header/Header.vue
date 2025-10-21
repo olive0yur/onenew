@@ -203,10 +203,10 @@ watch([activeSection, scrollY], ([section, scrollY]) => {
       headerColor.value = 'rgba(0, 0, 0)';
       logoUrl.value = '/static/logo-b.svg';
     }
-     if(section.id === 'section-3' && section.distanceFromTop < -701) {
-      headerColor.value = '#ffffff';
-      logoUrl.value = '/static/logo.svg';
-    }
+    //  if(section.id === 'section-3' && section.distanceFromTop < -701) {
+    //   headerColor.value = '#ffffff';
+    //   logoUrl.value = '/static/logo.svg';
+    // }
     if(section.id === 'section-4' && section.distanceFromTop > 200) {
       headerColor.value = '#000';
       logoUrl.value = '/static/logo-b.svg';

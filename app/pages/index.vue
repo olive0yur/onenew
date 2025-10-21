@@ -178,18 +178,18 @@
                 <!-- 覆盖卡片 -->
                 <section
                   id="section-3"
-                  class="section-3 w-[100vw] min-h-[100vh] bg-[#F8F8F8] p-[40px] overflow-hidden rotate-[0deg]"
+                  class="section-3 w-[100vw] min-h-[100vh] bg-[#F8F8F8] overflow-hidden rotate-[0deg]"
                 >
-                  <div class="text-[16px] text-[#000]">
+                  <div class="text-[16px] text-[#000] px-[40px] pt-[40px]">
                     <span class="mr-[4px]"> /</span>
                     <span style="font-family: 'Noto'">我们的客户</span>
                   </div>
                   <div
-                    class="text-[#0B0B0B] font-['Inter'] text-[160px] font-normal capitalize leading-[160px] mb-[80px]"
+                    class="text-[#0B0B0B] font-['Inter'] text-[160px] font-normal capitalize leading-[160px] mb-[60px] px-[40px]"
                   >
                     Trust
                   </div>
-                  <div class="h-[360px] overflow-x-auto list-card-wrap">
+                  <div class="h-[360px] overflow-x-auto list-card-wrap mb-[40px]">
                     <div class="flex gap-[40px] list-card-item-wrap"> 
                       <div class="w-[586px] h-[360px] box-border flex-shrink-0 bg-[#fff] list-card-item p-[40px] translate-x-[100vw]" v-for="(item, index) in listCards" :key="item.title">
                       <div >
@@ -211,6 +211,9 @@
                       </div>
                     </div>
                     </div>
+                  </div>
+                  <div class="bg-[#faf7ff] overflow-hidden" style="height: calc(100vh - 480px);">
+                    <GlobeCanvas />
                   </div>
                 </section>
              </div>

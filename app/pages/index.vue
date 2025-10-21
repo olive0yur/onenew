@@ -357,6 +357,9 @@ gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
 const ctx: any = ref(null);
 const lenis: any = ref(null);
 const describeRefs: any = ref([]);
+// 小图渲染开关与时间线引用，避免回退后被异步回调重建
+const smallImagesRenderingEnabled = ref(true);
+let lastSmallImagesTimeline: gsap.core.Timeline | null = null;
 // 用于跟踪每个item的展开状态
 const expandedItems: any = ref({});
 
@@ -1097,6 +1100,7 @@ const initCentralImageManagement = (timeline: gsap.core.Timeline) => {
 
 // 渲染当前图片组
 const renderCurrentImages = () => {
+  if (!smallImagesRenderingEnabled.value) return;
   if (!currentImagesContainer.value) return;
   
   // 清空容器
@@ -1123,6 +1127,7 @@ const renderCurrentImages = () => {
 
 // 渲染上一组图片（可选：强制指定组索引，仅用于首次动画）
 const renderPreviousImages = (overrideIndex?: number) => {
+  if (!smallImagesRenderingEnabled.value) return;
   if (!previousImagesContainer.value) return;
   
   // 清空容器
@@ -1162,6 +1167,7 @@ const reRenderAllImages = () => {
 
 // 只触发右下角小图动画演示（首次进入时从底部滑上来）
 const triggerSmallImagesAnimation = () => {
+  if (!smallImagesRenderingEnabled.value) return;
   // 若容器为空（如滑回去后被清空），先渲染第一组再执行首次动画
   const hasLastImgs = document.querySelector('.last-imgs');
   if (!hasLastImgs) {
@@ -1172,6 +1178,7 @@ const triggerSmallImagesAnimation = () => {
 };
 
 const handleClick = (side: 'left' | 'right') => {
+  if (!smallImagesRenderingEnabled.value) return;
   // 如果正在转场中，忽略点击
   if (isTransitioning.value) return;
   
@@ -1195,6 +1202,7 @@ const handleClick = (side: 'left' | 'right') => {
 };
 
 const lastImgAnimations = (isFirstTime = false) => {
+  if (!smallImagesRenderingEnabled.value) return;
   const items = gsap.utils.toArray(".last-imgs");
   
   if (items.length === 0) {
@@ -1205,16 +1213,18 @@ const lastImgAnimations = (isFirstTime = false) => {
   const tl = gsap.timeline({
     onComplete: () => {
       // 动画完成后重新渲染所有图片，让GSAP可以更新新的元素
-      if (!isFirstTime) {
+      if (!isFirstTime && smallImagesRenderingEnabled.value) {
         reRenderAllImages();
       } else {
         // 首次动画结束后恢复到正常映射（prevIndex 与 currentIndex），避免首次点击时卡顿
         nextTick(() => {
-          reRenderAllImages();
+          if (smallImagesRenderingEnabled.value) reRenderAllImages();
         });
       }
     }
   });
+
+  lastSmallImagesTimeline = tl;
   
   // 从底部上来 - 依次执行
   items.forEach((item: any, index: number) => {
@@ -1241,17 +1251,31 @@ const lastImgAnimations = (isFirstTime = false) => {
 
 // 隐藏右下角小图（用于滚动回到上方时复位）
 const hideSmallImages = () => {
-  const items = gsap.utils.toArray(".last-imgs");
-  if (items.length === 0) {
-    // 若无元素，确保容器也为空
-    previousImagesContainer.value && (previousImagesContainer.value.innerHTML = '');
-  } else {
-    // 清空容器，确保“啥也没有”
-    if (previousImagesContainer.value) {
-      previousImagesContainer.value.innerHTML = '';
-    }
+  // 先停止所有相关的GSAP动画，避免动画继续更新已删除的DOM元素
+  const lastImgs = gsap.utils.toArray(".last-imgs");
+  const currentImgs = gsap.utils.toArray(".current-imgs");
+  
+  // 关闭渲染开关
+  smallImagesRenderingEnabled.value = false;
+
+  // 停止并清理时间线
+  if (lastSmallImagesTimeline) {
+    lastSmallImagesTimeline.kill();
+    lastSmallImagesTimeline = null;
   }
-  // 同步清空当前小图容器，避免回退时仍显示细窄列
+
+  // Kill掉所有小图相关的动画
+  lastImgs.forEach((item: any) => {
+    gsap.killTweensOf(item);
+  });
+  currentImgs.forEach((item: any) => {
+    gsap.killTweensOf(item);
+  });
+  
+  // 清空容器
+  if (previousImagesContainer.value) {
+    previousImagesContainer.value.innerHTML = '';
+  }
   if (currentImagesContainer.value) {
     currentImagesContainer.value.innerHTML = '';
   }
@@ -1457,8 +1481,12 @@ const section4Timeline = () => {
       scrub: 1,
       toggleActions: "play none none reverse",
       pin: ".section-4-wrap",
+      onEnter: () => {
+        smallImagesRenderingEnabled.value = true;
+      },
       onLeaveBack: () => {
         // 滑回去：隐藏右下角小图，待下次进入再触发显示动画
+        smallImagesRenderingEnabled.value = false;
         hideSmallImages();
       },
     },
@@ -1489,7 +1517,7 @@ const section4Timeline = () => {
 
   timeline.call(() => {
     // 仅在正向播放时触发首次小图动画，反向回退不重复触发
-    if (timeline.time() >= 0 && gsap.getProperty(timeline, "reversed") !== 1) {
+    if (timeline.time() >= 0 && !timeline.reversed() && smallImagesRenderingEnabled.value) {
       triggerSmallImagesAnimation();
     }
   }, [], "+=0.5"); // 在 redbook 动画完成后延迟 0.5 秒执行

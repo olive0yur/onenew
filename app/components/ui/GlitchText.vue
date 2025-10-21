@@ -113,6 +113,12 @@ const resetText = async () => {
 onMounted(() => {
   displayText.value = props.text;
 });
+
+// 暴露方法给父组件调用
+defineExpose({
+  startGlitch,
+  resetText
+});
 </script>
 
 <style scoped>

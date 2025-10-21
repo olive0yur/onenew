@@ -53,39 +53,49 @@
       />
     </div>
 
-    <div class="menu fixed z-[1001] w-[100vw] top-0 left-0 bg-[rgba(0,0,0,0.3)]">
-      <div class="bg-[#3B4EFF] px-[40px] pt-[25px] menu-content relative">
+    <div @click.stop.prevent="closeMenu" class="menu fixed z-[1001] w-[100vw] top-0 left-0 bg-[rgba(0,0,0,0.3)]">
+      <div @click.stop.prevent="()=>{}" class="bg-[#3B4EFF] px-[40px] pt-[25px] menu-content relative">
         <div class="flex justify-between items-center text-[16px] text-[#EEE]">
             <img
               src="/static/logo.svg"
               alt=""
               class="w-auto h-[17px] cursor-pointer"
             />
-          <span class="cursor-pointer hover:underline underline-offset-4" @click="closeMenu">CLOSE 关闭</span>
+          <span class="cursor-pointer hover:underline underline-offset-4" @click.stop.prevent="closeMenu">CLOSE 关闭</span>
         </div>
 
         <div class="mt-[120px] flex flex-col w-[288px]">
           <div>
             <img src="/images/image140.png" alt="" class="w-[288px] h-[162px] text-[16px] text-[#EEE]">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center text-white">
               <span>灵感来源于足够的休息</span>
               <span>{{ currentTime }}</span>
             </div>
           </div>
         </div>
 
-        <div class="mt-[66px] flex flex-col w-[288px]">
+        <div class="mt-[66px] flex flex-col w-[288px] text-white">
           <span>Atlanta, Georgia, USA</span>
           <span>15252507831</span>
           <span>1761973105@qq.com</span>
         </div>
 
         <div class="mt-[40px] flex flex-col w-[288px]">
-          <div class="w-[223px] h-[48px] bg-[#DCE4EF] flex justify-between items-center px-[20px] text-[#000]">
-            GET IN TOUCH 联系
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M14 8H2" stroke="black"/>
-              <path d="M10 4L14 8L10 12" stroke="black"/>
+          <div 
+            @mouseenter="onContactHover" 
+            @mouseleave="onContactLeave"
+            class="group w-[223px] h-[48px] transition-width duration-300 ease-in-out hover:bg-[#DCE4EF] flex justify-between items-center px-[20px] text-[#fff] hover:text-[#000] box-border border-l-[2px] border-solid border-[#fff]"
+          >
+            <GlitchText
+              ref="contactGlitchRef"
+              text="GET IN TOUCH 联系"
+              class="cursor-pointer nav-item nav-item-3"
+              :speed="30"
+              :iterations="3"
+            />
+            <svg class="" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path class="group-hover:stroke-[#000] transition-colors duration-300" d="M14 8H2" stroke="white"/>
+              <path class="group-hover:stroke-[#000] transition-colors duration-300" d="M10 4L14 8L10 12" stroke="white"/>
             </svg>
           </div >
 
@@ -148,6 +158,7 @@ const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
 const menuItemRefs: (HTMLElement | null)[] = [];
 let timeInterval: NodeJS.Timeout | null = null;
+const contactGlitchRef = ref<any>(null);
 
 // 使用 lenis composable
 const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
@@ -384,6 +395,19 @@ const openMenu = () => {
   stopScroll();
   // 也可以保留 CSS 类作为备用
   document.documentElement.classList.add("no-scroll");
+};
+
+// Contact 区域 hover 事件
+const onContactHover = () => {
+  if (contactGlitchRef.value) {
+    contactGlitchRef.value.startGlitch();
+  }
+};
+
+const onContactLeave = () => {
+  if (contactGlitchRef.value) {
+    contactGlitchRef.value.resetText();
+  }
 };
 </script>
 

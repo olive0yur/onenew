@@ -15,6 +15,17 @@ let points: [number, number][] = [];
 let projection: any = null;
 let animationId: number = 0;
 
+// 浮动粒子系统
+interface FloatingParticle {
+  x: number;
+  y: number;
+  size: number;
+  speed: number;
+  opacity: number;
+  fadeSpeed: number;
+}
+let floatingParticles: FloatingParticle[] = [];
+
 const initCanvas = () => {
   if (!globeCanvas.value) return;
   
@@ -29,6 +40,46 @@ const initCanvas = () => {
   projection = d3.geoOrthographic()
     .scale(Math.min(canvas.width, canvas.height) * 0.5)
     .translate([canvas.width / 2, canvas.height / 1.8]);
+};
+
+// 创建浮动粒子
+const createFloatingParticle = (canvasWidth: number, canvasHeight: number): FloatingParticle => {
+  return {
+    x: Math.random() * canvasWidth,
+    y: canvasHeight + Math.random() * 100, // 从底部下方开始
+    size: 0.1 + Math.random() * 1.2, // 0.8-2.0 更细小
+    speed: 0.5 + Math.random() * 0.8, // 0.5-1.3 更快
+    opacity: 0.9 + Math.random() * 0.1, // 0.9-1.0 几乎完全不透明
+    fadeSpeed: 0.0005 + Math.random() * 0.001, // 更慢淡出，存在时间更长
+  };
+};
+
+// 更新浮动粒子
+const updateFloatingParticles = (canvasWidth: number, canvasHeight: number) => {
+  // 移除超出屏幕或完全透明的粒子
+  floatingParticles = floatingParticles.filter(p => p.y > -20 && p.opacity > 0);
+  
+  // 大幅增加生成概率和数量上限
+  if (Math.random() < 0.4 && floatingParticles.length < 100) {
+    floatingParticles.push(createFloatingParticle(canvasWidth, canvasHeight));
+  }
+  
+  // 更新粒子位置和透明度
+  floatingParticles.forEach(p => {
+    p.y -= p.speed; // 向上移动
+    p.opacity -= p.fadeSpeed; // 逐渐淡出
+  });
+};
+
+// 绘制浮动粒子
+const drawFloatingParticles = (ctx: CanvasRenderingContext2D) => {
+  floatingParticles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, 2 * Math.PI);
+    // 黑色粒子
+    ctx.fillStyle = `rgba(0, 0, 0, ${p.opacity})`;
+    ctx.fill();
+  });
 };
 
 const loadAndRender = async () => {
@@ -59,6 +110,10 @@ const loadAndRender = async () => {
       if (!ctx || !globeCanvas.value || !projection) return;
       
       ctx.clearRect(0, 0, globeCanvas.value.width, globeCanvas.value.height);
+      
+      // 更新浮动粒子
+      updateFloatingParticles(globeCanvas.value.width, globeCanvas.value.height);
+      
       projection.rotate([rotation, -20]);
       const radius = projection.scale();
       const center = projection.translate();
@@ -72,7 +127,7 @@ const loadAndRender = async () => {
 
       // 绘制外层旋转圆环
       const ringRadius = radius * 1.06;
-      const gapAngle = Math.PI / 12;
+      const gapAngle = Math.PI / 20;
       const startAngle = gapAngle;
       const endAngle = 2 * Math.PI - gapAngle;
 
@@ -88,12 +143,12 @@ const loadAndRender = async () => {
         const angle1 = startAngle + t * angleRange;
         const angle2 = startAngle + (t + 1 / segments) * angleRange;
 
-        const widthStart = 5 - 1.5 * Math.min(t, 1 - t) * 4;
-        const lineWidth = Math.max(1.5, widthStart);
+        // 从起点到终点线宽逐渐递减：起点5，终点1.5
+        const lineWidth = 4 - t * 3.5;
 
         ctx.beginPath();
         ctx.arc(0, 0, ringRadius, angle1, angle2);
-        ctx.strokeStyle = "rgba(255,255,255,0.7)";
+        ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.lineWidth = lineWidth;
         ctx.stroke();
       }
@@ -114,20 +169,23 @@ const loadAndRender = async () => {
 
         const frontness = Math.max(0, 1 - (distFromCenter / radius) * 0.9);
         const latWeight = 1 + Math.abs(p[1]) / 90 * 0.8;
-        const alpha = (0.5 + 0.75 * frontness) * latWeight;
-        const size = 1.2 + 0.5 * alpha;
+        const alpha = (0.3 + 0.75 * frontness) * latWeight;
+        const size = 1.0 + 0.5 * alpha;
 
         // 使用简单的实心圆替代渐变，大幅提升性能
         ctx!.beginPath();
         ctx!.arc(xy[0], xy[1], size, 0, 2 * Math.PI);
-        ctx!.fillStyle = `rgba(255,255,255,${Math.min(1, alpha)})`;
+        ctx!.fillStyle = `rgba(200,200,200,${Math.min(1, alpha)})`;
         ctx!.fill();
       });
+      
+      // 绘制浮动粒子
+      drawFloatingParticles(ctx!);
     };
 
     const animate = () => {
       r += 0.15;
-      ringRotation += 0.4;
+      ringRotation += 0.2;
       render(r);
       animationId = requestAnimationFrame(animate);
     };
@@ -163,7 +221,7 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 20px;
+  padding-top: 0px;
 }
 
 canvas {

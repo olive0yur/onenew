@@ -44,7 +44,7 @@
           creativity
         </div>
         <div
-          class="text-[16px] group pl-[20px] border-l-[2px] border-[#0e0e0e] flex items-center h-[48px] w-[170px] mb-[36px] box-border hover:bg-[#0e0e0e] hover:text-[#fff]"
+          class="text-[16px] group pl-[20px] border-l-[2px] border-[#0e0e0e] flex items-center h-[48px] w-[170px] mb-[36px] box-border hover:bg-[#0e0e0e] text-black hover:text-[#fff]"
         >
           <GlitchText
             @mouseenter="onContactHover" 
@@ -1719,6 +1719,7 @@ const section4Timeline = () => {
     delay: 0.5,
     ease: "none",
   });
+
   gsap.to(".line-h", {
     height: "100vh",
     scrollTrigger: {
@@ -1727,9 +1728,25 @@ const section4Timeline = () => {
       toggleActions: "restart none none reverse",
     },
     duration: 1,
-    delay:1.2,
+    delay:0.5,
     ease: "none",
   });
+
+  gsap.to(".section-4-wrap", {
+    scrollTrigger:{
+      trigger: ".section-6",
+      start: "bottom bottom",
+      end: "bottom bottom",
+      scrub: 1,
+      toggleActions: "play none none reverse",
+    },
+    rotate:-5,
+    x:'-7vw',
+    // duration: ,
+    delay:1,
+    ease: "power2.inOut",
+  });
+  
 };
 
 // ===== 主渲染函数 =====
@@ -1758,7 +1775,7 @@ const renderIndex = () => {
     initScrollingTextAnimations(section2Timeline, SCALE_DURATION);
 
     section4Timeline()
-    
+  
   });
 };
 
@@ -2498,3 +2515,5 @@ onUnmounted(() => {
   bottom: -172px;
 }
 </style>
+
+

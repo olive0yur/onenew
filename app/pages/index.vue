@@ -21,10 +21,10 @@
           </div>
         </div>
         <div class="px-[40px] absolute bottom-0 left-0 right-0 logo-container">
-          <img src="/static/oneNew.svg" alt="" class="w-[100%]" />
+          <img :src="imgBaseURL('oneNew.svg')" alt="" class="w-[100%]" />
         </div>
         <img
-          src="/images/index/bg.jpg"
+          :src="imgBaseURL('bg.jpg')"
           alt=""
           class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
         />
@@ -83,7 +83,7 @@
                 }}</span>
               </div>
               <img
-                src="/static/add.svg"
+                :src="imgBaseURL('add.svg')"
                 alt=""
                 :class="[
                   'w-[24px] h-[24px] cursor-pointer transition-transform duration-300 hover:scale-110',
@@ -140,7 +140,7 @@
             </div>
 
             <!-- 中央图片 - 作为滚动序列的第一个 -->
-            <img src="/images/index/img1.png"  class="expand-image " alt="" />
+            <img :src="imgBaseURL('img1.png')"  class="expand-image " alt="" />
 
             <!-- 右侧文字 -->
             <div
@@ -167,7 +167,7 @@
             <img
               v-for="i in 10"
               :key="i"
-              :src="`/images/index/img${((i - 1) % 5) + 1}.png`"
+              :src="imgBaseURL(`img${((i - 1) % 5) + 1}.png`)"
               :class="`h-[90px] absolute scroll-img scroll-img-${i} opacity-0`"
               alt=""
             />
@@ -207,12 +207,12 @@
                       <div ref="listCardItemWrap" class="flex gap-[40px] list-card-item-wrap"> 
                       <div class="w-[586px] h-[360px] box-border flex-shrink-0 bg-[#fff] list-card-item p-[40px]" v-for="(item, index) in listCards" :key="item.title">
                       <div >
-                        <img src="/static/logo.png" class="h-[24px] w-[172px] mb-[24px]" alt="">
+                        <img :src="imgBaseURL('logo.png')" class="h-[24px] w-[172px] mb-[24px]" alt="">
                         <p class="text-[16px] leading-[24px] text-[#666] mb-[80px]">{{ item.description }}</p>
 
                         <div class="flex justify-between items-center">
                           <div class="flex items-center">
-                            <img src="/static/avatar.png" class="h-[60px] w-[60px] mr-[16px]" alt="">
+                            <img :src="imgBaseURL('avatar.png')" class="h-[60px] w-[60px] mr-[16px]" alt="">
                             <div class="flex flex-col">
                               <span class="text-[16px] text-[#293238] leading-[16px]">{{ item.name }}</span>
                               <span class="text-[16px] text-[#666] leading-[16px]">{{ item.mark }}</span>
@@ -295,7 +295,7 @@
           <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" style="grid-template-rows: 1fr 1.4fr;">
               <div class="lets-talk-top-left bg-[#fff] overflow-hidden relative">
                 <div class="flex items-center hover-container-left">
-                  <img src="/static/right.png" class="right-img hover-img-left" alt=""></img>
+                  <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
                   <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
                     <span class="hover-text-char">L</span>
                     <span class="hover-text-char">e</span>
@@ -313,19 +313,19 @@
               <div class="lets-talk-top-right bg-[#fff] overflow-hidden">
                 <div class="flex justify-end items-center hover-container-right ">
                   <span class="lets-talk-title opacity-0">L</span>
-                  <img src="/static/right.png" class="right-img hover-img-right m" alt=""></img>
+                  <img :src="imgBaseURL('right.png')" class="right-img hover-img-right m" alt=""></img>
                 </div>
               </div>
               <div class="lets-talk-bottom-left bg-[#fff] flex items-end">
-                <img src="/static/o.png" class="lets-talk-img" alt="">
-                <img src="/static/n.png" class="lets-talk-img" alt="">
-                <img src="/static/e.png" class="lets-talk-img" alt="">
+                <img :src="imgBaseURL('o.png')" class="lets-talk-img" alt="">
+                <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
+                <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
               </div>
               <div class="lets-talk-bottom-right bg-[#fff] flex justify-start items-end">
                 <div class="flex">
-                  <img src="/static/n.png" class="lets-talk-img" alt="">
-                  <img src="/static/e.png" class="lets-talk-img" alt="">
-                  <img src="/static/w.png" class="lets-talk-img" alt="">
+                  <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
+                  <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
+                  <img :src="imgBaseURL('w.png')" class="lets-talk-img" alt="">
                 </div>
               </div>
               <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
@@ -364,7 +364,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
-
+import { imgBaseURL } from "~/utils";
 import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
 gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
@@ -381,7 +381,7 @@ const expandedItems: any = ref({});
 // 跟随图标相关状态
 const followIcon: any = ref(null);
 const showFollowIcon = ref(false);
-const currentIcon = ref('/static/cursor-left.svg'); // 默认图标
+const currentIcon = ref( imgBaseURL('cursor-left.svg')); // 默认图标
 const mousePosition = ref({ x: 0, y: 0 });
 const targetPosition = ref({ x: 0, y: 0 });
 const animationId = ref(0);
@@ -463,8 +463,8 @@ const describes = ref([
   {
     title: "Brand Analysis & Insight ",
     description: "品牌分析洞察",
-    image1: "/static/add.svg",
-    image2: "/static/add.svg",
+    image1: imgBaseURL('add.svg'),
+    image2: imgBaseURL('add.svg'),
     remark:
       "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
     index: "1",
@@ -472,8 +472,8 @@ const describes = ref([
   {
     title: "Visual Creative Design",
     description: "设计视觉创意",
-    image1: "/static/add.svg",
-    image2: "/static/add.svg",
+    image1: imgBaseURL('add.svg'),
+    image2: imgBaseURL('add.svg'),
     remark:
       "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
     index: "2",
@@ -481,8 +481,8 @@ const describes = ref([
   {
     title: "Interactive Development",
     description: "开发交互体验",
-    image1: "/static/add.svg",
-    image2: "/static/add.svg",
+    image1: imgBaseURL('add.svg'),
+    image2: imgBaseURL('add.svg'),
     remark:
       "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
     index: "3",
@@ -490,8 +490,8 @@ const describes = ref([
   {
     title: "Maintenance and Optimization",
     description: "持续优化维护",
-    image1: "/static/add.svg",
-    image2: "/static/add.svg",
+    image1: imgBaseURL('add.svg'),
+    image2: imgBaseURL('add.svg'),
     remark:
       "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
     index: "4",
@@ -559,40 +559,40 @@ const listCards= ref([
   {
     title: "Maintenance and Optimization",
     description: "与 Onew 的合作体验非常棒！他们不仅准确捕捉到了我们品牌的精髓还通过极富创意的设计，让我们的网站焕然一新。整个团队专业、高效并且始终保持着开放的沟通。最终呈现的效果超出了我们的预期，网站不仅视觉上令人惊艳，用户体验也极其流畅。强烈推荐 Onew 给任何寻求卓越网页设计服务的公司！",
-    avatar: "/static/avatar.svg",
-    logo:'/static/logo.svg',
+    avatar: imgBaseURL('avatar.svg'),
+    logo:imgBaseURL('logo.svg'),
     name:"Amir Khan",
     mark:'CEO,Avito'
   },
     {
     title: "Maintenance and Optimization",
     description: "与 Onew 的合作体验非常棒！他们不仅准确捕捉到了我们品牌的精髓还通过极富创意的设计，让我们的网站焕然一新。整个团队专业、高效并且始终保持着开放的沟通。最终呈现的效果超出了我们的预期，网站不仅视觉上令人惊艳，用户体验也极其流畅。强烈推荐 Onew 给任何寻求卓越网页设计服务的公司！",
-    avatar: "/static/avatar.svg",
-    logo:'/static/logo.svg',
+    avatar: imgBaseURL('avatar.svg'),
+    logo:imgBaseURL('logo.svg'),
     name:"Amir Khan",
     mark:'CEO,Avito'
   },
     {
     title: "Maintenance and Optimization",
     description: "与 Onew 的合作体验非常棒！他们不仅准确捕捉到了我们品牌的精髓还通过极富创意的设计，让我们的网站焕然一新。整个团队专业、高效并且始终保持着开放的沟通。最终呈现的效果超出了我们的预期，网站不仅视觉上令人惊艳，用户体验也极其流畅。强烈推荐 Onew 给任何寻求卓越网页设计服务的公司！",
-    avatar: "/static/avatar.svg",
-    logo:'/static/logo.svg',
+    avatar: imgBaseURL('avatar.svg'),
+    logo:imgBaseURL('logo.svg'),
     name:"Amir Khan",
     mark:'CEO,Avito'
   },
     {
     title: "Maintenance and Optimization",
     description: "与 Onew 的合作体验非常棒！他们不仅准确捕捉到了我们品牌的精髓还通过极富创意的设计，让我们的网站焕然一新。整个团队专业、高效并且始终保持着开放的沟通。最终呈现的效果超出了我们的预期，网站不仅视觉上令人惊艳，用户体验也极其流畅。强烈推荐 Onew 给任何寻求卓越网页设计服务的公司！",
-    avatar: "/static/avatar.svg",
-    logo:'/static/logo.svg',
+    avatar: imgBaseURL('avatar.svg'),
+    logo:imgBaseURL('logo.svg'),
     name:"Amir Khan",
     mark:'CEO,Avito'
   },
     {
     title: "Maintenance and Optimization",
     description: "与 Onew 的合作体验非常棒！他们不仅准确捕捉到了我们品牌的精髓还通过极富创意的设计，让我们的网站焕然一新。整个团队专业、高效并且始终保持着开放的沟通。最终呈现的效果超出了我们的预期，网站不仅视觉上令人惊艳，用户体验也极其流畅。强烈推荐 Onew 给任何寻求卓越网页设计服务的公司！",
-    avatar: "/static/avatar.svg",
-    logo:'/static/logo.svg',
+    avatar: imgBaseURL('avatar.svg'),
+    logo:imgBaseURL('logo.svg'),
     name:"Amir Khan",
     mark:'CEO,Avito'
   },
@@ -600,21 +600,21 @@ const listCards= ref([
 
 const imagesList = ref([
   {
-    src: "/images/about/cover1.png",
+    src: "cover1.png",
     index: 1,
     mark: "REDBOOK",
     title: "小红书第二期——如何打造一个优秀的网站",
     description: "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
   },
   {
-    src: "/images/about/cover2.png",
+    src: "cover2.png",
     index: 2,
     mark: "REDBOOK",
     title: "小红书第二期——如何打造一个优秀的网站",
     description: "Onew​​ 是一家专注于高端数字体验设计的创意工作室。我们以颠覆性的设计思维重新诠释品牌在数字世界的表达方式，深度挖掘每个品牌独特的创新基因。通过将前沿设计美学与极致用户体验完美融合，我们为企业提供从品牌战略规划、视觉形象塑造到交互体验设计的全链路定制服务",
   },
   {
-    src: "/images/about/cover3.png",
+    src: "cover3.png",
     index: 3,
     mark: "REDBOOK",
     title: "小红书第二期——如何打造一个优秀的网站",
@@ -622,7 +622,7 @@ const imagesList = ref([
   },
   
   {
-    src: "/images/about/cover4.png",
+    src: "cover4.png",
     index: 4,
     mark: "REDBOOK",
     title: "小红书第二期——如何打造一个优秀的网站",
@@ -634,19 +634,19 @@ const imagesListGroup:any = ref([
   {
     images: [
       {
-        src: "/images/about/cover1.png",
+        src: "cover1.png",
         index: 1,
       },
       {
-        src: "/images/about/cover2.png",
+        src: "cover2.png",
         index: 2,
       },
       {
-        src: "/images/about/cover3.png",
+        src: "cover3.png",
         index: 3,
       },
       {
-        src: "/images/about/cover4.png",
+        src: "cover4.png",
         index: 4,
       },
     ]
@@ -654,19 +654,19 @@ const imagesListGroup:any = ref([
   {
     images: [
       {
-        src: "/images/about/cover4.png",
+        src: "cover4.png",
         index: 1,
       },
       {
-        src: "/images/about/cover5.png",
+        src: "cover5.png",
         index: 2,
       },
       {
-        src: "/images/about/cover6.png",
+        src: "cover6.png",
         index: 3,
       },
       {
-        src: "/images/about/cover7.png",
+        src: "cover7.png",
         index: 4,
       },
     ]
@@ -674,19 +674,19 @@ const imagesListGroup:any = ref([
   {
     images: [
       {
-        src: "/images/about/cover1.png",
+        src: "cover1.png",
         index: 1,
       },
       {
-        src: "/images/about/cover2.png",
+        src: "cover2.png",
         index: 2,
       },
       {
-        src: "/images/about/cover3.png",
+        src: "cover3.png",
         index: 3,
       },
       {
-        src: "/images/about/cover4.png",
+        src: "cover4.png",
         index: 4,
       },
     ]
@@ -694,19 +694,19 @@ const imagesListGroup:any = ref([
   {
     images: [
       {
-        src: "/images/about/cover4.png",
+        src: "cover4.png",
         index: 1,
       },
       {
-        src: "/images/about/cover5.png",
+        src: "cover5.png",
         index: 2,
       },
       {
-        src: "/images/about/cover6.png",
+        src: "cover6.png",
         index: 3,
       },
       {
-        src: "/images/about/cover7.png",
+        src: "cover7.png",
         index: 4,
       },
     ]
@@ -742,7 +742,7 @@ const toggleExpand = (index: string) => {
 const handleMouseEnter = (side: 'left' | 'right') => {
   showFollowIcon.value = true;
   // 根据左右区域设置不同的图标
-  currentIcon.value = side === 'left' ? '/static/cursor-left.svg' : '/static/cursor-right.svg';
+  currentIcon.value = side === 'left' ? imgBaseURL('cursor-left.svg') : imgBaseURL('cursor-right.svg');
   
   // 立即将图标位置设置为当前鼠标位置，避免从左上角(0,0)开始移动
   mousePosition.value = { ...targetPosition.value };
@@ -1097,7 +1097,7 @@ const initCentralImageManagement = (timeline: gsap.core.Timeline) => {
         ".expand-image"
       ) as HTMLImageElement;
       if (expandImage) {
-        expandImage.src = "/images/index/img1.png";
+        expandImage.src = imgBaseURL('img1.png');
       }
     },
     [],
@@ -1114,7 +1114,7 @@ const initCentralImageManagement = (timeline: gsap.core.Timeline) => {
       ) as HTMLImageElement;
 
       if (expandImage && progress < 0.15) {
-        expandImage.src = "/images/index/img1.png";
+        expandImage.src = imgBaseURL('img1.png');
       }
     };
   }
@@ -1126,7 +1126,7 @@ const initCentralImageManagement = (timeline: gsap.core.Timeline) => {
         ".expand-image"
       ) as HTMLImageElement;
       if (expandImage && timeline.progress() < 0.1) {
-        expandImage.src = "/images/index/img1.png";
+        expandImage.src = imgBaseURL('img1.png');
       }
     },
     [],
@@ -1146,7 +1146,7 @@ const renderCurrentImages = () => {
   
   images.forEach((item: any, index: number) => {
     const img = document.createElement('img');
-    img.src = item.src;
+    img.src = imgBaseURL(item.src);
     img.alt = '';
     img.className = 'current-imgs h-[172px] object-cover z-[21] overflow-hidden transition-all ease-in-out cursor-pointer image-list-item';
     img.style.left = `${index * 40}px`;
@@ -1179,7 +1179,7 @@ const renderPreviousImages = (overrideIndex?: number) => {
   
   images.forEach((item: any, index: number) => {
     const img = document.createElement('img');
-    img.src = item.src;
+    img.src = imgBaseURL(item.src);
     img.alt = '';
     img.className = 'last-imgs h-[172px] w-[306px] object-cover overflow-hidden transition-all ease-in-out previous-image-item absolute';
     img.style.zIndex = String(index + 22);
@@ -1689,7 +1689,7 @@ const loadAllImages = () => {
       return new Promise<HTMLImageElement>((resolve) => {
         const img = new Image();
         img.onload = () => resolve(img);
-        img.src = item.src;
+        img.src = imgBaseURL(item.src);
       });
     })
   );

@@ -17,3 +17,7 @@ export const formatQueryUrl = (query: any) => {
     return "";
   }
 };
+
+export const imgBaseURL = (url:string)=>{
+  return `https://static.onew.design/${url}`
+}

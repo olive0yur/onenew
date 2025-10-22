@@ -57,7 +57,7 @@
       <div @click.stop.prevent="()=>{}" class="bg-[#3B4EFF] px-[40px] pt-[25px] menu-content relative">
         <div class="flex justify-between items-center text-[16px] text-[#EEE]">
             <img
-              src="/static/logo.svg"
+              :src="imgBaseURL('logo.svg')"
               alt=""
               class="w-auto h-[17px] cursor-pointer"
             />
@@ -66,7 +66,7 @@
 
         <div class="mt-[120px] flex flex-col w-[288px]">
           <div>
-            <img src="/images/image140.png" alt="" class="w-[288px] h-[162px] text-[16px] text-[#EEE]">
+            <img :src="imgBaseURL('image140.png')" alt="" class="w-[288px] h-[162px] text-[16px] text-[#EEE]">
             <div class="flex justify-between items-center text-white">
               <span>灵感来源于足够的休息</span>
               <span>{{ currentTime }}</span>
@@ -137,10 +137,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import GlitchText from "~/components/ui/GlitchText.vue";
 import ContactButton from "~/components/ui/ContactButton.vue";
 import { useLenis } from "~/composables/useLenis";
+import { imgBaseURL } from "~/utils";
 
 const opacity = ref(1);
 const value = ref(false);
-const logoUrl = ref('/static/logo.svg');
+const logoUrl = ref(imgBaseURL('logo.svg'));
 const currentTime = ref("");
 const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
@@ -177,13 +178,13 @@ onUnmounted(() => {
 
 // 定义每个区域的主题配置（深色背景用白色文字，浅色背景用黑色文字）
 const sectionThemes:any = {
-  'section-0': { color: '#ffffff', logo: '/static/logo.svg' },      // 蓝色背景 -> 白色
-  'section-1': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅灰背景 -> 黑色
-  'section-2': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅色背景 -> 黑色
-  'section-3': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅色背景 -> 黑色
-  'section-4': { color: '#ffffff', logo: '/static/logo.svg' },      // 深色背景 -> 白色
-  'section-5': { color: '#000000', logo: '/static/logo-b.svg' },    // 白色背景 -> 黑色
-  'section-6': { color: '#000000', logo: '/static/logo-b.svg' },      // 深色背景 -> 白色
+  'section-0': { color: '#ffffff', logo: imgBaseURL('logo.svg') },      // 蓝色背景 -> 白色
+  'section-1': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅灰背景 -> 黑色
+  'section-2': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅色背景 -> 黑色
+  'section-3': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅色背景 -> 黑色
+  'section-4': { color: '#ffffff', logo: imgBaseURL('logo.svg') },      // 深色背景 -> 白色
+  'section-5': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 白色背景 -> 黑色
+  'section-6': { color: '#000000', logo: imgBaseURL('logo-b.svg') },      // 深色背景 -> 白色
 };
 
 // 监听当前激活区域，根据区域 ID 直接切换主题

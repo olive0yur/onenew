@@ -370,7 +370,7 @@
         </div>
       </section>
 
-      <section id="section-6" class="section-6 relative mt-[-75vh] z-[30]">
+      <section id="section-6" class="section-6 relative mt-[-85vh] z-[30]">
         <Footer />
       </section>
     </div>
@@ -824,7 +824,11 @@ const handleCardDragEnter = () => {
 // 卡片拖拽 - 鼠标离开
 const handleCardDragLeave = () => {
   showCardDragIcon.value = false;
-  isDragging.value = false;
+  
+  // 如果正在拖拽，执行结束拖拽逻辑
+  if (isDragging.value) {
+    handleCardDragEnd();
+  }
   
   // 停止图标跟随动画
   if (cardDragAnimationId.value) {
@@ -864,15 +868,17 @@ const handleCardDragMove = (event: MouseEvent) => {
   
   // 如果正在拖拽，根据拖拽距离移动
   if (isDragging.value) {
-    const currentTime = Date.now();
+    const currentTime = performance.now();
     const deltaX = event.clientX - dragStartX.value;
     
-    // 计算速度（用于惯性滚动）
+    // 计算速度（用于惯性滚动）- 使用更精确的时间戳
     if (lastDragTime.value > 0) {
       const timeDelta = currentTime - lastDragTime.value;
       if (timeDelta > 0) {
         const moveDelta = event.clientX - lastDragX.value;
-        velocity.value = moveDelta / timeDelta; // 像素/毫秒
+        // 使用加权平均来平滑速度变化
+        const newVelocity = moveDelta / timeDelta;
+        velocity.value = velocity.value * 0.6 + newVelocity * 0.4;
       }
     }
     
@@ -880,8 +886,6 @@ const handleCardDragMove = (event: MouseEvent) => {
     lastDragX.value = event.clientX;
     
     // 计算新的 translateX
-    // 向右拖拽（deltaX > 0）显示左边，translateX 增加（往右移）
-    // 向左拖拽（deltaX < 0）显示右边，translateX 减少（往左移）
     let newTranslateX = initialTranslateX.value + deltaX;
     
     // 计算边界
@@ -890,10 +894,11 @@ const handleCardDragMove = (event: MouseEvent) => {
     const maxTranslateX = containerWidth - itemWidth; // 最左边（负数）
     const minTranslateX = 0; // 最右边
     
-    // 限制拖拽范围
+    // 限制在边界内，不允许超出
     newTranslateX = Math.max(maxTranslateX, Math.min(minTranslateX, newTranslateX));
     
-    // 应用 transform
+    // 使用 will-change 和 transform 优化性能
+    listCardItemWrap.value.style.willChange = 'transform';
     listCardItemWrap.value.style.transform = `translateX(${newTranslateX}px)`;
   }
 };
@@ -911,9 +916,12 @@ const handleCardDragStart = (event: MouseEvent) => {
   isDragging.value = true;
   dragStartX.value = event.clientX;
   initialTranslateX.value = getCurrentTranslateX();
-  lastDragTime.value = 0;
+  lastDragTime.value = performance.now();
   lastDragX.value = event.clientX;
   velocity.value = 0;
+  
+  // 添加 will-change 提示浏览器即将变化
+  listCardItemWrap.value.style.willChange = 'transform';
   
   // 阻止默认行为，防止选中文字
   event.preventDefault();
@@ -921,11 +929,16 @@ const handleCardDragStart = (event: MouseEvent) => {
 
 // 卡片拖拽 - 结束拖拽
 const handleCardDragEnd = () => {
+  if (!listCardItemWrap.value) return;
+  
   isDragging.value = false;
   
-  // 开始惯性滚动
-  if (Math.abs(velocity.value) > 0.1) { // 如果速度足够大
+  // 如果速度足够大，开始惯性滚动
+  if (Math.abs(velocity.value) > 0.1) {
     startMomentumScroll();
+  } else {
+    // 清除 will-change
+    listCardItemWrap.value.style.willChange = 'auto';
   }
 };
 
@@ -933,8 +946,10 @@ const handleCardDragEnd = () => {
 const startMomentumScroll = () => {
   if (!listCardWrap.value || !listCardItemWrap.value) return;
   
-  const friction = 0.95; // 摩擦系数，越小减速越快（0.90-0.98之间）
+  const friction = 0.92; // 摩擦系数，调整为更自然的减速
   const minVelocity = 0.05; // 最小速度阈值
+  
+  listCardItemWrap.value.style.willChange = 'transform';
   
   const animate = () => {
     if (!listCardWrap.value || !listCardItemWrap.value) return;
@@ -942,34 +957,32 @@ const startMomentumScroll = () => {
     // 应用摩擦力
     velocity.value *= friction;
     
-    // 如果速度太小，停止动画
-    if (Math.abs(velocity.value) < minVelocity) {
-      momentumAnimationId.value = 0;
-      return;
-    }
-    
-    // 计算新的 translateX
-    const currentTranslateX = getCurrentTranslateX();
-    const newTranslateX = currentTranslateX + velocity.value * 16; // 16ms约等于一帧
-    
     // 计算边界
     const containerWidth = listCardWrap.value.clientWidth;
     const itemWidth = listCardItemWrap.value.scrollWidth;
     const maxTranslateX = containerWidth - itemWidth; // 最左边（负数）
     const minTranslateX = 0; // 最右边
     
-    // 限制范围
-    const clampedTranslateX = Math.max(maxTranslateX, Math.min(minTranslateX, newTranslateX));
+    // 计算新的 translateX
+    const currentTranslateX = getCurrentTranslateX();
+    let newTranslateX = currentTranslateX + velocity.value * 16; // 16ms约等于一帧
     
-    // 如果到达边界，停止动画
-    if (clampedTranslateX === maxTranslateX || clampedTranslateX === minTranslateX) {
-      if (currentTranslateX === clampedTranslateX) {
-        momentumAnimationId.value = 0;
-        return;
-      }
+    // 限制在边界内
+    newTranslateX = Math.max(maxTranslateX, Math.min(minTranslateX, newTranslateX));
+    
+    // 如果到达边界，停止速度
+    if (newTranslateX === maxTranslateX || newTranslateX === minTranslateX) {
+      velocity.value = 0;
     }
     
-    listCardItemWrap.value.style.transform = `translateX(${clampedTranslateX}px)`;
+    listCardItemWrap.value.style.transform = `translateX(${newTranslateX}px)`;
+    
+    // 如果速度太小，停止动画
+    if (Math.abs(velocity.value) < minVelocity) {
+      listCardItemWrap.value.style.willChange = 'auto';
+      momentumAnimationId.value = 0;
+      return;
+    }
     
     momentumAnimationId.value = requestAnimationFrame(animate);
   };
@@ -2258,6 +2271,9 @@ onUnmounted(() => {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  touch-action: pan-y; /* 触摸设备优化 */
 }
 
 /* 隐藏滚动条 */
@@ -2265,9 +2281,20 @@ onUnmounted(() => {
   display: none;
 }
 
-.list-card-wrap {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+/* 拖拽内容容器性能优化 */
+.list-card-item-wrap {
+  transform: translateZ(0); /* 启用GPU加速 */
+  backface-visibility: hidden; /* 防止闪烁 */
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* 单个卡片项优化 */
+.list-card-item {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* remark内容样式优化 */

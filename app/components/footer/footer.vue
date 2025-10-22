@@ -1,7 +1,7 @@
 <template>
     <!-- 底页 -->
   <section
-    class="section-3 h-[130vh] w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
+    class="section-3 h-[calc(100vh+469px)] w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
   >
     <div class="h-[469px] flex flex-col justify-between ">
       <!-- 上半部分：联系信息和导航 -->

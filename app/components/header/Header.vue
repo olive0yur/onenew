@@ -81,24 +81,11 @@
         </div>
 
         <div class="mt-[40px] flex flex-col w-[288px]">
-          <div 
-            @mouseenter="onContactHover" 
-            @mouseleave="onContactLeave"
-            class="group w-[223px] h-[48px] transition-width duration-300 ease-in-out hover:bg-[#DCE4EF] flex justify-between items-center px-[20px] text-[#fff] hover:text-[#000] box-border border-l-[2px] border-solid border-[#fff]"
-          >
-            <GlitchText
-              ref="contactGlitchRef"
-              text="GET IN TOUCH 联系"
-              class="cursor-pointer nav-item nav-item-3"
-              :speed="30"
-              :iterations="3"
-            />
-            <svg class="" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path class="group-hover:stroke-[#000] transition-colors duration-300" d="M14 8H2" stroke="white"/>
-              <path class="group-hover:stroke-[#000] transition-colors duration-300" d="M10 4L14 8L10 12" stroke="white"/>
-            </svg>
-          </div >
-
+          <ContactButton 
+            text="GET IN TOUCH 联系"
+            @hover="onContactHover"
+            @leave="onContactLeave"
+          />
         </div>
 
         <div class="mt-[84px] h-[1px] bg-[#fff] opacity-20"></div>
@@ -148,6 +135,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import GlitchText from "~/components/ui/GlitchText.vue";
+import ContactButton from "~/components/ui/ContactButton.vue";
 import { useLenis } from "~/composables/useLenis";
 
 const opacity = ref(1);
@@ -158,7 +146,6 @@ const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
 const menuItemRefs: (HTMLElement | null)[] = [];
 let timeInterval: NodeJS.Timeout | null = null;
-const contactGlitchRef = ref<any>(null);
 
 // 使用 lenis composable
 const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
@@ -188,52 +175,23 @@ onUnmounted(() => {
 });
 
 
-// 监听当前激活区域
-watch([activeSection, scrollY], ([section, scrollY]) => {
-  if (section) {
-    // console.log('滚动距离:', scrollY);
-    // // console.log('可见度:', section.intersectionRatio);
-    // // console.log('是否到达顶部:', section.isAtTop);
-    // if(section.id === 'section-5'){
-    //   console.log('当前区域:', section.id);
-    //   console.log('距离顶部:', section.distanceFromTop, 'px');
-    // }
-    if(section.id === 'section-0') {
-      headerColor.value = '#ffffff';
-      logoUrl.value = '/static/logo.svg';
-    }
-    if(section.id === 'section-1' && section.distanceFromTop > 70) {
-      headerColor.value = '#ffffff';
-      logoUrl.value = '/static/logo.svg';
-    }
-    if(section.id === 'section-1' && section.distanceFromTop < 60) {
-      headerColor.value = 'rgba(0, 0, 0)';
-      logoUrl.value = '/static/logo-b.svg';
-    }
-    if(section.id === 'section-3' && section.distanceFromTop > -700) {
-      headerColor.value = 'rgba(0, 0, 0)';
-      logoUrl.value = '/static/logo-b.svg';
-    }
-    //  if(section.id === 'section-3' && section.distanceFromTop < -701) {
-    //   headerColor.value = '#ffffff';
-    //   logoUrl.value = '/static/logo.svg';
-    // }
-    if(section.id === 'section-4' && section.distanceFromTop > 200) {
-      headerColor.value = '#000';
-      logoUrl.value = '/static/logo-b.svg';
-    }
-    if(section.id === 'section-4' && section.distanceFromTop < 100) {
-      headerColor.value = '#ffffff';
-      logoUrl.value = '/static/logo.svg';
-    }
-    if(section.id === 'section-5' && section.distanceFromTop > 33) {
-      headerColor.value = '#fff';
-      logoUrl.value = '/static/logo.svg'; 
-    }
-    if(section.id === 'section-5' && section.distanceFromTop < 30) {
-      headerColor.value = '#000';
-      logoUrl.value = '/static/logo-b.svg'; 
-    }
+// 定义每个区域的主题配置（深色背景用白色文字，浅色背景用黑色文字）
+const sectionThemes:any = {
+  'section-0': { color: '#ffffff', logo: '/static/logo.svg' },      // 蓝色背景 -> 白色
+  'section-1': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅灰背景 -> 黑色
+  'section-2': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅色背景 -> 黑色
+  'section-3': { color: '#000000', logo: '/static/logo-b.svg' },    // 浅色背景 -> 黑色
+  'section-4': { color: '#ffffff', logo: '/static/logo.svg' },      // 深色背景 -> 白色
+  'section-5': { color: '#000000', logo: '/static/logo-b.svg' },    // 白色背景 -> 黑色
+  'section-6': { color: '#000000', logo: '/static/logo-b.svg' },      // 深色背景 -> 白色
+};
+
+// 监听当前激活区域，根据区域 ID 直接切换主题
+watch(activeSection, (section) => {
+  if (section && sectionThemes[section.id]) {
+    const theme = sectionThemes[section.id];
+    headerColor.value = theme.color;
+    logoUrl.value = theme.logo;
   }
 });
 
@@ -397,17 +355,15 @@ const openMenu = () => {
   document.documentElement.classList.add("no-scroll");
 };
 
-// Contact 区域 hover 事件
+// Contact 按钮 hover 事件
 const onContactHover = () => {
-  if (contactGlitchRef.value) {
-    contactGlitchRef.value.startGlitch();
-  }
+  // 可以在这里添加其他 hover 效果
+  console.log('Contact button hovered');
 };
 
 const onContactLeave = () => {
-  if (contactGlitchRef.value) {
-    contactGlitchRef.value.resetText();
-  }
+  // 可以在这里添加其他 leave 效果
+  console.log('Contact button left');
 };
 </script>
 

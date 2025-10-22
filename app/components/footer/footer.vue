@@ -1,9 +1,9 @@
 <template>
     <!-- 底页 -->
   <section
-    class="section-3 h-[100vh] w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
+    class="section-3 h-[130vh] w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
   >
-    <div class="h-[499px] flex flex-col justify-between ">
+    <div class="h-[469px] flex flex-col justify-between ">
       <!-- 上半部分：联系信息和导航 -->
       <div class="flex flex-col lg:flex-row lg:justify-between w-[100%] gap-[40px] lg:gap-0 mt-[40px] lg:mt-0">
         <!-- 联系我们 -->

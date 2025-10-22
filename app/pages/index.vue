@@ -44,21 +44,20 @@
           creativity
         </div>
         <div
-          class="text-[16px] group pl-[20px] border-l-[2px] border-[#0e0e0e] flex items-center h-[48px] w-[170px] mb-[36px] box-border hover:bg-[#0e0e0e] text-black hover:text-[#fff]"
+          class=""
         >
-          <GlitchText
-            @mouseenter="onContactHover" 
-            @mouseleave="onContactLeave"
-            ref="aboutGlitchRef"
+          <ContactButton 
+            width="170px"
+            borderColor="#000"
+            borderWidth="2px"
+            textColor="#000"
+            bgColorHover="#0e0e0e"
+            textColorHover="#fff"
+            arrowColorHover="#fff"
             text="ABOUT 关于"
-            class="cursor-pointer nav-item nav-item-3"
-            :speed="30"
-            :iterations="3"
+            @hover="onContactHover"
+            @leave="onContactLeave"
           />
-          <svg class="ml-[10px]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path class="group-hover:stroke-[#fff] transition-colors duration-50" d="M14 8H2" stroke="black"/>
-              <path class="group-hover:stroke-[#fff] transition-colors duration-50" d="M10 4L14 8L10 12" stroke="black"/>
-          </svg>
         </div>
         <div class="flex flex-col items-end overflow-hidden">
           <div
@@ -201,26 +200,10 @@
                   </div>
                   <!-- 外层容器 -->
                   <div class="relative h-[360px] mb-[40px]">
-                    <!-- 遮罩 + 交互区域 -->
-                    <div class="absolute w-[100vw] left-0 top-0 z-[11] h-[360px] flex">
-                      <div 
-                        @mouseenter="handleCardDragEnter('left')" 
-                        @mouseleave="handleCardDragLeave"
-                        @mousemove="handleCardDragMove"
-                        class="flex-1 cursor-pointer"
-                      ></div>
-                      <div 
-                        @mouseenter="handleCardDragEnter('right')" 
-                        @mouseleave="handleCardDragLeave"
-                        @mousemove="handleCardDragMove"
-                        class="flex-1 cursor-pointer"
-                      ></div>
-                    </div>
-
-                    <!-- 跟随鼠标的拖拽图标 -->
+                    <!-- 跟随鼠标的拖拽图标 - 使用 fixed 定位 -->
                     <div 
                       ref="cardDragIcon" 
-                      class="card-drag-icon absolute z-[13] pointer-events-none opacity-0 transition-opacity duration-300"
+                      class="card-drag-icon fixed z-[13] pointer-events-none opacity-0 transition-opacity duration-300"
                       :class="{ 'opacity-100': showCardDragIcon }"
                     >
                       <img 
@@ -229,10 +212,17 @@
                         class="w-[80px] h-[80px]"
                       />
                     </div>
-
+                    
                     <!-- 滚动容器 -->
-                    <div ref="listCardWrap" class="h-[360px] overflow-x-auto list-card-wrap">
-                      <div class="flex gap-[40px] list-card-item-wrap"> 
+                    <div 
+                      ref="listCardWrap" 
+                      @mouseenter="handleCardDragEnter" 
+                      @mouseleave="handleCardDragLeave"
+                      @mousemove="handleCardDragMove"
+                      @mousedown="handleCardDragStart"
+                      @mouseup="handleCardDragEnd"
+                      class="h-[360px] overflow-hidden list-card-wrap cursor-grab active:cursor-grabbing relative">
+                      <div ref="listCardItemWrap" class="flex gap-[40px] list-card-item-wrap"> 
                       <div class="w-[586px] h-[360px] box-border flex-shrink-0 bg-[#fff] list-card-item p-[40px]" v-for="(item, index) in listCards" :key="item.title">
                       <div >
                         <img src="/static/logo.png" class="h-[24px] w-[172px] mb-[24px]" alt="">
@@ -380,7 +370,7 @@
         </div>
       </section>
 
-      <section id="section-6" class="section-6 relative mt-[-40vh] z-[30]">
+      <section id="section-6" class="section-6 relative mt-[-75vh] z-[30]">
         <Footer />
       </section>
     </div>
@@ -423,13 +413,20 @@ const scrollTextAnimationId = ref(0);
 
 // 卡片拖拽相关状态
 const listCardWrap = ref<HTMLElement | null>(null);
+const listCardItemWrap = ref<HTMLElement | null>(null);
 const cardDragIcon = ref<HTMLElement | null>(null);
 const showCardDragIcon = ref(false);
-const cardDragDirection = ref<'left' | 'right'>('left');
 const cardDragPosition = ref({ x: 0, y: 0 });
 const cardDragTarget = ref({ x: 0, y: 0 });
 const cardDragAnimationId = ref(0);
-const cardScrollInterval = ref(0);
+const isDragging = ref(false);
+const dragStartX = ref(0);
+const initialTranslateX = ref(0);
+// 惯性滚动相关
+const lastDragTime = ref(0);
+const lastDragX = ref(0);
+const velocity = ref(0);
+const momentumAnimationId = ref(0);
 
 // 图片切换相关状态
 const currentImageIndex = ref(0); // 当前显示的图片索引
@@ -817,43 +814,167 @@ const handleSection0MouseMove = (e: MouseEvent) => {
 };
 
 // 卡片拖拽 - 鼠标进入
-const handleCardDragEnter = (direction: 'left' | 'right') => {
+const handleCardDragEnter = () => {
   showCardDragIcon.value = true;
-  cardDragDirection.value = direction;
   
   // 开始图标跟随动画
   startCardDragAnimation();
-  
-  // 开始自动滚动
-  startCardAutoScroll(direction);
 };
 
 // 卡片拖拽 - 鼠标离开
 const handleCardDragLeave = () => {
   showCardDragIcon.value = false;
+  isDragging.value = false;
   
   // 停止图标跟随动画
   if (cardDragAnimationId.value) {
     cancelAnimationFrame(cardDragAnimationId.value);
     cardDragAnimationId.value = 0;
   }
+};
+
+// 获取当前的 translateX 值
+const getCurrentTranslateX = (): number => {
+  if (!listCardItemWrap.value) return 0;
   
-  // 停止自动滚动
-  if (cardScrollInterval.value) {
-    cancelAnimationFrame(cardScrollInterval.value);
-    cardScrollInterval.value = 0;
+  const style = window.getComputedStyle(listCardItemWrap.value);
+  const matrix = style.transform;
+  
+  if (matrix === 'none' || !matrix) return 0;
+  
+  const values = matrix.match(/matrix\((.+)\)/);
+  if (values && values[1]) {
+    const parts = values[1].split(', ');
+    const value = parts[4];
+    return value ? parseFloat(value) : 0;
   }
+  
+  return 0;
 };
 
 // 卡片拖拽 - 鼠标移动
 const handleCardDragMove = (event: MouseEvent) => {
-  if (!listCardWrap.value) return;
+  if (!listCardWrap.value || !listCardItemWrap.value) return;
   
-  const rect = listCardWrap.value.getBoundingClientRect();
+  // 使用 fixed 定位，直接使用 clientX/Y
   cardDragTarget.value = {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top - 40 // 调整图标位置
+    x: event.clientX,
+    y: event.clientY
   };
+  
+  // 如果正在拖拽，根据拖拽距离移动
+  if (isDragging.value) {
+    const currentTime = Date.now();
+    const deltaX = event.clientX - dragStartX.value;
+    
+    // 计算速度（用于惯性滚动）
+    if (lastDragTime.value > 0) {
+      const timeDelta = currentTime - lastDragTime.value;
+      if (timeDelta > 0) {
+        const moveDelta = event.clientX - lastDragX.value;
+        velocity.value = moveDelta / timeDelta; // 像素/毫秒
+      }
+    }
+    
+    lastDragTime.value = currentTime;
+    lastDragX.value = event.clientX;
+    
+    // 计算新的 translateX
+    // 向右拖拽（deltaX > 0）显示左边，translateX 增加（往右移）
+    // 向左拖拽（deltaX < 0）显示右边，translateX 减少（往左移）
+    let newTranslateX = initialTranslateX.value + deltaX;
+    
+    // 计算边界
+    const containerWidth = listCardWrap.value.clientWidth;
+    const itemWidth = listCardItemWrap.value.scrollWidth;
+    const maxTranslateX = containerWidth - itemWidth; // 最左边（负数）
+    const minTranslateX = 0; // 最右边
+    
+    // 限制拖拽范围
+    newTranslateX = Math.max(maxTranslateX, Math.min(minTranslateX, newTranslateX));
+    
+    // 应用 transform
+    listCardItemWrap.value.style.transform = `translateX(${newTranslateX}px)`;
+  }
+};
+
+// 卡片拖拽 - 开始拖拽
+const handleCardDragStart = (event: MouseEvent) => {
+  if (!listCardWrap.value || !listCardItemWrap.value) return;
+  
+  // 停止正在进行的惯性滚动
+  if (momentumAnimationId.value) {
+    cancelAnimationFrame(momentumAnimationId.value);
+    momentumAnimationId.value = 0;
+  }
+  
+  isDragging.value = true;
+  dragStartX.value = event.clientX;
+  initialTranslateX.value = getCurrentTranslateX();
+  lastDragTime.value = 0;
+  lastDragX.value = event.clientX;
+  velocity.value = 0;
+  
+  // 阻止默认行为，防止选中文字
+  event.preventDefault();
+};
+
+// 卡片拖拽 - 结束拖拽
+const handleCardDragEnd = () => {
+  isDragging.value = false;
+  
+  // 开始惯性滚动
+  if (Math.abs(velocity.value) > 0.1) { // 如果速度足够大
+    startMomentumScroll();
+  }
+};
+
+// 惯性滚动动画
+const startMomentumScroll = () => {
+  if (!listCardWrap.value || !listCardItemWrap.value) return;
+  
+  const friction = 0.95; // 摩擦系数，越小减速越快（0.90-0.98之间）
+  const minVelocity = 0.05; // 最小速度阈值
+  
+  const animate = () => {
+    if (!listCardWrap.value || !listCardItemWrap.value) return;
+    
+    // 应用摩擦力
+    velocity.value *= friction;
+    
+    // 如果速度太小，停止动画
+    if (Math.abs(velocity.value) < minVelocity) {
+      momentumAnimationId.value = 0;
+      return;
+    }
+    
+    // 计算新的 translateX
+    const currentTranslateX = getCurrentTranslateX();
+    const newTranslateX = currentTranslateX + velocity.value * 16; // 16ms约等于一帧
+    
+    // 计算边界
+    const containerWidth = listCardWrap.value.clientWidth;
+    const itemWidth = listCardItemWrap.value.scrollWidth;
+    const maxTranslateX = containerWidth - itemWidth; // 最左边（负数）
+    const minTranslateX = 0; // 最右边
+    
+    // 限制范围
+    const clampedTranslateX = Math.max(maxTranslateX, Math.min(minTranslateX, newTranslateX));
+    
+    // 如果到达边界，停止动画
+    if (clampedTranslateX === maxTranslateX || clampedTranslateX === minTranslateX) {
+      if (currentTranslateX === clampedTranslateX) {
+        momentumAnimationId.value = 0;
+        return;
+      }
+    }
+    
+    listCardItemWrap.value.style.transform = `translateX(${clampedTranslateX}px)`;
+    
+    momentumAnimationId.value = requestAnimationFrame(animate);
+  };
+  
+  animate();
 };
 
 // 开始图标跟随动画
@@ -865,48 +986,14 @@ const startCardDragAnimation = () => {
     cardDragPosition.value.x += (cardDragTarget.value.x - cardDragPosition.value.x) * 0.15;
     cardDragPosition.value.y += (cardDragTarget.value.y - cardDragPosition.value.y) * 0.15;
     
-    // 更新图标位置
-    cardDragIcon.value.style.transform = `translate(${cardDragPosition.value.x}px, ${cardDragPosition.value.y}px)`;
+    // 更新图标位置（使用 left/top 而不是 transform）
+    cardDragIcon.value.style.left = `${cardDragPosition.value.x}px`;
+    cardDragIcon.value.style.top = `${cardDragPosition.value.y}px`;
     
     cardDragAnimationId.value = requestAnimationFrame(animate);
   };
   
   animate();
-};
-
-// 开始自动滚动
-const startCardAutoScroll = (direction: 'left' | 'right') => {
-  if (!listCardWrap.value) return;
-  
-  const scrollSpeed = 8; // 增加滚动速度，让滚动更流畅
-  
-  // 预先计算最大滚动距离，避免在循环中重复计算
-  const maxScrollLeft = listCardWrap.value.scrollWidth - listCardWrap.value.clientWidth;
-  
-  // 使用 requestAnimationFrame 替代 setInterval，更流畅
-  const scroll = () => {
-    if (!listCardWrap.value) return;
-    
-    if (direction === 'left') {
-      // 向左滚动，检查是否已经到达最左边
-      if (listCardWrap.value.scrollLeft <= 0) {
-        cardScrollInterval.value = 0;
-        return;
-      }
-      listCardWrap.value.scrollLeft -= scrollSpeed;
-      cardScrollInterval.value = requestAnimationFrame(scroll) as any;
-    } else {
-      // 向右滚动，检查是否已经到达最右边
-      if (listCardWrap.value.scrollLeft >= maxScrollLeft) {
-        cardScrollInterval.value = 0;
-        return;
-      }
-      listCardWrap.value.scrollLeft += scrollSpeed;
-      cardScrollInterval.value = requestAnimationFrame(scroll) as any;
-    }
-  };
-  
-  scroll();
 };
 
 // 开始文字跟随动画
@@ -1735,15 +1822,13 @@ const section4Timeline = () => {
   gsap.to(".section-4-wrap", {
     scrollTrigger:{
       trigger: ".section-6",
-      start: "bottom bottom",
+      start: "top 5%",
       end: "bottom bottom",
       scrub: 1,
-      toggleActions: "play none none reverse",
+      toggleActions: "restart none none reverse",
     },
     rotate:-5,
-    x:'-7vw',
-    // duration: ,
-    delay:1,
+    x:'-6vw',
     ease: "power2.inOut",
   });
   
@@ -2125,6 +2210,14 @@ onUnmounted(() => {
   if (canvasAnimationId.value) {
     cancelAnimationFrame(canvasAnimationId.value);
   }
+  // 清理惯性滚动动画
+  if (momentumAnimationId.value) {
+    cancelAnimationFrame(momentumAnimationId.value);
+  }
+  // 清理卡片拖拽动画
+  if (cardDragAnimationId.value) {
+    cancelAnimationFrame(cardDragAnimationId.value);
+  }
 });
 
 
@@ -2149,14 +2242,32 @@ onUnmounted(() => {
 
 /* 卡片拖拽图标样式 */
 .card-drag-icon {
-  top: 0;
-  left: 0;
+  transform: translate(-50%, -50%); /* 让图标中心对齐鼠标 */
   transform-origin: center center;
   will-change: transform;
+  pointer-events: none;
 }
 
 .card-drag-icon img {
   transition: transform 0.3s ease;
+}
+
+/* 列表容器样式 */
+.list-card-wrap {
+  user-select: none; /* 防止拖拽时选中文字 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 隐藏滚动条 */
+.list-card-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.list-card-wrap {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 /* remark内容样式优化 */

@@ -1370,7 +1370,7 @@ const initScrollingImagesAnimations = (
 ) => {
   for (let i = 1; i <= 10; i++) {
     const delay = scaleDuration + (i - 0) * 0.6; // 在图片缩放完成后开始
-    const imageSrc = `/images/index/img${(i % 5) + 1}.png`;
+    const imageSrc = imgBaseURL(`img${(i % 5) + 1}.png`);
 
     // 设置初始位置
     timeline.set(

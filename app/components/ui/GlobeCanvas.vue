@@ -192,7 +192,7 @@ const loadAndRender = async () => {
 
     animate();
   } catch (error) {
-    console.error('加载地球数据失败:', error);
+    // console.error('加载地球数据失败:', error);
   }
 };
 

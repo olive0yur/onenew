@@ -144,7 +144,7 @@ export const useLenis = () => {
   // 添加观察单个元素
   const observeElement = (element: Element) => {
     if (!observer) {
-      console.warn('请先调用 observeSections 初始化 observer');
+      // console.warn('请先调用 observeSections 初始化 observer');
       return;
     }
     

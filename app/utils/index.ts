@@ -21,3 +21,6 @@ export const formatQueryUrl = (query: any) => {
 export const imgBaseURL = (url:string)=>{
   return `https://static.onew.design/${url}`
 }
+
+// 导出 SSR 友好的 HTTP 请求工具
+export { useHttp } from './useHttp'

@@ -359,12 +359,10 @@ const openMenu = () => {
 // Contact 按钮 hover 事件
 const onContactHover = () => {
   // 可以在这里添加其他 hover 效果
-  console.log('Contact button hovered');
 };
 
 const onContactLeave = () => {
   // 可以在这里添加其他 leave 效果
-  console.log('Contact button left');
 };
 </script>
 

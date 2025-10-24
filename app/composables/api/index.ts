@@ -14,3 +14,13 @@ export const getDictList = async (data?: object) => {
     return e;
   }
 };
+
+/** 获取图片组 **/
+export const getImageGroup = async (data?: object) => {
+  const url = formatQueryUrl(data);
+  try {
+    return await $http.get<Response>("dict/img-group" + url);
+  } catch (e) {
+    return e;
+  }
+};

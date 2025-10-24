@@ -280,13 +280,13 @@
          
           <div
             ref="currentImagesContainer"
-            :style="{ width: `${306 + (clickImageList.length - 1) * 40}px` }"
+            :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
             class="flex absolute bottom-[40px] right-[40px]">
           </div>
 
           <div 
             ref="previousImagesContainer"
-            :style="{ width: `${306 + (clickImageList.length - 1) * 40}px` }"
+            :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
             class="previous-image-group flex"
           >
           </div>
@@ -367,8 +367,8 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { imgBaseURL } from "~/utils";
 import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
-import { getDictList } from "~/composables/api";
-import { useDictList } from "~/composables/api/useHttpExample";
+// import { getDictList } from "~/composables/api";
+import { useDictList, useGetGroupImage } from "~/composables/api/useHttpExample";
 
 const homeFixed:any= ref<any>([]);
 const aboutList:any= ref<any>([]);
@@ -376,6 +376,7 @@ const scrollImage:any= ref<any>([]);
 const scrollWords:any = ref<any>([]);
 const customerList:any= ref<any>([]);
 const clickImageList:any= ref<any>([]);
+const groupImage:any= ref<any>([]);
 
 if(import.meta.client) {
   gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
@@ -471,88 +472,7 @@ const OUTER_ANGLE_RANGE = Math.PI * 2 - INNER_ANGLE_RANGE; // 外角范围（弧
 const currentImagesContainer = ref<HTMLElement | null>(null);
 const previousImagesContainer = ref<HTMLElement | null>(null);
 
-const imagesListGroup:any = ref([
-  {
-    images: [
-      {
-        src: "cover1.png",
-        index: 1,
-      },
-      {
-        src: "cover2.png",
-        index: 2,
-      },
-      {
-        src: "cover3.png",
-        index: 3,
-      },
-      {
-        src: "cover4.png",
-        index: 4,
-      },
-    ]
-  },
-  {
-    images: [
-      {
-        src: "cover4.png",
-        index: 1,
-      },
-      {
-        src: "cover5.png",
-        index: 2,
-      },
-      {
-        src: "cover6.png",
-        index: 3,
-      },
-      {
-        src: "cover7.png",
-        index: 4,
-      },
-    ]
-  },
-  {
-    images: [
-      {
-        src: "cover1.png",
-        index: 1,
-      },
-      {
-        src: "cover2.png",
-        index: 2,
-      },
-      {
-        src: "cover3.png",
-        index: 3,
-      },
-      {
-        src: "cover4.png",
-        index: 4,
-      },
-    ]
-  },
-  {
-    images: [
-      {
-        src: "cover4.png",
-        index: 1,
-      },
-      {
-        src: "cover5.png",
-        index: 2,
-      },
-      {
-        src: "cover6.png",
-        index: 3,
-      },
-      {
-        src: "cover7.png",
-        index: 4,
-      },
-    ]
-  }
-])
+const imagesListGroup:any = ref([])
 
 const hoveredImageIndex = ref(0);
 
@@ -1074,6 +994,9 @@ const handleClick = (side: 'left' | 'right') => {
   
   // 执行小图动画
   currentImgAnimations().then(() => {
+    // 先渲染下一组图片（nextImageIndex对应的图片组）
+    renderPreviousImages(nextImageIndex.value);
+    // 然后执行滑上来的动画
     lastImgAnimations();
   });
 };
@@ -1189,7 +1112,7 @@ const handleImageHover = (index: number) => {
 
 const handleImageLeave = () => {
   // 回到默认状态：最右边的图片展开
-  hoveredImageIndex.value = clickImageList.value.length - 1;
+  hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
 };
 
 // ===== 显示线条和文字 =====
@@ -1500,15 +1423,41 @@ const {data: aboutListData} = await useDictList({ typeName: 'about-list' });
 const {data: scrollImageData} = await useDictList({ typeName: 'scroll-image' });
 const {data: scrollWordsData} = await useDictList({ typeName: 'scroll-words' });
 const {data: customerListData} = await useDictList({ typeName: 'customer-list' });
+const {data: groupImageData} = await useGetGroupImage();
 const {data: clickImageListData} = await useDictList({ typeName: 'click-image-list' });
-// console.log(homeFixedData?.value?.data, aboutListData?.value?.data, scrollImageData?.value?.data, scrollWordsData?.value?.data, customerListData?.value?.data, clickImageListData?.value?.data);
+
 // 监听数据变化并更新 ref
 watch(homeFixedData, (newVal) => { homeFixed.value = newVal?.data ?? []; }, { immediate: true });
 watch(aboutListData, (newVal) => { aboutList.value = newVal?.data ?? []; }, { immediate: true });
 watch(scrollImageData, (newVal) => { scrollImage.value = newVal?.data ?? []; }, { immediate: true });
 watch(scrollWordsData, (newVal) => { scrollWords.value = newVal?.data ?? []; }, { immediate: true });
 watch(customerListData, (newVal) => { customerList.value = newVal?.data ?? []; }, { immediate: true });
-watch(clickImageListData, (newVal) => { clickImageList.value = newVal?.data ?? []; hoveredImageIndex.value = clickImageList.value?.length - 1; }, { immediate: true });
+watch(groupImageData, (newVal) => { 
+  groupImage.value = newVal?.data ?? [];
+  
+  // 将返回的数据转换成 imagesListGroup 格式
+  const transformedData = (newVal?.data ?? []).map((item: any) => {
+    // 将 imgUrl 按分号分割成数组，兼容无分号的情况（只有一个图片）
+    const imageUrls = item.imgUrl 
+      ? (item.imgUrl.includes(';') ? item.imgUrl.split(';') : [item.imgUrl])
+      : [];
+    
+    // 生成 images 数组
+    const images = imageUrls.map((url: string, index: number) => ({
+      src: url,
+      index: index + 1
+    }));
+    
+    return {
+      images
+    };
+  });
+  
+  // 更新 imagesListGroup
+  imagesListGroup.value = transformedData;
+  hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
+}, { immediate: true });
+watch(clickImageListData, (newVal) => { clickImageList.value = newVal?.data ?? [];}, { immediate: true });
 
 onMounted(async() => {
   initLenis(); // 初始化 Lenis 平滑滚动

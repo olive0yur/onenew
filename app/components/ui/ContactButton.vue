@@ -22,7 +22,7 @@
     class="contact-button group transition-all duration-300 ease-in-out flex justify-between items-center px-[20px] box-border border-l border-solid cursor-pointer"
   >
     <span 
-      class="text-[16px] font-[400] transition-colors duration-300 whitespace-nowrap button-text"
+      class="text-[12px] lg:text-[16px] font-[400] transition-colors duration-300 whitespace-nowrap button-text"
     >
       {{ displayText }}
     </span>

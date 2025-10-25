@@ -1,9 +1,9 @@
 <template>
   <div class="overflow-hidden">
     <div>
-      <section id="section-0" class="section-0 relative w-[100vw] h-[100vh]">
+      <section id="section-0" class="section-0 relative w-[100vw] h-[100dvh]">
         <div 
-          class="section-0-warp w-full h-[100vh] bg-[#3B4EFF]/50 blue-mask"
+          class="section-0-warp w-full h-[100dvh] bg-[#3B4EFF]/50 blue-mask relative"
           @mouseenter="handleSection0MouseEnter"
           @mouseleave="handleSection0MouseLeave"
           @mousemove="handleSection0MouseMove"
@@ -19,9 +19,10 @@
           >
             SCROLL TO EXPLORE
           </div>
-        </div>
-        <div class="px-[40px] absolute bottom-0 left-0 right-0 logo-container">
-          <img :src="imgBaseURL('oneNew.svg')" alt="" class="w-[100%]" />
+          <!-- logo-container 移到 blue-mask 内部 -->
+          <div class="px-[16px] lg:px-[40px] absolute bottom-0 left-0 right-0 logo-container">
+            <img :src="imgBaseURL('oneNew.svg')" alt="" class="w-[100%]" />
+          </div>
         </div>
         <img
           :src="imgBaseURL(homeFixed[0]?.img)"
@@ -32,53 +33,78 @@
 
       <section
         id="section-1"
-        class="section-1 w-[100vw] min-h-[100vh] bg-[#F8F8F8] p-[40px] overflow-hidden rotate-[0deg] mt-[30vh]"
+        class="section-1 w-[100vw] min-h-[100dvh] bg-[#F8F8F8] lg:p-[40px] p-[16px] overflow-hidden rotate-[0deg] mt-[30vh]"
       >
-        <div class="text-[16px] text-[#000]">
+        <div class="lg:text-[16px] text-[12px] text-[#000]">
           <span class="mr-[4px]"> /</span>
           <span style="font-family: 'Noto'">关于我们</span>
         </div>
         <div
-          class="text-[#0B0B0B] font-['Inter'] text-[160px] font-normal capitalize leading-[160px] mb-[40px]"
+          class="text-[#0B0B0B] font-['Inter'] lg:text-[160px] text-[64px] font-normal capitalize lg:leading-[160px] leading-[64px] lg:mb-[40px] mb-[16px]"
         >
           creativity
         </div>
         <div
-          class=""
+          class=" mb-[40px] lg:mb-0"
         >
           <ContactButton 
-            width="170px"
+            class="hidden lg:flex"
             borderColor="#000"
             borderWidth="2px"
+            width="165px"
             textColor="#000"
-            bgColorHover="#0e0e0e"
+            bgColorHover="#3B4EFF"
             textColorHover="#fff"
             arrowColorHover="#fff"
             text="ABOUT 关于"
             @hover="onContactHover"
             @leave="onContactLeave"
           />
+
+          <div class="lg:hidden h-[28px] w-[110px] text-[12px] bg-[#3B4EFF] text-[#fff] flex items-center justify-center border-l-[1px] border-[#000] border-solid">
+            ABOUT 关于
+
+            <svg 
+              class="transition-colors duration-300 button-arrow ml-[8px]" 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 16 16" 
+              fill="none"
+            >
+              <path 
+                class="transition-colors duration-300" 
+                stroke="#fff"
+                d="M14 8H2"
+              />
+              <path 
+                class="transition-colors duration-300" 
+                stroke="#fff"
+                d="M10 4L14 8L10 12"
+              />
+            </svg>
+          </div>
         </div>
         <div class="flex flex-col items-end overflow-hidden">
           <div
             v-for="(describe, index) in aboutList"
             :key="describe.index"
             :ref="(el: any) => setDescribeRef(el, index)"
-            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] py-[40px] pr-[39px] w-full max-w-[1318px] cursor-pointer relative"
+            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] lg:py-[40px] py-[16px] lg:pr-[39px] w-full max-w-[1318px] cursor-pointer relative"
           >
             <!-- index -->
             <span
-              class="font-['Inter'] text-[16px] text-[#3B4EFF] absolute top-[40px] left-[-64px] uppercase font-[400]"
+              class="font-['Inter'] text-[16px] text-[#3B4EFF] absolute top-[40px] left-[-64px] uppercase font-[400] hidden lg:block"
               >/ {{ '0' + (index+1) }}</span
             >
             <!-- 主要内容行 -->
             <div @click="toggleExpand(index)" class="flex items-center justify-between w-full">
-              <div class="flex items-center">
+              <div class="flex flex-col lg:flex-row lg:items-center items-start">
                 <span
-                  class="font-['Inter'] text-[64px] font-normal leading-[64px] text-[#000] mr-[16px]"
+                  class="font-['Inter'] lg:text-[64px] text-[24px] font-normal lg:leading-[64px] leading-[24px] text-[#000] mr-[16px]"
                   >{{ describe?.label }}</span
                 >
-                <span class="font-['Noto'] text-[32px]">{{
+                <span class="font-['Noto'] lg:text-[32px] text-[16px] mt-[8px] lg:mt-0">{{
                   describe?.remark
                 }}</span>
               </div>
@@ -86,7 +112,7 @@
                 :src="imgBaseURL('add.svg')"
                 alt=""
                 :class="[
-                  'w-[24px] h-[24px] cursor-pointer transition-transform duration-300 hover:scale-110',
+                  'lg:w-[24px] lg:h-[24px] w-[16px] h-[16px] cursor-pointer transition-transform duration-300 hover:scale-110',
                   { 'rotate-45': expandedItems[index] }
                 ]"
                 @click.stop.prevent="toggleExpand(index)"
@@ -128,106 +154,132 @@
               class="section2-text-left flex flex-col items-end justify-center w-[400px] z-10"
             >
               <span
-                class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+                class="font-['Inter'] lg:text-[64px] text-[24px] text-[#000] whitespace-nowrap lg:leading-[64px] leading-[24px] lg:mb-[40px] mb-[16px]"
               >
                 The Work
               </span>
               <span
-                class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+                class="font-['Noto'] lg:text-[32px] text-[16px] text-[#000] lg:leading-[32px] leading-[16px]"
               >
                 看作品
               </span>
             </div>
 
             <!-- 中央图片 - 作为滚动序列的第一个 -->
-            <img :src="imgBaseURL(scrollImage[0]?.img)"  class="expand-image " alt="" />
+            <img :src="imgBaseURL(scrollImage[0]?.img)"  class="expand-image object-cover" alt="" />
 
             <!-- 右侧文字 -->
             <div
               class="section2-text-right w-[400px] flex flex-col items-start justify-center z-10"
             >
               <span
-                class="font-['Inter'] text-[64px] text-[#000] whitespace-nowrap leading-[64px] mb-[40px]"
+                class="font-['Inter'] lg:text-[64px] text-[24px] text-[#000] whitespace-nowrap lg:leading-[64px] leading-[24px] lg:mb-[40px] mb-[16px]"
               >
                 Can Speak
               </span>
-              <span class="font-['Noto'] text-[32px] text-[#000] leading-[32px]"
+              <span class="font-['Noto'] lg:text-[32px] text-[16px] text-[#000] lg:leading-[32px] leading-[16px]"
                 >见实力</span
               >
             </div>
 
             <!-- 线条 -->
-            <div class="section-2-line-top absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh-10px)] rotate-[-45deg] origin-left z-[10]"></div>
-            <div class="section-2-line-bottom absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh+10px)] rotate-[45deg] origin-left z-[10]"></div>
+            <div class="section-2-line-top absolute h-[1px] bg-[#FFF] lg:left-[147px] left-[49%] ml-[10px] lg:ml-0 lg:top-[calc(50vh-10px)] top-[200px] lg:rotate-[-45deg] rotate-[45deg] origin-left z-[10]"></div>
+            <div class="section-2-line-bottom absolute h-[1px] bg-[#FFF] lg:left-[147px] left-[49%] lg:top-[calc(50vh+10px)] top-[200px] lg:rotate-[45deg] rotate-[135deg] origin-left z-[10]"></div>
 
             <!-- 文字 -->
-             <span class="section-2-text absolute text-[#fff] text-[16px] left-[40px]">DISCOVER</span>
+             <span class="section-2-text ml-[-33px] lg:ml-0 absolute lg:top-[50%] top-[177px] left-[50%] lg:translate-x-0 lg:translate-y-[-50%] z-[10] text-[#fff] lg:text-[16px] text-[12px] lg:left-[40px]">DISCOVER</span>
 
-            <!-- 多组滚动图片 -->
+            <!-- PC端滚动图片 -->
             <img
               v-for="(item, index) in scrollImage"
               :key="index"
               :src="imgBaseURL(item?.img)"
-              :class="`h-[90px] absolute scroll-img scroll-img-${index + 1} opacity-0`"
+              :class="`hidden lg:block h-[90px] absolute scroll-img scroll-img-${index + 1} opacity-0`"
               alt=""
             />
+
+            <!-- 移动端滚动图片（从左到右，沿曲线路径） -->
+            <div class="lg:hidden absolute h-[100dvh] w-[100vw] z-[15] overflow-hidden pointer-events-none">
+              <img
+                v-for="(item, index) in scrollImage"
+                :key="index"
+                :src="imgBaseURL(item?.img)"
+                :class="`scroll-img-mobile scroll-img-mobile-${index + 1} w-[100px] opacity-0 absolute`"
+                :style="{ top: 'calc(58vh)', left: '0' }"
+                alt=""
+              />
+            </div>
             
-            <!-- 文字遮罩区域 -->
-            <div class="absolute h-[100vh] w-[100vw] z-[20]"
+            <!-- PC端文字遮罩区域 -->
+            <div class="hidden lg:block absolute h-[100dvh] w-[100vw] z-[20]"
             style="clip-path: polygon(147px calc(50vh - 10px), calc(147px + 56.57vw) calc(50vh - 56.57vw - 10px), 100vw calc(50vh - 56.57vw - 10px), 100vw calc(50vh + 56.57vw + 10px), calc(147px + 56.57vw) calc(50vh + 56.57vw + 10px), 147px calc(50vh + 10px), 147px 50vh);">
               <span 
                 v-for="(item, index) in scrollWords" 
                 :key="item?.id" 
-                :class="`scroll-text scroll-text-${index + 1} text-[64px] text-[#FFF] absolute opacity-100`"
+                :class="`scroll-text scroll-text-${index + 1} text-[64px] leading-[64px] text-[#FFF] absolute opacity-100`"
               >{{ item?.dict_value }}</span>
+            </div>
+
+            <!-- 移动端文字区域（无遮罩，从右到左横向滚动） -->
+            <div class="lg:hidden absolute h-[100dvh] w-[100vw] z-[20] overflow-hidden">
+              <div class="scroll-text-mobile-container absolute top-[58vh] left-0 -translate-y-1/2 flex items-center gap-[16px]">
+                <span 
+                  v-for="(item, index) in scrollWords" 
+                  :key="item?.id" 
+                  :class="`scroll-text-mobile scroll-text-mobile-${index + 1} text-[24px] leading-[24px] text-[#FFF] opacity-30 w-[200px] h-auto text-center flex-shrink-0`"
+                >{{ item?.dict_value }}</span>
+              </div>
             </div> 
 
             <!-- 封面遮罩 -->
-             <div class="cover-mask absolute h-[100vh] w-[100vw] z-[30] translate-y-[100vh] rotate-[45deg] flex flex-col">
+             <div class="cover-mask absolute h-[100dvh] w-[100vw] z-[30] translate-y-[100dvh] rotate-[45deg] flex flex-col">
                 <!-- 覆盖卡片 -->
                 <section
                   id="section-3"
-                  class="section-3 w-[100vw] min-h-[100vh] bg-[#F8F8F8] overflow-hidden rotate-[0deg]"
+                  class="section-3 w-[100vw] min-h-[100dvh] bg-[#F8F8F8] overflow-hidden rotate-[0deg]"
                 >
-                  <div class="text-[16px] text-[#000] px-[40px] pt-[40px]">
+                  <div class="text-[16px] text-[#000] lg:px-[40px] px-[16px] lg:pt-[40px] pt-[16px]">
                     <span class="mr-[4px]"> /</span>
                     <span style="font-family: 'Noto'">我们的客户</span>
                   </div>
                   <div
-                    class="text-[#0B0B0B] font-['Inter'] text-[160px] font-normal capitalize leading-[160px] mb-[60px] px-[40px]"
+                    class="text-[#0B0B0B] font-['Inter'] lg:text-[160px] text-[64px] font-normal capitalize lg:leading-[160px] leading-[64px] lg:mb-[60px] mb-[16px] lg:px-[40px] px-[16px]"
                   >
                     Trust
                   </div>
                   <!-- 外层容器 -->
-                  <div class="relative h-[360px] mb-[40px]">
+                  <div class="relative lg:mb-[40px] mb-[16px]">
                     <!-- 滚动容器 -->
                     <div 
                       ref="listCardWrap" 
                       class="h-[360px] overflow-hidden list-card-wrap relative">
-                      <div ref="listCardItemWrap" class="flex gap-[40px] list-card-item-wrap"> 
-                      <div class="w-[586px] h-[360px] box-border flex-shrink-0 bg-[#fff] list-card-item p-[40px]" v-for="(item, index) in customerList" :key="item.title">
-                      <div >
-                        <img :src="imgBaseURL(item?.img1)" class="h-[24px] w-[172px] mb-[24px]" alt="">
-                        <p class="text-[16px] leading-[24px] text-[#666] mb-[80px]">{{ item?.description }}</p>
+                      <div ref="listCardItemWrap" class="flex lg:gap-[40px] gap-[16px] list-card-item-wrap"> 
+                        <div class="lg:w-[586px] w-[252px] lg:h-[360px] h-[328px] box-border flex-shrink-0 bg-[#fff] list-card-item lg:p-[40px] p-[16px]" v-for="(item, index) in customerList" :key="item.title">
+                          <div >
+                            <img :src="imgBaseURL(item?.img1)" class="h-[24px] w-[172px] lg:mb-[24px] mb-[16px]" alt="">
+                            <p class="lg:text-[16px] text-[12px] leading-[24px] text-[#666] lg:mb-[80px] mb-[34px]">{{ item?.description }}</p>
 
-                        <div class="flex justify-between items-center">
-                          <div class="flex items-center">
-                            <img :src="imgBaseURL(item?.img)" class="h-[60px] w-[60px] mr-[16px]" alt="">
-                            <div class="flex flex-col">
-                              <span class="text-[16px] text-[#293238] leading-[16px]">{{ item?.dict_value }}</span>
-                              <span class="text-[16px] text-[#666] leading-[16px]">{{ item?.remark }}</span>
+                            <div class="flex justify-between items-center">
+                              <div class="flex items-center">
+                                <img :src="imgBaseURL(item?.img)" class="lg:h-[60px] lg:w-[60px] h-[32px] w-[32px] mr-[16px]" alt="">
+                                <div class="flex flex-col">
+                                  <span class="lg:text-[16px] text-[12px] text-[#293238] lg:leading-[16px] leading-[12px]">{{ item?.dict_value }}</span>
+                                  <span class="lg:text-[16px] text-[12px] text-[#666] lg:leading-[16px] leading-[12px]">{{ item?.remark }}</span>
+                                </div>
+                              </div>
+                              <div class="lg:text-[16px] text-[12px] text-[#666]">
+                                / 0{{ index+1 }}
+                              </div>
                             </div>
-                          </div>
-                          <div class="text-[#666]">
-                            / 0{{ index+1 }}
                           </div>
                         </div>
                       </div>
                     </div>
-                      </div>
-                    </div>
                   </div>
-                  <div class="overflow-hidden" style="height: calc(100vh - 480px);">
+                  <div class="overflow-hidden hidden lg:block" style="height: calc(100dvh - 480px);">
+                    <GlobeCanvas />
+                  </div>
+                  <div class="overflow-hidden block lg:hidden" style="height: calc(100dvh - 320px);">
                     <GlobeCanvas />
                   </div>
                 </section>
@@ -246,20 +298,24 @@
             :height="canvasHeight"
           ></canvas>
 
-          <div class="section-4-line-top absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh-10px)] rotate-[-45deg] origin-left z-[22]"></div>
-          <div class="section-4-line-bottom absolute h-[1px] bg-[#FFF] left-[147px] top-[calc(50vh+10px)] rotate-[45deg] origin-left z-[22]"></div>
+          <div class="section-4-line-top absolute h-[1px] bg-[#FFF] lg:left-[147px] left-[49%] ml-[10px] lg:ml-0 lg:top-[calc(50vh-10px)] top-[200px] lg:rotate-[-45deg] rotate-[45deg] origin-left z-[22]"></div>
+          <div class="section-4-line-bottom absolute h-[1px] bg-[#FFF] lg:left-[147px] left-[49%] lg:top-[calc(50vh+10px)] top-[200px] lg:rotate-[45deg] rotate-[135deg] origin-left z-[22]"></div>
 
-          <div class="redbook absolute top-[50%] translate-y-[-50%] left-[352px] z-[10] text-[#fff] text-[16px] flex flex-col">
-            <span class="text-[64px] leading-[64px] mb-[24px] redbook-mark">{{clickImageList[currentImageIndex]?.remark}}</span>
-            <span class="text-[32px] leading-[32px] redbook-title">{{clickImageList[currentImageIndex]?.label}}</span>
+          <div class="redbook absolute w-[100%] lg:top-[50%] top-[56%] lg:translate-y-[-50%] lg:left-[352px] z-[10] text-[#fff] text-[16px] flex flex-col items-center lg:items-start">
+            <span class="lg:text-[64px] text-[24px] lg:leading-[64px] leading-[24px] lg:mb-[24px] mb-[12px] redbook-mark">{{clickImageList[currentImageIndex]?.remark}}</span>
+            <span class="lg:text-[32px] text-[16px] lg:leading-[32px] leading-[16px] redbook-title">{{clickImageList[currentImageIndex]?.label}}</span>
           </div>
 
-          <div class="redbook-desc absolute top-[70%] translate-y-[-50%] right-[40px] z-[10] text-[#fff] text-[16px] flex flex-col w-[690px]">
-            <span class="text-[16px] leading-[32px]">{{clickImageList[currentImageIndex]?.description}}</span>
+          <div class="redbook-desc absolute bottom-[-48px] lg:bottom-auto lg:top-[70%] lg:translate-y-[-50%] left-[16px] lg:left-auto lg:right-[40px] z-[10] text-[#fff] text-[16px] flex flex-col lg:w-[690px] w-[240px]">
+            <span class="lg:text-[16px] text-[12px] lg:leading-[32px] leading-[24px]">{{clickImageList[currentImageIndex]?.description}}</span>
+          </div>
+          
+          <div class="lg:hidden absolute z-[13] bottom-[16px] right-[16px] flex gap-[16px]">
+            <img @click.stop.prevent="handleClick('left')" :src="imgBaseURL('cursor-left-white.svg')" alt="" class="w-[32px] h-[32px]" srcset="">
+            <img @click.stop.prevent="handleClick('right')" :src="imgBaseURL('cursor-right.svg')" alt="" class="w-[32px] h-[32px]" srcset="">
           </div>
 
-
-          <span class="section-4-text absolute top-[50%] translate-y-[-50%]  z-[10] text-[#fff] text-[16px] left-[40px]">FOLLOW US</span>
+          <span class="section-4-text ml-[-33px] lg:ml-0 absolute lg:top-[50%] top-[177px] left-[50%] lg:translate-x-0 lg:translate-y-[-50%] z-[10] text-[#fff] lg:text-[16px] text-[12px] lg:left-[40px]">FOLLOW US</span>
 
           <div class="absolute z-[11] inset-0 flex">
           <div @click="handleClick('left')" class="flex-1 section-4-left" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter('left')" @mouseleave="handleMouseLeave"></div>
@@ -268,7 +324,7 @@
 
           <div 
             ref="followIcon" 
-            class="follow-icon absolute z-[12] pointer-events-none opacity-0 transition-opacity duration-300"
+            class="follow-icon absolute z-[12] pointer-events-none opacity-0 transition-opacity duration-300 hidden lg:block"
             :class="{ 'opacity-100': showFollowIcon }"
           >
             <img 
@@ -281,13 +337,13 @@
           <div
             ref="currentImagesContainer"
             :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
-            class="flex absolute bottom-[40px] right-[40px]">
+            class="absolute bottom-[40px] right-[40px] hidden lg:flex">
           </div>
 
           <div 
             ref="previousImagesContainer"
             :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
-            class="previous-image-group flex"
+            class="previous-image-group hidden lg:flex"
           >
           </div>
 
@@ -367,7 +423,6 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { imgBaseURL } from "~/utils";
 import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
-// import { getDictList } from "~/composables/api";
 import { useDictList, useGetGroupImage } from "~/composables/api/useHttpExample";
 
 const homeFixed:any= ref<any>([]);
@@ -377,9 +432,19 @@ const scrollWords:any = ref<any>([]);
 const customerList:any= ref<any>([]);
 const clickImageList:any= ref<any>([]);
 const groupImage:any= ref<any>([]);
+const isMobile = ref(false);
+
+// 检测移动端设备
+const detectMobile = () => {
+  if (import.meta.client) {
+    isMobile.value = window.innerWidth < 768;
+  }
+};
 
 if(import.meta.client) {
   gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
+  detectMobile(); // 初始化时检测
+  window.addEventListener('resize', detectMobile); // 监听窗口大小变化
 }
 
 const ctx: any = ref(null);
@@ -445,28 +510,35 @@ const nextImageIndex = ref(0); // 下一张图片的索引
 // ========== 转场角度配置 ==========
 // 这些角度必须与CSS中引导线的角度保持一致
 // CSS引导线位置：
-//   .section-4-line-top:   rotate-[-45deg]  <-- LINE_TOP_ANGLE
-//   .section-4-line-bottom: rotate-[45deg]  <-- LINE_BOTTOM_ANGLE
-// 
-// 修改方法：
-// 1. 修改下面的角度值（单位：度）
-// 2. 同时修改对应的CSS样式（第236-237行）
-// 3. 内角 = LINE_BOTTOM_ANGLE - LINE_TOP_ANGLE
-// 4. 外角 = 360 - 内角
+//   PC端（lg）：
+//     .section-4-line-top:   rotate-[-45deg]
+//     .section-4-line-bottom: rotate-[45deg]
+//   移动端：
+//     .section-4-line-top:   rotate-[45deg]
+//     .section-4-line-bottom: rotate-[135deg]
 // ===================================
 
-const LINE_TOP_ANGLE = -45; // 上引导线角度（度）
-const LINE_BOTTOM_ANGLE = 45; // 下引导线角度（度）
+// PC端角度
+const LINE_TOP_ANGLE_PC = -45;
+const LINE_BOTTOM_ANGLE_PC = 45;
+
+// 移动端角度
+const LINE_TOP_ANGLE_MOBILE = 45;
+const LINE_BOTTOM_ANGLE_MOBILE = 135;
+
+// 响应式角度值
+const LINE_TOP_ANGLE = computed(() => isMobile.value ? LINE_TOP_ANGLE_MOBILE : LINE_TOP_ANGLE_PC);
+const LINE_BOTTOM_ANGLE = computed(() => isMobile.value ? LINE_BOTTOM_ANGLE_MOBILE : LINE_BOTTOM_ANGLE_PC);
 
 // 转换为弧度（Canvas使用弧度）
-const LINE_TOP_ANGLE_RAD = (LINE_TOP_ANGLE * Math.PI) / 180;
-const LINE_BOTTOM_ANGLE_RAD = (LINE_BOTTOM_ANGLE * Math.PI) / 180;
+const LINE_TOP_ANGLE_RAD = computed(() => (LINE_TOP_ANGLE.value * Math.PI) / 180);
+const LINE_BOTTOM_ANGLE_RAD = computed(() => (LINE_BOTTOM_ANGLE.value * Math.PI) / 180);
 
 // 自动计算内角和外角的范围
-const INNER_ANGLE_START = LINE_TOP_ANGLE_RAD; // 内角起点（沿上引导线）
-const INNER_ANGLE_END = LINE_BOTTOM_ANGLE_RAD; // 内角终点（沿下引导线）
-const INNER_ANGLE_RANGE = INNER_ANGLE_END - INNER_ANGLE_START; // 内角范围（弧度）
-const OUTER_ANGLE_RANGE = Math.PI * 2 - INNER_ANGLE_RANGE; // 外角范围（弧度）
+const INNER_ANGLE_START = computed(() => LINE_TOP_ANGLE_RAD.value); // 内角起点（沿上引导线）
+const INNER_ANGLE_END = computed(() => LINE_BOTTOM_ANGLE_RAD.value); // 内角终点（沿下引导线）
+const INNER_ANGLE_RANGE = computed(() => INNER_ANGLE_END.value - INNER_ANGLE_START.value); // 内角范围（弧度）
+const OUTER_ANGLE_RANGE = computed(() => Math.PI * 2 - INNER_ANGLE_RANGE.value); // 外角范围（弧度）
 
 // 图片容器ref
 const currentImagesContainer = ref<HTMLElement | null>(null);
@@ -624,10 +696,11 @@ const onLeave = (el: Element, done: () => void) => {
 const { setLenis } = useLenis();
 
 const initLenis = () => {
+  // 移动端降低触摸滚动倍数，让滚动更平缓
   lenis.value = new Lenis({
     duration: 0,
     wheelMultiplier: 1,
-    touchMultiplier: 1,
+    touchMultiplier: isMobile.value ? 0.2 : 1, // 移动端降低到 0.5
     smoothWheel: true,
     syncTouch: false,
     easing: (t) => t,
@@ -667,16 +740,17 @@ const initBackgroundAnimations = () => {
     ease: "power2.inOut",
   });
 
-  // logo-container和blue-mask滚动动画
-  gsap.to([".logo-container", ".blue-mask"], {
+  // blue-mask滚动动画（logo-container会自动跟随父容器）
+  // 移动端使用更大的 scrub 值让滚动更平缓
+  gsap.to(".blue-mask", {
     scrollTrigger: {
       trigger: "body",
       start: "top top",
       end: "100vh top",
-      scrub: 1.5,
+      scrub: isMobile.value ? 3 : 1.5, // 移动端使用 3，桌面端使用 1.5
     },
-    x: "-10vw",
-    y: "-100vh",
+    x: isMobile.value ? "-30vw" : "-10vw",
+    y: isMobile.value ? "-100dvh" : "-100vh",
     rotation: -15,
     ease: "sine.inOut",
   });
@@ -795,6 +869,27 @@ const generateBracketPath = () => {
   }
 
   return bracketPath;
+};
+
+// ===== 生成移动端曲线路径（向下突出的弧线）=====
+const generateMobileCurvePath = () => {
+  const curvePath = [];
+  const curveSteps = 100; // 路径点数量
+  const curveDepth = 120; // 向下突出的深度（px）
+  const screenWidth = window.innerWidth;
+  
+  for (let i = 0; i <= curveSteps; i++) {
+    const t = i / curveSteps; // 0 到 1 的进度
+    // X轴：从左侧屏幕外到右侧屏幕外
+    const x = -200 + t * (screenWidth + 400);
+    // Y轴：使用抛物线函数，中间向下凸起
+    // 使用 4 * t * (1 - t) 创建一个在 t=0.5 时达到最大值 1 的抛物线
+    const y = Math.sin(t * Math.PI) * curveDepth;
+    
+    curvePath.push({ x, y });
+  }
+  
+  return curvePath;
 };
 
 // 图片缩放和文字移动的持续时间配置
@@ -1120,7 +1215,7 @@ const showLineAndText = (timeline: gsap.core.Timeline, scaleDuration: number) =>
   // 等待图片缩放完成后再显示线条和文字
   timeline.to([".section-2-line-top", ".section-2-line-bottom", ".section-2-text"], {
     opacity: 1,
-    width: "80vw",
+    width: "100vw",
   }, scaleDuration); // 在缩放完成后开始
 
 };
@@ -1131,150 +1226,328 @@ const initScrollingImagesAnimations = (
   bracketPath: any[],
   scaleDuration: number
 ) => {
-  for (let i = 1; i <= 10; i++) {
-    const delay = scaleDuration + (i - 0) * 0.6; // 在图片缩放完成后开始
-    const imageSrc = imgBaseURL(scrollImage.value[i-1]?.img);
-
-    // 设置初始位置
-    timeline.set(
-      `.scroll-img-${i}`,
-      {
+  if (isMobile.value) {
+    // ===== 移动端：图片沿曲线路径从左到右滚动 =====
+    const mobileCurvePath:any = generateMobileCurvePath(); // 生成移动端曲线路径
+    const totalImages = scrollImage.value.length;
+    const centerX = window.innerWidth / 2;
+    
+    // 为每个图片设置独立的曲线路径动画
+    for (let i = 1; i <= totalImages; i++) {
+      const imgIndex = i - 1;
+      const imageSrc = imgBaseURL(scrollImage.value[imgIndex]?.img);
+      const delay = scaleDuration + imgIndex * 0.6; // 每个图片延迟0.6秒
+      
+      // 图片初始隐藏
+      timeline.set(`.scroll-img-mobile-${i}`, {
         opacity: 0,
-        y: 0,
-      },
-      delay
-    );
-
-    // 显示动画
-    timeline.to(
-      `.scroll-img-${i}`,
-      {
+      }, 0);
+      
+      // 设置初始位置（路径起点）
+      timeline.set(`.scroll-img-mobile-${i}`, {
+        x: mobileCurvePath[0].x,
+        y: mobileCurvePath[0].y,
+      }, delay);
+      
+      // 显示图片
+      timeline.to(`.scroll-img-mobile-${i}`, {
         opacity: 1,
         duration: 0.1,
         ease: "power2.out",
-      },
-      delay
-    );
-
-    // 路径运动动画
-    timeline.to(
-      `.scroll-img-${i}`,
-      {
+      }, delay);
+      
+      // 沿曲线路径运动
+      timeline.to(`.scroll-img-mobile-${i}`, {
         duration: 3,
         ease: "none",
         motionPath: {
-          path: bracketPath,
-          curviness: 2,
+          path: mobileCurvePath,
+          curviness: 1.5, // 曲线平滑度
         },
-      },
-      delay + 0.1
-    );
-
-    // 中央图片替换
-    timeline.call(
-      () => {
-        const expandImage = document.querySelector(
-          ".expand-image"
-        ) as HTMLImageElement;
-        if (expandImage) {
-          expandImage.src = imageSrc;
-        }
-      },
-      [],
-      delay + 1.5
-    );
-
-    // 淡出动画
-    timeline.to(
-      `.scroll-img-${i}`,
-      {
+      }, delay + 0.1);
+      
+      // 计算图片到达中心的时间点（大约在路径的50%位置）
+      const timeToCenter = delay + 0.1 + 1.5; // 在3秒动画的中点
+      
+      // 当图片到达中心时，替换中央图片
+      timeline.call(
+        () => {
+          const expandImage = document.querySelector(
+            ".expand-image"
+          ) as HTMLImageElement;
+          if (expandImage) {
+            expandImage.src = imageSrc;
+          }
+        },
+        [],
+        timeToCenter
+      );
+      
+      // 淡出动画
+      timeline.to(`.scroll-img-mobile-${i}`, {
         opacity: 0,
         duration: 0.2,
         ease: "power2.out",
-      },
-      delay + 2.9
-    );
+      }, delay + 2.9);
+      if(i === 6){
+        gsap.set(".cover-mask", {
+          transformOrigin: "50% 50%",
+          x: "-14vw",
+          y: "120vh",
+          rotation: 10,
+        });
+        
+        // 设置 list-card-item-wrap 初始位置并执行动画
+        const container = document.querySelector(".list-card-wrap") as HTMLElement;
+        const item = document.querySelector(".list-card-item-wrap") as HTMLElement;
+        
+        // 设置初始位置在右边（100vw）
+        gsap.set(".list-card-item-wrap", {
+          x: "100vw",
+        });
+        
+        // 计算目标位置
+        const x = container.offsetWidth - item.scrollWidth;
+        timeline.to(".list-card-item-wrap", {
+          x: x,
+          duration: 5,
+          ease: "sine.inOut",
+        });
+        
+        // cover-mask 动画与 list-card-item-wrap 同时开始
+        timeline.to(".cover-mask", {
+          x: 0,
+          y: 0,
+          duration: 2,
+          rotation: 0,
+          ease: "sine.inOut",
+        }, "<"); // "<" 表示与前一个动画同时开始
+      }
+    }
+  } else {
+    // ===== PC端：原有的路径运动动画 =====
+    for (let i = 1; i <= 10; i++) {
+      const delay = scaleDuration + (i - 0) * 0.6; // 在图片缩放完成后开始
+      const imageSrc = imgBaseURL(scrollImage.value[i-1]?.img);
 
-    if(i === 6){
-      gsap.set(".cover-mask", {
-        transformOrigin: "50% 50%",
-        x: "-14vw",
-        y: "120vh",
-        rotation: 10,
-      });
-      
-      // 设置 list-card-item-wrap 初始位置并执行动画
-      const container = document.querySelector(".list-card-wrap") as HTMLElement;
-      const item = document.querySelector(".list-card-item-wrap") as HTMLElement;
-      
-      // 设置初始位置在右边（100vw）
-      gsap.set(".list-card-item-wrap", {
-        x: "100vw",
-      });
-      
-      // 计算目标位置
-      const x = container.offsetWidth - item.scrollWidth;
-      timeline.to(".list-card-item-wrap", {
-        x: x,
-        duration: 5,
-        ease: "sine.inOut",
-      });
-      
-      // cover-mask 动画与 list-card-item-wrap 同时开始
-      timeline.to(".cover-mask", {
-        x: 0,
-        y: 0,
-        duration: 2,
-        rotation: 0,
-        ease: "sine.inOut",
-      }, "<"); // "<" 表示与前一个动画同时开始
+      // 设置初始位置
+      timeline.set(
+        `.scroll-img-${i}`,
+        {
+          opacity: 0,
+          y: 0,
+        },
+        delay
+      );
+
+      // 显示动画
+      timeline.to(
+        `.scroll-img-${i}`,
+        {
+          opacity: 1,
+          duration: 0.1,
+          ease: "power2.out",
+        },
+        delay
+      );
+
+      // 路径运动动画
+      timeline.to(
+        `.scroll-img-${i}`,
+        {
+          duration: 3,
+          ease: "none",
+          motionPath: {
+            path: bracketPath,
+            curviness: 2,
+          },
+        },
+        delay + 0.1
+      );
+
+      // 中央图片替换
+      timeline.call(
+        () => {
+          const expandImage = document.querySelector(
+            ".expand-image"
+          ) as HTMLImageElement;
+          if (expandImage) {
+            expandImage.src = imageSrc;
+          }
+        },
+        [],
+        delay + 1.5
+      );
+
+      // 淡出动画
+      timeline.to(
+        `.scroll-img-${i}`,
+        {
+          opacity: 0,
+          duration: 0.2,
+          ease: "power2.out",
+        },
+        delay + 2.9
+      );
+
+      if(i === 6){
+        gsap.set(".cover-mask", {
+          transformOrigin: "50% 50%",
+          x: "-14vw",
+          y: "120vh",
+          rotation: 10,
+        });
+        
+        // 设置 list-card-item-wrap 初始位置并执行动画
+        const container = document.querySelector(".list-card-wrap") as HTMLElement;
+        const item = document.querySelector(".list-card-item-wrap") as HTMLElement;
+        
+        // 设置初始位置在右边（100vw）
+        gsap.set(".list-card-item-wrap", {
+          x: "100vw",
+        });
+        
+        // 计算目标位置
+        const x = container.offsetWidth - item.scrollWidth;
+        timeline.to(".list-card-item-wrap", {
+          x: x,
+          duration: 5,
+          ease: "sine.inOut",
+        });
+        
+        // cover-mask 动画与 list-card-item-wrap 同时开始
+        timeline.to(".cover-mask", {
+          x: 0,
+          y: 0,
+          duration: 2,
+          rotation: 0,
+          ease: "sine.inOut",
+        }, "<"); // "<" 表示与前一个动画同时开始
+      }
     }
   }
 };
 
 // ===== 滚动文字动画 =====
 const initScrollingTextAnimations = (timeline: gsap.core.Timeline, scaleDuration: number) => {
-  for (let i = 1; i <= scrollWords.value.length; i++) {
-    const delay = scaleDuration + (i - 1) * 0.4; // 在图片缩放完成后开始，缩短间隔到0.4秒
-
-    // 设置初始位置 - 第一个文字初始透明度为1，其他为0.3
-    timeline.set(
-      `.scroll-text-${i}`,
-      {
-        opacity: i === 1 ? 1 : 0.3,
-        y: '64px', // 从底部开始
-      },
-      delay
-    );
-
-    // 从下到上滚动动画
-    timeline.to(
-      `.scroll-text-${i}`,
-      {
-        y: -window.innerHeight -300, // 向上滚动到屏幕外
-        duration: 3,
-        ease: "none",
-      },
-      delay
-    );
-
-    // 进入中间区域时瞬间变为完全不透明
-    timeline.set(
-      `.scroll-text-${i}`,
-      {
-        opacity: 1,
-      },
-      delay + 1.3 // 提前进入中间区域
-    );
-
-    // 离开中间区域后瞬间变回半透明
-    timeline.set(
-      `.scroll-text-${i}`,
-      {
+  if (isMobile.value) {
+    // ===== 移动端：整个容器从右到左滚动，文字依次经过中心高亮 =====
+    const itemWidth = 200; // 每个文字宽度
+    const gap = 16; // 文字间隔
+    const itemTotalWidth = itemWidth + gap; // 每个item的总宽度(包含间隔)
+    const totalWords = scrollWords.value.length;
+    const containerWidth = totalWords * itemTotalWidth - gap; // 容器总宽度
+    
+    // 计算滚动距离：从右侧完全进入到左侧完全离开
+    const startX = window.innerWidth; // 从屏幕右侧开始
+    const endX = -containerWidth - 100; // 滚动到左侧屏幕外
+    const totalDistance = startX - endX;
+    
+    // 屏幕中心位置
+    const centerX = window.innerWidth / 2;
+    
+    // 在动画开始前，先隐藏整个容器
+    timeline.set('.scroll-text-mobile-container', {
+      opacity: 0,
+      x: startX,
+    }, 0);
+    
+    // 在动画开始时，显示容器
+    timeline.set('.scroll-text-mobile-container', {
+      opacity: 1,
+    }, scaleDuration);
+    
+    // 容器从右到左滚动
+    timeline.to('.scroll-text-mobile-container', {
+      x: endX,
+      duration: totalWords * 0.8, // 根据文字数量调整总时长
+      ease: "none",
+    }, scaleDuration);
+    
+    // 为每个文字设置透明度动画
+    for (let i = 1; i <= totalWords; i++) {
+      const itemIndex = i - 1;
+      // 计算该文字在容器中的位置（左边缘）
+      const itemPositionInContainer = itemIndex * itemTotalWidth;
+      // 计算该文字中心在容器中的位置
+      const itemCenterInContainer = itemPositionInContainer + itemWidth / 2;
+      
+      // 计算该文字中心到达屏幕中心的时间点
+      // 文字在屏幕上的位置 = 容器位置 + 文字在容器中的位置
+      // 当 startX + itemCenterInContainer - 移动距离 = centerX 时，文字在中心
+      // 移动距离 = startX + itemCenterInContainer - centerX
+      const distanceToCenter = startX + itemCenterInContainer - centerX;
+      const progressToCenter = distanceToCenter / totalDistance;
+      const timeToCenter = scaleDuration + progressToCenter * totalWords * 0.8;
+      
+      // 在动画开始前，先隐藏所有文字
+      timeline.set(`.scroll-text-mobile-${i}`, {
+        opacity: 0,
+      }, 0);
+      
+      // 文字进入中心前：透明度0.3
+      timeline.set(`.scroll-text-mobile-${i}`, {
         opacity: 0.3,
-      },
-      delay + 1.7 // 延后离开中间区域，延长高亮持续时间
-    );
+      }, scaleDuration);
+      
+      // 文字到达中心：透明度变为1
+      timeline.to(`.scroll-text-mobile-${i}`, {
+        opacity: 1,
+        duration: 0.2,
+        ease: "none",
+      }, timeToCenter - 0.2);
+      
+      // 文字离开中心：透明度变回0.3
+      timeline.to(`.scroll-text-mobile-${i}`, {
+        opacity: 0.3,
+        duration: 0.2,
+        ease: "none",
+      }, timeToCenter + 0.3);
+    }
+  } else {
+    // ===== PC端：从下到上垂直滚动 =====
+    for (let i = 1; i <= scrollWords.value.length; i++) {
+      const delay = scaleDuration + (i - 1) * 0.4;
+      
+      // 设置初始位置 - 第一个文字初始透明度为1，其他为0.3
+      timeline.set(
+        `.scroll-text-${i}`,
+        {
+          opacity: i === 1 ? 1 : 0.3,
+          y: '64px', // 从底部开始
+        },
+        delay
+      );
+
+      // 从下到上滚动动画
+      timeline.to(
+        `.scroll-text-${i}`,
+        {
+          y: -window.innerHeight - 300, // 向上滚动到屏幕外
+          duration: 3,
+          ease: "none",
+        },
+        delay
+      );
+
+      // 进入中间区域时瞬间变为完全不透明
+      timeline.set(
+        `.scroll-text-${i}`,
+        {
+          opacity: 1,
+        },
+        delay + 1.3 // 提前进入中间区域
+      );
+
+      // 离开中间区域后瞬间变回半透明
+      timeline.set(
+        `.scroll-text-${i}`,
+        {
+          opacity: 0.3,
+        },
+        delay + 1.7 // 延后离开中间区域，延长高亮持续时间
+      );
+    }
   }
 };
 
@@ -1381,7 +1654,7 @@ const section4Timeline = () => {
       toggleActions: "restart none none reverse",
     },
     rotate:-5,
-    x:'-6vw',
+    x:isMobile.value?'-12vw':'-6vw',
     ease: "power2.inOut",
   });
   
@@ -1511,9 +1784,15 @@ const drawCanvas = () => {
   // 清空画布
   context.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
   
-  // 计算裁剪区域的起点（147px, 50vh）
-  const clipOriginX = 138;
-  const clipOriginY = canvasHeight.value / 2;
+  // 计算裁剪区域的起点
+  // PC端：left-[147px], top-[calc(50vh±10px)]
+  // 移动端：left-[49%] + ml-[10px], top-[200px]
+  const clipOriginX = isMobile.value 
+    ? (canvasWidth.value * 0.49) + 5  // 49% + 10px
+    : 138;  // 147px（注意：这里是138，可能是为了对齐调整）
+  const clipOriginY = isMobile.value 
+    ? 200  // 移动端固定200px
+    : canvasHeight.value / 2;  // PC端 50vh
   const radius = Math.max(canvasWidth.value, canvasHeight.value) * 2;
   
   if (isTransitioning.value) {
@@ -1534,12 +1813,12 @@ const drawCanvas = () => {
       // 两个方向都是顺时针旋转
       // 内角区域：保留从当前内角擦除线到内角终点的部分（还没被擦除）
       context.moveTo(clipOriginX, clipOriginY);
-      context.arc(clipOriginX, clipOriginY, radius, transitionAngleInner.value, INNER_ANGLE_END, false);
+      context.arc(clipOriginX, clipOriginY, radius, transitionAngleInner.value, INNER_ANGLE_END.value, false);
       context.lineTo(clipOriginX, clipOriginY);
       
       // 外角区域：保留从当前外角擦除线到下一个内角起点的部分（还没被擦除）
       context.moveTo(clipOriginX, clipOriginY);
-      context.arc(clipOriginX, clipOriginY, radius, transitionAngleOuter.value, INNER_ANGLE_START + Math.PI * 2, false);
+      context.arc(clipOriginX, clipOriginY, radius, transitionAngleOuter.value, INNER_ANGLE_START.value + Math.PI * 2, false);
       context.lineTo(clipOriginX, clipOriginY);
       
       context.closePath();
@@ -1647,19 +1926,19 @@ const startTransition = (side: 'left' | 'right') => {
   if (side === 'right') {
     // 向右切换（顺时针）
     // 内角擦除线：从内角起点（沿上引导线）顺时针转到内角终点（沿下引导线）
-    transitionAngleInner.value = INNER_ANGLE_START;
+    transitionAngleInner.value = INNER_ANGLE_START.value;
     // 外角擦除线：从内角终点（沿下引导线）顺时针转过外角区域到下一个内角起点
-    transitionAngleOuter.value = INNER_ANGLE_END;
+    transitionAngleOuter.value = INNER_ANGLE_END.value;
     
     // 同时执行两个旋转动画
     gsap.to(transitionAngleInner, {
-      value: INNER_ANGLE_END,
+      value: INNER_ANGLE_END.value,
       duration: duration,
       ease: "power1.inOut"
     });
     
     gsap.to(transitionAngleOuter, {
-      value: INNER_ANGLE_START + Math.PI * 2, // 转过整个外角区域
+      value: INNER_ANGLE_START.value + Math.PI * 2, // 转过整个外角区域
       duration: duration,
       ease: "power1.inOut",
       onComplete: () => {
@@ -1674,19 +1953,19 @@ const startTransition = (side: 'left' | 'right') => {
   } else {
     // 向左切换（顺时针）
     // 内角擦除线：从内角起点（沿上引导线）顺时针转到内角终点（沿下引导线）
-    transitionAngleInner.value = INNER_ANGLE_START;
+    transitionAngleInner.value = INNER_ANGLE_START.value;
     // 外角擦除线：从内角终点（沿下引导线）顺时针转过外角区域到下一个内角起点
-    transitionAngleOuter.value = INNER_ANGLE_END;
+    transitionAngleOuter.value = INNER_ANGLE_END.value;
     
     // 同时执行两个旋转动画
     gsap.to(transitionAngleInner, {
-      value: INNER_ANGLE_END,
+      value: INNER_ANGLE_END.value,
       duration: duration,
       ease: "power1.inOut"
     });
     
     gsap.to(transitionAngleOuter, {
-      value: INNER_ANGLE_START + Math.PI * 2, // 转过整个外角区域
+      value: INNER_ANGLE_START.value + Math.PI * 2, // 转过整个外角区域
       duration: duration,
       ease: "power1.inOut",
       onComplete: () => {
@@ -1804,6 +2083,10 @@ onUnmounted(() => {
   // 清理Canvas动画循环
   if (canvasAnimationId.value) {
     cancelAnimationFrame(canvasAnimationId.value);
+  }
+  // 清理移动端检测监听器
+  if (import.meta.client) {
+    window.removeEventListener('resize', detectMobile);
   }
 });
 

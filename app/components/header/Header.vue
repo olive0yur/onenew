@@ -5,7 +5,7 @@
       color: headerColor,
       backgroundColor: headerBgColor,
     }"
-    class="fixed top-0 left-0 right-0 z-[1000] pt-[24px] px-[40px] flex justify-between items-center transition-all duration-500 ease-in-out"
+    class="fixed top-0 left-0 right-0 z-[1000] pt-[24px] lg:px-[40px] px-[16px] flex justify-between items-center transition-all duration-500 ease-in-out"
   >
     <div>
       <img
@@ -17,9 +17,12 @@
     <div
       class="nav flex items-center gap-[120px] text-[16px] font-[400] leading-[16px]"
       :style="{ color: headerColor }"
-    >
-      <span @click="openMenu" class="nav-button flex items-center cursor-pointer hover:underline underline-offset-4">
-        <GlitchText text="MENU 菜单" :speed="30" :iterations="3" />
+    > 
+      <span @click="openMenu" class="lg:hidden block text-[12px] lg:text-[16px]">
+        <GlitchText text="MENU" :speed="30" :iterations="3"  />
+      </span>
+      <span @click="openMenu" class="nav-button items-center cursor-pointer hover:underline underline-offset-4 text-[12px] lg:text-[16px] lg:flex hidden">
+        <GlitchText text="MENU" :speed="30" :iterations="3"  />
         <!-- <button
           @click="value = !value"
           class="relative inline-flex h-[22px] w-[44px] items-center rounded-full transition-colors duration-500 ease-in-out focus:outline-none"
@@ -35,36 +38,37 @@
       </span>
       <GlitchText
         text="WORKS 案例"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1"
+        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
         :speed="30"
         :iterations="3"
       />
       <GlitchText
         text="ABOUT 关于"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-2"
+        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-2 hidden lg:block"
         :speed="30"
         :iterations="3"
       />
       <GlitchText
         text="CONTACT 联系"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-3"
+        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-3 hidden lg:block"
         :speed="30"
         :iterations="3"
       />
     </div>
 
     <div @click.stop.prevent="closeMenu" class="menu fixed z-[1001] w-[100vw] top-0 left-0 bg-[rgba(0,0,0,0.3)]">
-      <div @click.stop.prevent="()=>{}" class="bg-[#3B4EFF] px-[40px] pt-[25px] menu-content relative">
+      <div @click.stop.prevent="()=>{}" class="bg-[#3B4EFF] px-[16px] lg:px-[40px] pt-[25px] menu-content relative h-[100dvh] lg:h-auto">
         <div class="flex justify-between items-center text-[16px] text-[#EEE]">
             <img
               :src="imgBaseURL('logo.svg')"
               alt=""
               class="w-auto h-[17px] cursor-pointer"
             />
-          <span class="cursor-pointer hover:underline underline-offset-4" @click.stop.prevent="closeMenu">CLOSE 关闭</span>
+          <span class="cursor-pointer hover:underline underline-offset-4 hidden lg:block" @click.stop.prevent="closeMenu">CLOSE 关闭</span>
+           <span class="cursor-pointer hover:underline underline-offset-4 block lg:hidden text-[12px] lg:text-[16px]" @click.stop.prevent="closeMenu">MENU</span>
         </div>
 
-        <div class="mt-[120px] flex flex-col w-[288px]">
+        <div class="mt-[120px]  flex-col w-[288px] lg:flex hidden">
           <div>
             <img :src="imgBaseURL('image140.png')" alt="" class="w-[288px] h-[162px] text-[16px] text-[#EEE]">
             <div class="flex justify-between items-center text-white">
@@ -74,50 +78,61 @@
           </div>
         </div>
 
-        <div class="mt-[66px] flex flex-col w-[288px] text-white">
-          <span>Atlanta, Georgia, USA</span>
-          <span>15252507831</span>
-          <span>1761973105@qq.com</span>
+        <div class="lg:mt-[66px] mt-[80px] flex justify-between w-[100%] lg:w-[288px] text-white">
+          <div class="flex flex-col text-[12px] lg:text-[16px]">
+            <span>Atlanta, Georgia, USA</span>
+            <span>15252507831</span>
+            <span>1761973105@qq.com</span>
+          </div>
+          <div class="lg:hidden block text-[12px]">
+            <img :src="imgBaseURL('image140.png')" alt="" class="w-[100px] h-[56px] text-[16px] text-[#EEE]">
+            <div class="flex justify-between items-center text-white">
+              <span></span>
+              <span>{{ currentTime }}</span>
+            </div>
+          </div>
         </div>
 
-        <div class="mt-[40px] flex flex-col w-[288px]">
-          <ContactButton 
-            text="GET IN TOUCH 联系"
-            @hover="onContactHover"
-            @leave="onContactLeave"
-          />
-        </div>
+        <div class="absolute bottom-0 left-[16px] right-[16px] lg:relative lg:left-0 lg:right-0">
+          <div class="mt-[40px] flex flex-col w-[288px] lg:text-[16px] text-[12px]">
+            <ContactButton 
+              text="GET IN TOUCH 联系"
+              @hover="onContactHover"
+              @leave="onContactLeave"
+            />
+          </div>
 
-        <div class="mt-[84px] h-[1px] bg-[#fff] opacity-20"></div>
+          <div class="mt-[16px] lg:mt-[84px] h-[1px] bg-[#fff] opacity-20"></div>
 
-        <div class="h-[72px] flex justify-end items-center text-[24px] text-[#EEE]">
-          <span class="mr-[60px]">
-            <GlitchText text="X 推特" :speed="30" :iterations="3" />
-          </span>
-          <span>
-            <GlitchText text="RED BOOK 小红书" :speed="30" :iterations="3" />
-          </span>
+          <div class="lg:h-[72px] h-[44px] flex lg:justify-end items-center text-[24px] text-[#EEE]">
+            <span class="lg:mr-[60px] mr-[46px] text-[12px] lg:text-[24px]">
+              <GlitchText text="X 推特" :speed="30" :iterations="3" />
+            </span>
+            <span class="text-[12px] lg:text-[24px]">
+              <GlitchText text="RED BOOK 小红书" :speed="30" :iterations="3" />
+            </span>
+          </div>
         </div>
 
         <!-- 右侧文字 -->
         <div 
-          class="absolute flex flex-col z-[1002] top-[161px] right-[319px]"
+          class="absolute flex-col z-[1002] bottom-[115px] lg:top-[161px] lg:right-[319px] lg:flex"
           @mouseleave="hoveredIndex = null"
         >
           <div 
             v-for="(item, index) in menuItems" 
             :key="item.path"
-            class="menu-item-wrapper relative cursor-pointer mb-[20px] transition-opacity duration-300"
+            class="menu-item-wrapper relative cursor-pointer mb-[16px] lg:mb-[20px] transition-opacity duration-300"
             :class="{ 'dimmed': hoveredIndex !== null && hoveredIndex !== index }"
             @mouseenter="hoveredIndex = index"
             :ref="el => setMenuItemRef(el, index)"
           >
             <div class="flex items-baseline relative">
               <div class="flex items-baseline menu-text-wrapper">
-                <span class="text-[64px] text-[#EEE]">{{ item.enName }}</span>
-                <span class="text-[32px] text-[#EEE] ml-[16px]">{{ item.cnName }}</span>
+                <span class="lg:text-[64px] text-[40px] text-[#EEE]">{{ item.enName }}</span>
+                <span class="lg:text-[32px] text-[20px] text-[#EEE] ml-[16px]">{{ item.cnName }}</span>
               </div>
-              <svg class="menu-arrow ml-[12px]" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 32 32" fill="none">
+              <svg class="menu-arrow lg:ml-[12px] ml-[8px]" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 32 32" fill="none">
                 <path d="M28 16H4" stroke="white" stroke-width="2"/>
                 <path d="M20 8L28 16L20 24" stroke="white" stroke-width="2"/>
               </svg>

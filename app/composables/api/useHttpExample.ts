@@ -52,6 +52,18 @@ export const useGetGroupImage = async (params?: object) => {
   };
 };
 
+export const useWebCount = async (params?: object) => {
+  const { data, pending, error, refresh } = await useHttp.post<Response>(
+    "web-collection/record"
+  );
+  return {
+    data,
+    pending,  
+    error,
+    refresh,
+  };
+};
+
 /**
  * 示例：使用 POST 请求提交数据
  */

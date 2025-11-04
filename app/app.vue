@@ -5,3 +5,8 @@
     </NuxtLayout>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useWebCount } from '~/composables/api/useHttpExample';
+useWebCount();
+</script>

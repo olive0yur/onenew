@@ -6,17 +6,17 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "ONEW - 专业网站制造商",
+      title: "ONEW专业网站制造商",
       meta: [
         {
           name: "description",
           content:
-            "ONEW 是专业的网站制造商，提供网站设计、网站制作、网站开发、网站优化、网站推广等全方位网站解决方案，助力中国制造业和外贸企业拓展全球市场。",
+            "ONEW设计建立于2018年，是一家致力于高端网站建设以及小程序app开发，软件定制，数字营销服务的一体化互联网公司，7年来为大量企业制作高端网站设计，深受客户好评，我们致力每一个品牌走向世界的舞台!",
         },
         {
           name: "keywords",
           content:
-            "ONEW,跨境电商,网站制造商,网站设计,网站制作,网站开发,网站优化,网站推广,网站解决方案,网站服务,网站解决方案,一站式服务",
+            "OONEW,杭州onew,云联在线,杭州网站建设,网站建设,设计工作室,重庆网站建设,专业网站制作,高端网站设计,网站定制开发",
         },
         { name: "author", content: "ONEW" },
         { name: "robots", content: "index,follow" },
@@ -24,7 +24,7 @@ export default defineNuxtConfig({
         {
           property: "og:description",
           content:
-            "专业的网站制造商，提供网站设计、网站制作、网站开发、网站优化、网站推广等全方位网站解决方案，助力中国制造业和外贸企业拓展全球市场。",
+            "ONEW设计建立于2018年，是一家致力于高端网站建设以及小程序app开发，软件定制，数字营销服务的一体化互联网公司，7年来为大量企业制作高端网站设计，深受客户好评，我们致力每一个品牌走向世界的舞台!",
         },
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "ONEW" },
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
         {
           name: "twitter:description",
           content:
-            "专业的网站制造商，提供网站设计、网站制作、网站开发、网站优化、网站推广等全方位网站解决方案，助力中国制造业和外贸企业拓展全球市场。",
+            "ONEW设计建立于2018年，是一家致力于高端网站建设以及小程序app开发，软件定制，数字营销服务的一体化互联网公司，7年来为大量企业制作高端网站设计，深受客户好评，我们致力每一个品牌走向世界的舞台!",
         },
       ],
     },

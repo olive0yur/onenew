@@ -53,9 +53,36 @@ export const useGetGroupImage = async (params?: object) => {
 };
 
 export const useWebCount = async (params?: object) => {
+  // 获取真实 IP 地址
+  let clientIp = '';
+  
+  // 只在服务端执行
+  if (process.server) {
+    const event = useRequestEvent();
+    if (event) {
+      const headers = event.node.req.headers;
+      clientIp = 
+        (headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+        (headers['x-real-ip'] as string) ||
+        (headers['cf-connecting-ip'] as string) ||
+        event.node.req.socket.remoteAddress ||
+        '';
+      
+      if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
+        clientIp = '127.0.0.1';
+      }
+    }
+  }
+  
+  // 将 IP 地址添加到请求体中
   const { data, pending, error, refresh } = await useHttp.post<Response>(
-    "web-collection/record"
+    "web-collection/record",
+    {
+      clientIp,
+      ...params
+    }
   );
+  
   return {
     data,
     pending,  

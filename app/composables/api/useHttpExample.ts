@@ -96,7 +96,10 @@ export const useWebCount = async (params?: object) => {
     {
       clientIp,
       type: deviceType,
-      ...params
+      ...params,
+    },
+    {
+      server: true,
     }
   );
   
@@ -111,7 +114,14 @@ export const useWebCount = async (params?: object) => {
 //获取公司信息
 export const useGetCompanyInfo = async (params?: object) => {
   const { data, pending, error, refresh } = await useHttp.get<Response>(
-    "dict/company"
+    "dict/company",
+    {
+      params, // GET 请求参数
+      // 可选配置
+      lazy: false, // 是否懒加载
+      server: true, // 是否在服务端执行
+      watch: [], // 监听的响应式数据
+    }
   );
   return {
     data,

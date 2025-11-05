@@ -1699,6 +1699,8 @@ const {data: customerListData} = await useDictList({ typeName: 'customer-list' }
 const {data: groupImageData} = await useGetGroupImage();
 const {data: clickImageListData} = await useDictList({ typeName: 'click-image-list' });
 
+
+
 // 监听数据变化并更新 ref
 watch(homeFixedData, (newVal) => { homeFixed.value = newVal?.data ?? []; }, { immediate: true });
 watch(aboutListData, (newVal) => { aboutList.value = newVal?.data ?? []; }, { immediate: true });
@@ -1731,6 +1733,7 @@ watch(groupImageData, (newVal) => {
   hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
 }, { immediate: true });
 watch(clickImageListData, (newVal) => { clickImageList.value = newVal?.data ?? [];}, { immediate: true });
+
 
 onMounted(async() => {
   initLenis(); // 初始化 Lenis 平滑滚动

@@ -81,8 +81,8 @@
         <div class="lg:mt-[66px] mt-[80px] flex justify-between w-[100%] lg:w-[288px] text-white">
           <div class="flex flex-col text-[12px] lg:text-[16px]">
             <span>Atlanta, Georgia, USA</span>
-            <span>15252507831</span>
-            <span>1761973105@qq.com</span>
+            <span>{{companyInfo?.company_phone}}</span>
+            <span>{{companyInfo?.company_email}}</span>
           </div>
           <div class="lg:hidden block text-[12px]">
             <img :src="imgBaseURL('image140.png')" alt="" class="w-[100px] h-[56px] text-[16px] text-[#EEE]">
@@ -153,7 +153,7 @@ import GlitchText from "~/components/ui/GlitchText.vue";
 import ContactButton from "~/components/ui/ContactButton.vue";
 import { useLenis } from "~/composables/useLenis";
 import { imgBaseURL } from "~/utils";
-
+import { useGetCompanyInfo } from "~/composables/api/useHttpExample";
 const opacity = ref(1);
 const value = ref(false);
 const logoUrl = ref(imgBaseURL('logo.svg'));
@@ -162,6 +162,19 @@ const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
 const menuItemRefs: (HTMLElement | null)[] = [];
 let timeInterval: NodeJS.Timeout | null = null;
+interface CompanyInfo {
+  company_email: string;
+  company_phone: string;
+  company_name: string;
+  company_address: string;
+  company_logo: string;
+  company_description: string;
+}
+const companyInfo = ref<CompanyInfo>();
+
+const {data: companyInfoData} = await useGetCompanyInfo();
+watch(companyInfoData, (newVal) => { companyInfo.value = newVal?.data ?? [];
+}, { immediate: true });
 
 // 使用 lenis composable
 const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
@@ -311,7 +324,7 @@ const navItemsDisappear = () => {
       .to(
         ".nav-button",
         {
-          x: moveDistance-0, // 移动到最右边span的位置
+          x: moveDistance+60, // 移动到最右边span的位置
           duration: 0.8,
           ease: "power2.inOut",
         },

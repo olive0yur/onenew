@@ -9,8 +9,8 @@
         <!-- 联系我们 -->
         <div class="flex flex-col">
           <span class="text-[14px] lg:text-[16px] text-[#FFF] leading-[16px] mb-[12px]">/联系我们</span>
-          <span class="text-[20px] lg:text-[24px] text-[#FFF] leading-[28px] lg:leading-[32px]">1761973105@qq.com</span>
-          <span class="text-[20px] lg:text-[24px] text-[#FFF] leading-[28px] lg:leading-[32px]">+86 15252507831</span>
+          <span class="text-[20px] lg:text-[24px] text-[#FFF] leading-[28px] lg:leading-[32px]">{{companyInfo?.company_email}}</span>
+          <span class="text-[20px] lg:text-[24px] text-[#FFF] leading-[28px] lg:leading-[32px]">+86 {{companyInfo?.company_phone}}</span>
         </div>
         
         <!-- 导航和跟随我们 -->
@@ -55,7 +55,14 @@
         <!-- 版权信息和返回顶部 -->
         <div class="flex lg:flex-col justify-between items-start lg:items-end gap-[24px] lg:gap-0">
           <div class="text-[12px] lg:text-[16px] text-[#EEEEEE] opacity-60 leading-[18px] lg:leading-[16px] order-1 lg:order-2 ">
-            <span class="block lg:inline">ONEW原创版权归杭州云联在线科技有限公司所有 盗用必究 ©2025</span>
+            <span class="block lg:inline"> 
+              <a
+                href="https://beian.miit.gov.cn/"
+                target="_blank"
+                class="ml-[1px] cursor-pointer hover:underline-offset-2 hover:underline inline-flex items-center"
+                ><img src="/static/gh.png" class="h-[20px] w-[20px] mr-[10px]" alt=""> 浙ICP备2025205436号</a
+              >
+            </span>
           </div>
           <div 
             class="text-[14px] lg:text-[16px] text-[#FFF] leading-[16px] flex items-center order-2 lg:order-1 cursor-pointer hover:opacity-80 transition-opacity"
@@ -72,11 +79,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-
+import { useGetCompanyInfo } from "~/composables/api/useHttpExample";
 // placeholder 打字机效果
 const placeholderText = ref('ENTER EMAIL')
 const fullText = 'ENTER EMAIL'
 let isTyping = false
+interface CompanyInfo {
+  company_email: string;
+  company_phone: string;
+  company_name: string;
+  company_address: string;
+  company_logo: string;
+  company_description: string;
+}
+const companyInfo = ref<CompanyInfo>();
 
 const startTypewriter = () => {
   if (isTyping) return // 如果正在打字，不重复执行
@@ -103,6 +119,10 @@ const scrollToTop = () => {
     behavior: 'smooth' // 平滑滚动
   })
 }
+
+const {data: companyInfoData} = await useGetCompanyInfo();
+watch(companyInfoData, (newVal) => { companyInfo.value = newVal?.data ?? [];
+}, { immediate: true });
 </script>
 
 <style scoped>

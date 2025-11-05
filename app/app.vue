@@ -8,5 +8,5 @@
 
 <script setup lang="ts">
 import { useWebCount } from '~/composables/api/useHttpExample';
-useWebCount();
+ const {data: webCountData} = await useWebCount();
 </script>

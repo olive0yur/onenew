@@ -32,6 +32,7 @@ export const useDictList = async (params?: object) => {
   };
 };
 
+//获取图片组
 export const useGetGroupImage = async (params?: object) => {
   const { data, pending, error, refresh } = await useHttp.get<Response>(
     "dict/img-group",
@@ -52,15 +53,19 @@ export const useGetGroupImage = async (params?: object) => {
   };
 };
 
+//收集访问信息
 export const useWebCount = async (params?: object) => {
   // 获取真实 IP 地址
   let clientIp = '';
+  let deviceType = 'pc'
   
   // 只在服务端执行
   if (process.server) {
     const event = useRequestEvent();
     if (event) {
       const headers = event.node.req.headers;
+      
+      // 获取真实 IP
       clientIp = 
         (headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
         (headers['x-real-ip'] as string) ||
@@ -71,14 +76,26 @@ export const useWebCount = async (params?: object) => {
       if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
         clientIp = '127.0.0.1';
       }
+      
+      // 检测设备类型
+      const userAgent = (headers['user-agent'] || '').toLowerCase();
+      const mobileKeywords = [
+        'mobile', 'android', 'iphone', 'ipad', 'ipod', 
+        'blackberry', 'windows phone', 'webos', 'opera mini'
+      ];
+      
+      deviceType = mobileKeywords.some(keyword => userAgent.includes(keyword)) 
+        ? 'mobile' 
+        : 'pc';
     }
   }
   
-  // 将 IP 地址添加到请求体中
+  // 将 IP 地址和设备类型添加到请求体中
   const { data, pending, error, refresh } = await useHttp.post<Response>(
     "web-collection/record",
     {
       clientIp,
+      type: deviceType,
       ...params
     }
   );
@@ -86,6 +103,19 @@ export const useWebCount = async (params?: object) => {
   return {
     data,
     pending,  
+    error,
+    refresh,
+  };
+};
+
+//获取公司信息
+export const useGetCompanyInfo = async (params?: object) => {
+  const { data, pending, error, refresh } = await useHttp.get<Response>(
+    "dict/company"
+  );
+  return {
+    data,
+    pending,
     error,
     refresh,
   };

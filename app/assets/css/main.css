@@ -3,12 +3,12 @@
 @tailwind utilities;
 @font-face {
     font-family: "Inter";
-    src: url("/fonts/Inter.ttf") format("truetype");
+    src: url("https://static.onew.design/Inter.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Noto";
-    src: url("/fonts/Noto.ttf") format("truetype");
+    src: url("https://static.onew.design/Noto.ttf") format("truetype");
 }
 
 

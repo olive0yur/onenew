@@ -19,7 +19,7 @@ export const useDictList = async (params?: object) => {
       params, // GET 请求参数
       // 可选配置
       lazy: false, // 是否懒加载
-      server: true, // 保持 true 以支持 SSR 和 SEO
+      server: false, // 保持 true 以支持 SSR 和 SEO
       watch: [], // 监听的响应式数据
       // 添加缓存控制,确保每次路由切换都能获取数据
       getCachedData: null, // 禁用缓存,允许客户端导航时重新请求
@@ -42,7 +42,7 @@ export const useGetGroupImage = async (params?: object) => {
       params, // GET 请求参数
       // 可选配置
       lazy: false, // 是否懒加载
-      server: true, // 保持 true 以支持 SSR 和 SEO
+      server: false, // 保持 true 以支持 SSR 和 SEO
       watch: [], // 监听的响应式数据
       getCachedData: null, // 禁用缓存,允许客户端导航时重新请求
     }
@@ -122,7 +122,7 @@ export const useGetCompanyInfo = async (params?: object) => {
       params, // GET 请求参数
       // 可选配置
       lazy: false, // 是否懒加载
-      server: true, // 保持 true 以支持 SSR 和 SEO
+      server: false, // 保持 true 以支持 SSR 和 SEO
       watch: [], // 监听的响应式数据
       getCachedData: null, // 禁用缓存,允许客户端导航时重新请求
     }

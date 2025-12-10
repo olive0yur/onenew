@@ -1268,6 +1268,12 @@ const initScrollingImagesAnimations = (
   bracketPath: any[],
   scaleDuration: number
 ) => {
+  // 如果没有图片数据，直接返回
+  if (!scrollImage.value || scrollImage.value.length === 0) {
+    console.warn('scrollImage 数据为空，跳过图片滚动动画');
+    return;
+  }
+  
   if (isMobile.value) {
     // ===== 移动端：图片沿曲线路径从左到右滚动 =====
     const mobileCurvePath:any = generateMobileCurvePath(); // 生成移动端曲线路径
@@ -1472,6 +1478,12 @@ const initScrollingImagesAnimations = (
 
 // ===== 滚动文字动画 =====
 const initScrollingTextAnimations = (timeline: gsap.core.Timeline, scaleDuration: number) => {
+  // 如果没有数据，直接返回
+  if (!scrollWords.value || scrollWords.value.length === 0) {
+    console.warn('scrollWords 数据为空，跳过文字滚动动画');
+    return;
+  }
+  
   if (isMobile.value) {
     // ===== 移动端：整个容器从右到左滚动，文字依次经过中心高亮 =====
     const itemWidth = 200; // 每个文字宽度
@@ -1798,6 +1810,9 @@ onMounted(async() => {
   }
   
   initLenis(); // 初始化 Lenis 平滑滚动
+  
+  // 等待 DOM 渲染完成后再初始化 GSAP 动画
+  await nextTick();
   renderIndex();
   
   // 延迟设置hover效果，确保DOM已经完全渲染

@@ -130,6 +130,7 @@
             :key="item.path"
             class="menu-item-wrapper relative cursor-pointer mb-[16px] lg:mb-[20px] transition-opacity duration-300"
             :class="{ 'dimmed': hoveredIndex !== null && hoveredIndex !== index }"
+            @click="goPath(item.path)"
             @mouseenter="hoveredIndex = index"
             :ref="el => setMenuItemRef(el, index)"
           >
@@ -183,6 +184,11 @@ interface CompanyInfo {
   redbook_name: string;
 }
 const companyInfo = ref<CompanyInfo>();
+
+const goPath = (path: string) => {
+  navigateTo(path);
+  closeMenu();
+}
 
 const {data: companyInfoData} = await useGetCompanyInfo();
 watch(companyInfoData, (newVal) => { companyInfo.value = newVal?.data ?? [];
@@ -256,7 +262,7 @@ watch(activeSection, (section) => {
 // 菜单项数据
 const menuItems = [
   { enName: 'HOME', cnName: '首页', path: '/' },
-  { enName: 'WORKS', cnName: '案例', path: '/works' },
+  { enName: 'WORKS', cnName: '案例', path: '/case' },
   { enName: 'ABOUT', cnName: '关于', path: '/about' },
   { enName: 'CONTACT', cnName: '联系', path: '/contact' }
 ];

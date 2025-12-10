@@ -656,24 +656,29 @@ const setupHoverEffects = () => {
   }
 };
 
+// 使用独立的 key 确保每次进入页面都能重新获取数据
+const routeKey = ref(Date.now());
+
 const {data: caseListData} = await useDictList({ typeName: 'case' });
 const {data: projectListData} = await useDictList({ typeName: 'project' });
 const {data: projectSloganData} = await useDictList({ typeName:'project-slogan' });
 const {data: blogListData} = await useDictList({ typeName: 'blog' });
 
-
 watch(caseListData, (newVal) => {
   caseList.value = newVal?.data ?? [];
 }, { immediate: true });
+
 watch(projectListData, (newVal) => {
   projectList.value = newVal?.data ?? [];
   const data = newVal?.data ?? [];
   projectListArr.value = data.length > 0 ? data.slice(0, 2) : [];
   projectListArr2.value = data.length > 2 ? data.slice(2) : [];
 }, { immediate: true });
+
 watch(projectSloganData, (newVal) => {
   projectSlogan.value = newVal?.data ?? [];
 }, { immediate: true });
+
 watch(blogListData, (newVal) => {
   blogList.value = newVal?.data ?? [];
   // 数据加载后初始化位置

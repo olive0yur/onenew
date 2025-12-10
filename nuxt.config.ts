@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "ONEW专业网站制造商",
+      title: "ONEW专业网站建设公司 云联在线",
       meta: [
         {
           name: "description",
@@ -20,7 +20,7 @@ export default defineNuxtConfig({
         },
         { name: "author", content: "ONEW" },
         { name: "robots", content: "index,follow" },
-        { property: "og:title", content: "ONEW - 专业网站制造商" },
+        { property: "og:title", content: "ONEW - 专业网站建设公司" },
         {
           property: "og:description",
           content:
@@ -29,7 +29,7 @@ export default defineNuxtConfig({
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "ONEW" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: "ONEW - 专业网站制造商" },
+        { name: "twitter:title", content: "ONEW - 专业网站建设公司" },
         {
           name: "twitter:description",
           content:

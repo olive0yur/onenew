@@ -18,7 +18,8 @@ export const formatQueryUrl = (query: any) => {
   }
 };
 
-export const imgBaseURL = (url:string)=>{
+export const imgBaseURL = (url:string|undefined)=>{
+  if (!url) return '';
   return `https://static.onew.design/${url}`
 }
 

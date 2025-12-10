@@ -4,6 +4,7 @@
       opacity: opacityValue,
       color: headerColor,
       backgroundColor: headerBgColor,
+      ...(isMounted ? { transform: isHeaderVisible ? 'translateY(0)' : 'translateY(-100%)' } : {}),
     }"
     class="fixed top-0 left-0 right-0 z-[1000] pt-[24px] lg:px-[40px] px-[16px] flex justify-between items-center transition-all duration-500 ease-in-out"
   >
@@ -12,6 +13,7 @@
         :src="logoUrl"
         alt=""
         class="w-auto h-[17px] cursor-pointer "
+        @click="navigateTo('/')"
       />
     </div>
     <div
@@ -41,6 +43,7 @@
         class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
         :speed="30"
         :iterations="3"
+        @click="navigateTo('/case')"
       />
       <GlitchText
         text="ABOUT 关于"
@@ -70,9 +73,12 @@
 
         <div class="mt-[120px]  flex-col w-[288px] lg:flex hidden">
           <div>
-            <img :src="imgBaseURL('image140.png')" alt="" class="w-[288px] h-[162px] text-[16px] text-[#EEE]">
+            <video :src="imgBaseURL(companyInfo?.video)" alt="" class="w-[288px] h-[162px]" autoplay muted loop></video>
             <div class="flex justify-between items-center text-white">
-              <span>灵感来源于足够的休息</span>
+              <span class="flex items-center">
+                <span>{{ companyInfo?.video_desc }}</span>
+                <img src="/static/image180.png" class="w-[16px] h-[16px] ml-[8px]" alt="">
+              </span>
               <span>{{ currentTime }}</span>
             </div>
           </div>
@@ -80,7 +86,7 @@
 
         <div class="lg:mt-[66px] mt-[80px] flex justify-between w-[100%] lg:w-[288px] text-white">
           <div class="flex flex-col text-[12px] lg:text-[16px]">
-            <span>Atlanta, Georgia, USA</span>
+            <span>{{companyInfo?.company_address}}</span>
             <span>{{companyInfo?.company_phone}}</span>
             <span>{{companyInfo?.company_email}}</span>
           </div>
@@ -105,11 +111,11 @@
           <div class="mt-[16px] lg:mt-[84px] h-[1px] bg-[#fff] opacity-20"></div>
 
           <div class="lg:h-[72px] h-[44px] flex lg:justify-end items-center text-[24px] text-[#EEE]">
-            <span class="lg:mr-[60px] mr-[46px] text-[12px] lg:text-[24px]">
-              <GlitchText text="X 推特" :speed="30" :iterations="3" />
+            <span class="lg:mr-[60px] mr-[46px] text-[12px] lg:text-[24px] cursor-pointer">
+              <GlitchText @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
             </span>
-            <span class="text-[12px] lg:text-[24px]">
-              <GlitchText text="RED BOOK 小红书" :speed="30" :iterations="3" />
+            <span class="text-[12px] lg:text-[24px] cursor-pointer">
+              <GlitchText @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
             </span>
           </div>
         </div>
@@ -169,6 +175,12 @@ interface CompanyInfo {
   company_address: string;
   company_logo: string;
   company_description: string;
+  video: string;
+  video_desc: string;
+  x: string;
+  x_name: string;
+  redbook: string;
+  redbook_name: string;
 }
 const companyInfo = ref<CompanyInfo>();
 
@@ -183,7 +195,17 @@ const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useL
 const headerColor = ref('#ffffff');
 const headerBgColor = ref('transparent');
 
+// 移动端滚动隐藏/显示 Header
+const lastScrollY = ref(0);
+const isHeaderVisible = ref(true);
+
+// SSR hydration 标记 - 确保 transform 样式只在客户端渲染后才应用
+const isMounted = ref(false);
+
 onMounted(() => {
+  // 标记组件已挂载，用于 SSR hydration
+  isMounted.value = true;
+  
   // 使用更密集的阈值，让监听更连续（每 5% 触发一次）
   observeSections('section', {
     threshold: Array.from({ length: 21 }, (_, i) => i * 0.05)
@@ -194,6 +216,8 @@ onMounted(() => {
   updateTime();
   // 每秒更新时间
   timeInterval = setInterval(updateTime, 1000);
+  // 监听移动端滚动方向
+  handleMobileScrollDirection();
 });
 
 onUnmounted(() => {
@@ -202,6 +226,11 @@ onUnmounted(() => {
     clearInterval(timeInterval);
   }
 });
+
+const goPage = (url: string) => {
+  if (!url) return;
+  window.open(url, '_blank');
+}
 
 
 // 定义每个区域的主题配置（深色背景用白色文字，浅色背景用黑色文字）
@@ -391,6 +420,40 @@ const onContactHover = () => {
 
 const onContactLeave = () => {
   // 可以在这里添加其他 leave 效果
+};
+
+// 处理移动端滚动方向
+const handleMobileScrollDirection = () => {
+  // 监听 scrollY 的变化
+  watch(scrollY, (newScrollY) => {
+    // 只在移动端生效（屏幕宽度小于 1024px）
+    if (window.innerWidth >= 1024) {
+      isHeaderVisible.value = true;
+      return;
+    }
+
+    // 滚动距离小于 80px 时始终显示 header
+    if (newScrollY < 80) {
+      isHeaderVisible.value = true;
+      lastScrollY.value = newScrollY;
+      return;
+    }
+
+    // 判断滚动方向
+    const scrollDiff = newScrollY - lastScrollY.value;
+    
+    // 滚动差值大于 5px 才触发（避免小幅抖动）
+    if (Math.abs(scrollDiff) > 5) {
+      if (scrollDiff > 0) {
+        // 向下滚动 - 隐藏 header
+        isHeaderVisible.value = false;
+      } else {
+        // 向上滚动 - 显示 header
+        isHeaderVisible.value = true;
+      }
+      lastScrollY.value = newScrollY;
+    }
+  });
 };
 </script>
 

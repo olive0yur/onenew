@@ -1,6 +1,18 @@
 <template>
-  <div class="overflow-hidden">
-    <div>
+  <div class="overflow-hidden" :class="{'bg-[#283faa]': showLoadingVideo}">
+    <div v-if="showLoadingVideo" class="w-[100vw] h-[100dvh] fixed top-0 left-0 z-[100000] transition-opacity duration-500" :class="{ 'opacity-0': isVideoFadingOut }">
+      <div class="lg:h-[180px] h-[100px] w-[100vw] absolute top-0 left-0 flex items-center">
+         <img src="/static/Subtract.svg"  class="lg:h-[180px] lg:w-[180px] h-[100px] w-[100px]"  alt=""></img>
+         <div class="bg-[#FFFFFF33] h-[1px] w-[100%] flex-1"></div>
+         <span class="loading-text-remark">{{ homeFixed[0]?.remark }}</span>
+      </div>
+      <div class="h-[180px] absolute bottom-[80px] right-[80px] loading-text">
+        <span>{{loadingText}}</span>
+        <span>%</span>
+      </div>
+      <video :src="imgBaseURL(homeFixed[0]?.video)" autoplay muted loop class="w-full h-full object-cover"></video>
+    </div>
+    <div :class="{ 'opacity-0': showLoadingVideo }">
       <section id="section-0" class="section-0 relative w-[100vw] h-[100dvh]">
         <div 
           class="section-0-warp w-full h-[100dvh] bg-[#3B4EFF]/50 blue-mask relative"
@@ -33,7 +45,7 @@
 
       <section
         id="section-1"
-        class="section-1 w-[100vw] min-h-[100dvh] bg-[#F8F8F8] lg:p-[40px] p-[16px] overflow-hidden rotate-[0deg] mt-[30vh]"
+        class="section-1 w-[100vw] h-auto bg-[#F8F8F8] lg:p-[40px] p-[16px] overflow-hidden rotate-[0deg] mt-[30vh]"
       >
         <div class="lg:text-[16px] text-[12px] text-[#000]">
           <span class="mr-[4px]"> /</span>
@@ -255,20 +267,22 @@
                       class="h-[360px] overflow-hidden list-card-wrap relative">
                       <div ref="listCardItemWrap" class="flex lg:gap-[40px] gap-[16px] list-card-item-wrap"> 
                         <div class="lg:w-[586px] w-[252px] lg:h-[360px] h-[328px] box-border flex-shrink-0 bg-[#fff] list-card-item lg:p-[40px] p-[16px]" v-for="(item, index) in customerList" :key="item.title">
-                          <div >
-                            <img :src="imgBaseURL(item?.img1)" class="h-[24px] w-[172px] lg:mb-[24px] mb-[16px]" alt="">
-                            <p class="lg:text-[16px] text-[12px] leading-[24px] text-[#666] lg:mb-[80px] mb-[34px]">{{ item?.description }}</p>
+                          <div class="h-[100%]">
+                            <img :src="imgBaseURL(item?.img1)" class="h-[24px] w-auto lg:mb-[24px] mb-[16px]" alt="">
+                            <div class="flex flex-col justify-between h-[100%] ">
+                              <p class="lg:text-[16px] text-[12px] leading-[24px] text-[#666]">{{ item?.description }}</p>
 
-                            <div class="flex justify-between items-center">
-                              <div class="flex items-center">
-                                <img :src="imgBaseURL(item?.img)" class="lg:h-[60px] lg:w-[60px] h-[32px] w-[32px] mr-[16px]" alt="">
-                                <div class="flex flex-col">
-                                  <span class="lg:text-[16px] text-[12px] text-[#293238] lg:leading-[16px] leading-[12px]">{{ item?.dict_value }}</span>
-                                  <span class="lg:text-[16px] text-[12px] text-[#666] lg:leading-[16px] leading-[12px]">{{ item?.remark }}</span>
+                              <div class="flex justify-between items-center mb-[40px] ">
+                                <div class="flex items-center">
+                                  <img :src="imgBaseURL(item?.img)" class="lg:h-[60px] lg:w-[60px] h-[32px] w-[32px] mr-[16px]" alt="">
+                                  <div class="flex flex-col">
+                                    <span class="lg:text-[16px] text-[12px] text-[#293238] lg:leading-[16px] leading-[12px]">{{ item?.dict_value }}</span>
+                                    <span class="lg:text-[16px] text-[12px] text-[#666] lg:leading-[16px] leading-[12px]">{{ item?.remark }}</span>
+                                  </div>
                                 </div>
-                              </div>
-                              <div class="lg:text-[16px] text-[12px] text-[#666]">
-                                / 0{{ index+1 }}
+                                <div class="lg:text-[16px] text-[12px] text-[#666]">
+                                  / 0{{ index+1 }}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -302,12 +316,21 @@
           <div class="section-4-line-bottom absolute h-[1px] bg-[#FFF] lg:left-[147px] left-[49%] lg:top-[calc(50vh+10px)] top-[200px] lg:rotate-[45deg] rotate-[135deg] origin-left z-[22]"></div>
 
           <div class="redbook absolute w-[100%] lg:top-[50%] top-[56%] lg:translate-y-[-50%] lg:left-[352px] z-[10] text-[#fff] text-[16px] flex flex-col items-center lg:items-start">
-            <span class="lg:text-[64px] text-[24px] lg:leading-[64px] leading-[24px] lg:mb-[24px] mb-[12px] redbook-mark">{{clickImageList[currentImageIndex]?.remark}}</span>
-            <span class="lg:text-[32px] text-[16px] lg:leading-[32px] leading-[16px] redbook-title">{{clickImageList[currentImageIndex]?.label}}</span>
+            <span 
+              class="lg:text-[64px] text-[24px] lg:leading-[64px] leading-[24px] lg:mb-[24px] mb-[12px] redbook-mark"
+              :class="isTextAnimating ? 'redbook-fade-out' : 'redbook-fade-in-up'"
+            >{{clickImageList[currentImageIndex]?.remark}}</span>
+            <span 
+              class="lg:text-[32px] text-[16px] lg:leading-[32px] leading-[16px] redbook-title"
+              :class="isTextAnimating ? 'redbook-fade-out redbook-fade-out-delay' : 'redbook-fade-in-up redbook-fade-in-up-delay'"
+            >{{clickImageList[currentImageIndex]?.label}}</span>
           </div>
 
           <div class="redbook-desc absolute bottom-[-48px] lg:bottom-auto lg:top-[70%] lg:translate-y-[-50%] left-[16px] lg:left-auto lg:right-[40px] z-[10] text-[#fff] text-[16px] flex flex-col lg:w-[690px] w-[240px]">
-            <span class="lg:text-[16px] text-[12px] lg:leading-[32px] leading-[24px]">{{clickImageList[currentImageIndex]?.description}}</span>
+            <span 
+              class="lg:text-[16px] text-[12px] lg:leading-[32px] leading-[24px]"
+              :class="isTextAnimating ? 'redbook-fade-out redbook-fade-out-delay-long' : 'redbook-fade-in-up redbook-fade-in-up-delay-long'"
+            >{{clickImageList[currentImageIndex]?.description}}</span>
           </div>
           
           <div class="lg:hidden absolute z-[13] bottom-[16px] right-[16px] flex gap-[16px]">
@@ -327,11 +350,14 @@
             class="follow-icon absolute z-[12] pointer-events-none opacity-0 transition-opacity duration-300 hidden lg:block"
             :class="{ 'opacity-100': showFollowIcon }"
           >
-            <img 
-              :src="currentIcon" 
-              alt="follow icon" 
-              class="w-[80px] h-[80px]"
-            />
+            <div class="w-[80px] h-[80px] bg-[#3B4EFF] flex items-center justify-center rounded-full">
+              <img 
+                src="/static/toRight.png" 
+                alt="follow icon" 
+                class="w-[40px] h-[40px] transition-transform duration-300" 
+                :class="{ 'rotate-180': currentSide === 'left' }"
+              />
+            </div>
           </div>
          
           <div
@@ -384,7 +410,7 @@
                   <img :src="imgBaseURL('w.png')" class="lets-talk-img" alt="">
                 </div>
               </div>
-              <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
+              <div class="absolute w-[150px] h-[150px] md:w-[288px] md:h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
                 <svg class="star" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
                   <!-- 灰色背景 -->
                   <rect width="288" height="288" fill="#fff"/>
@@ -425,6 +451,16 @@ import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
 import { useDictList, useGetGroupImage } from "~/composables/api/useHttpExample";
 
+
+useHead({
+  title: 'ONEW专业网站建设公司 云联在线',
+  meta: [
+    { name: 'description', content: 'ONEW专业网站建设公司 云联在线' },
+    { name: 'keywords', content: 'ONEW专业网站建设公司 云联在线' },
+  ],
+})
+
+const loadingText = ref(0);
 const homeFixed:any= ref<any>([]);
 const aboutList:any= ref<any>([]);
 const scrollImage:any= ref<any>([]);
@@ -433,6 +469,10 @@ const customerList:any= ref<any>([]);
 const clickImageList:any= ref<any>([]);
 const groupImage:any= ref<any>([]);
 const isMobile = ref(false);
+
+// 控制加载视频的显示
+const showLoadingVideo = ref(true);
+const isVideoFadingOut = ref(false);
 
 // 检测移动端设备
 const detectMobile = () => {
@@ -459,7 +499,7 @@ const expandedItems: any = ref({});
 // 跟随图标相关状态
 const followIcon: any = ref(null);
 const showFollowIcon = ref(false);
-const currentIcon = ref( imgBaseURL('cursor-left.svg')); // 默认图标
+const currentSide = ref<'left' | 'right'>('right'); // 跟踪当前是左侧还是右侧
 const mousePosition = ref({ x: 0, y: 0 });
 const targetPosition = ref({ x: 0, y: 0 });
 const animationId = ref(0);
@@ -477,6 +517,7 @@ const listCardItemWrap = ref<HTMLElement | null>(null);
 
 // 图片切换相关状态
 const currentImageIndex = ref(0); // 当前显示的图片索引
+const isTextAnimating = ref(false); // 文字动画状态
 const aboutGlitchRef = ref<any>(null);
 // Canvas相关状态
 const imageCanvas = ref<HTMLCanvasElement | null>(null);
@@ -574,12 +615,10 @@ const toggleExpand = (index: number) => {
 // 鼠标进入区域时的处理
 const handleMouseEnter = (side: 'left' | 'right') => {
   showFollowIcon.value = true;
-  // 根据左右区域设置不同的图标
-  currentIcon.value = side === 'left' ? imgBaseURL('cursor-left.svg') : imgBaseURL('cursor-right.svg');
+  currentSide.value = side; // 更新当前侧边
   
   // 立即将图标位置设置为当前鼠标位置，避免从左上角(0,0)开始移动
   mousePosition.value = { ...targetPosition.value };
-  
   // 开始跟随动画
   startFollowAnimation();
 };
@@ -720,8 +759,8 @@ const initLenis = () => {
 
 // ===== 背景和初始动画 =====
 const initBackgroundAnimations = () => {
-  // 初始动画timeline
-  const initialTl = gsap.timeline();
+  // 初始动画timeline，延迟4秒开始（与加载视频显示时间一致）
+  const initialTl = gsap.timeline({ delay: 4 });
 
   // 设置bg-image初始状态
   gsap.set(".bg-image", {
@@ -1073,6 +1112,9 @@ const handleClick = (side: 'left' | 'right') => {
   if (!smallImagesRenderingEnabled.value) return;
   // 如果正在转场中，忽略点击
   if (isTransitioning.value) return;
+  
+  // 立即触发文字消失动画
+  isTextAnimating.value = true;
   
   // 计算下一张图片的索引
   if (side === 'left') {
@@ -1702,7 +1744,41 @@ const {data: clickImageListData} = await useDictList({ typeName: 'click-image-li
 
 
 // 监听数据变化并更新 ref
-watch(homeFixedData, (newVal) => { homeFixed.value = newVal?.data ?? []; }, { immediate: true });
+watch(homeFixedData, (newVal) => { 
+  homeFixed.value = newVal?.data ?? []; 
+  // console.log(homeFixed.value);
+  
+  // 数据加载完成后，启动加载进度动画和视频显示
+  if (newVal?.data && newVal.data.length > 0 && newVal.data[0]?.video) {
+    // 确保只在客户端执行动画
+    if (import.meta.client) {
+      // 使用 requestAnimationFrame 实现平滑的进度条动画
+      const duration = 4000; // 4秒
+      const startTime = Date.now();
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1); // 0 到 1
+        loadingText.value = Math.floor(progress * 100); // 转换为 0-100
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // 进度到达100%后，开始淡出
+          loadingText.value = 100;
+          isVideoFadingOut.value = true;
+          // 等待淡出动画完成后再完全隐藏
+          setTimeout(() => {
+            showLoadingVideo.value = false;
+          }, 500); // 与 CSS transition 时间一致
+        }
+      };
+      
+      // 开始动画
+      requestAnimationFrame(animate);
+    }
+  }
+}, { immediate: true });
 watch(aboutListData, (newVal) => { aboutList.value = newVal?.data ?? []; }, { immediate: true });
 watch(scrollImageData, (newVal) => { scrollImage.value = newVal?.data ?? []; }, { immediate: true });
 watch(scrollWordsData, (newVal) => { scrollWords.value = newVal?.data ?? []; }, { immediate: true });
@@ -1948,6 +2024,8 @@ const startTransition = (side: 'left' | 'right') => {
         // 转场完成
         isTransitioning.value = false;
         currentImageIndex.value = nextImageIndex.value;
+        // 重置文字动画状态，触发文字出现
+        isTextAnimating.value = false;
         
         // 更新所有图片的目标缩放
         updateTargetScales();
@@ -1975,6 +2053,8 @@ const startTransition = (side: 'left' | 'right') => {
         // 转场完成
         isTransitioning.value = false;
         currentImageIndex.value = nextImageIndex.value;
+        // 重置文字动画状态，触发文字出现
+        isTextAnimating.value = false;
         
         // 更新所有图片的目标缩放
         updateTargetScales();
@@ -2095,7 +2175,42 @@ onUnmounted(() => {
 
 
 </script>
+
 <style scoped>
+.loading-text {
+  color: #FFF;
+  font-size: 160px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 160px; /* 100% */
+  letter-spacing: -6px;
+  text-transform: capitalize;
+  @media (max-width: 768px) {
+    font-size: 100px;
+    line-height: 100px;
+    bottom: 0px;
+    right: 40px;
+  }
+}
+
+.loading-text-remark {
+  color: #FFF;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px;
+  position: absolute;
+  right: 40px;
+  top: 40px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    line-height: 24px;
+    right: 15px;
+    top: 15px;
+  }
+}
+
 .scroll-text-follow {
   position: fixed;
   top: 0;
@@ -2344,11 +2459,19 @@ onUnmounted(() => {
     gap: 1.85vw;
   }
   .lets-talk-title {
+    /* width: 80vw; */
     font-size: 8.33vw;
     margin-left: 1.5vw;
   }
   .lets-talk-img {
     height: 14.5vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .lets-talk-title {
+    font-size: 64px;
+    white-space: nowrap;
   }
 }
 
@@ -2494,6 +2617,57 @@ onUnmounted(() => {
 
 .last-imgs {
   bottom: -172px;
+}
+
+/* Redbook 文字切换动画 */
+/* 文字消失动画 - 快速 */
+.redbook-fade-out {
+  animation: redbookFadeOut 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+.redbook-fade-out-delay {
+  animation-delay: 0.05s;
+}
+
+.redbook-fade-out-delay-long {
+  animation-delay: 0.1s;
+}
+
+@keyframes redbookFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* 文字出现动画 - 较慢 */
+.redbook-fade-in-up {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: redbookFadeInUp 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.redbook-fade-in-up-delay {
+  animation-delay: 0.15s;
+}
+
+.redbook-fade-in-up-delay-long {
+  animation-delay: 0.25s;
+}
+
+@keyframes redbookFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 

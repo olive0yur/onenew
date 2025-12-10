@@ -2,8 +2,8 @@
 // Nuxt 4 优化版本 - 使用 useFetch
 
 // 基础配置
-const BASE_URL = 'http://onew-nest:9000/api/'
-// const BASE_URL = 'http://127.0.0.1:9000/api/'
+// const BASE_URL = 'http://onew-nest:9000/api/'
+const BASE_URL = 'http://127.0.0.1:9000/api/'
 const TIMEOUT = 25000
 
 // 定义请求选项类型

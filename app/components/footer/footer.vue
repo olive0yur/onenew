@@ -1,9 +1,10 @@
 <template>
     <!-- 底页 -->
   <section
-    class="section-3 h-[calc(100vh+469px)] w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
+    class="section-3 w-[100vw] relative bg-[#3B4EFF] pt-[40px] lg:pt-[103px] px-[20px] lg:pl-[48px] lg:pr-[40px] flex flex-col justify-end pb-[40px]"
+    :style="{ height: height }"
   >
-    <div class="h-[469px] flex flex-col justify-between ">
+    <div class="flex flex-col justify-between" :style="{ height: contentHeight, paddingTop: `${paddingTop}px` }">
       <!-- 上半部分：联系信息和导航 -->
       <div class="flex flex-col lg:flex-row lg:justify-between w-[100%] gap-[40px] lg:gap-0 mt-[40px] lg:mt-0">
         <!-- 联系我们 -->
@@ -30,10 +31,10 @@
           <div class="flex flex-col mt-[-26px] lg:mt-0">
             <span class="text-[14px] lg:text-[16px] text-[#FFF] leading-[16px] mb-[12px] hidden lg:block">/跟随我们</span>
             <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
-              <GlitchText text="X 推特" :speed="30" :iterations="3" />
+              <GlitchText @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
             </span>
             <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
-              <GlitchText text="RED BOOK 小红书" :speed="30" :iterations="3" />
+              <GlitchText @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
             </span>
           </div>
         </div>
@@ -80,6 +81,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useGetCompanyInfo } from "~/composables/api/useHttpExample";
+
+// 定义 props
+interface FooterProps {
+  height?: string
+  contentHeight?: string
+  paddingTop?: number
+}
+
+const goPage = (url: string) => {
+  if (!url) return;
+  window.open(url, '_blank');
+}
+
+const props = withDefaults(defineProps<FooterProps>(), {
+  height: 'calc(100vh + 469px)',
+  contentHeight: '469px',
+  paddingTop: 0
+})
+
 // placeholder 打字机效果
 const placeholderText = ref('ENTER EMAIL')
 const fullText = 'ENTER EMAIL'
@@ -91,6 +111,10 @@ interface CompanyInfo {
   company_address: string;
   company_logo: string;
   company_description: string;
+  x_name: string;
+  redbook_name: string;
+  x: string;
+  redbook: string;
 }
 const companyInfo = ref<CompanyInfo>();
 

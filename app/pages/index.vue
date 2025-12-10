@@ -449,7 +449,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { imgBaseURL } from "~/utils";
 import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
-import { useDictList, useGetGroupImage } from "~/composables/api/useHttpExample";
+import { getDictList, getImageGroup } from "~/composables/api";
 
 
 useHead({
@@ -1732,68 +1732,31 @@ const renderIndex = () => {
   });
 };
 
-// 在 setup 顶层调用数据请求（支持 SSR）
-const {data: homeFixedData} = await useDictList({ typeName: 'home-fixed' });
-const {data: aboutListData} = await useDictList({ typeName: 'about-list' });
-const {data: scrollImageData} = await useDictList({ typeName: 'scroll-image' });
-const {data: scrollWordsData} = await useDictList({ typeName: 'scroll-words' });
-const {data: customerListData} = await useDictList({ typeName: 'customer-list' });
-const {data: groupImageData} = await useGetGroupImage();
-const {data: clickImageListData} = await useDictList({ typeName: 'click-image-list' });
-
-
-
-// 监听数据变化并更新 ref
-watch(homeFixedData, (newVal) => { 
-  homeFixed.value = newVal?.data ?? []; 
-  // console.log(homeFixed.value);
+onMounted(async() => {
+  // 请求数据
+  const homeFixedData: any = await getDictList({ typeName: 'home-fixed' });
+  const aboutListData: any = await getDictList({ typeName: 'about-list' });
+  const scrollImageData: any = await getDictList({ typeName: 'scroll-image' });
+  const scrollWordsData: any = await getDictList({ typeName: 'scroll-words' });
+  const customerListData: any = await getDictList({ typeName: 'customer-list' });
+  const groupImageData: any = await getImageGroup();
+  const clickImageListData: any = await getDictList({ typeName: 'click-image-list' });
   
-  // 数据加载完成后，启动加载进度动画和视频显示
-  if (newVal?.data && newVal.data.length > 0 && newVal.data[0]?.video) {
-    // 确保只在客户端执行动画
-    if (import.meta.client) {
-      // 使用 requestAnimationFrame 实现平滑的进度条动画
-      const duration = 4000; // 4秒
-      const startTime = Date.now();
-      
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1); // 0 到 1
-        loadingText.value = Math.floor(progress * 100); // 转换为 0-100
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // 进度到达100%后，开始淡出
-          loadingText.value = 100;
-          isVideoFadingOut.value = true;
-          // 等待淡出动画完成后再完全隐藏
-          setTimeout(() => {
-            showLoadingVideo.value = false;
-          }, 500); // 与 CSS transition 时间一致
-        }
-      };
-      
-      // 开始动画
-      requestAnimationFrame(animate);
-    }
-  }
-}, { immediate: true });
-watch(aboutListData, (newVal) => { aboutList.value = newVal?.data ?? []; }, { immediate: true });
-watch(scrollImageData, (newVal) => { scrollImage.value = newVal?.data ?? []; }, { immediate: true });
-watch(scrollWordsData, (newVal) => { scrollWords.value = newVal?.data ?? []; }, { immediate: true });
-watch(customerListData, (newVal) => { customerList.value = newVal?.data ?? []; }, { immediate: true });
-watch(groupImageData, (newVal) => { 
-  groupImage.value = newVal?.data ?? [];
+  // 初始化数据
+  homeFixed.value = homeFixedData?.data ?? [];
+  aboutList.value = aboutListData?.data ?? [];
+  scrollImage.value = scrollImageData?.data ?? [];
+  scrollWords.value = scrollWordsData?.data ?? [];
+  customerList.value = customerListData?.data ?? [];
+  clickImageList.value = clickImageListData?.data ?? [];
   
-  // 将返回的数据转换成 imagesListGroup 格式
-  const transformedData = (newVal?.data ?? []).map((item: any) => {
-    // 将 imgUrl 按分号分割成数组，兼容无分号的情况（只有一个图片）
+  // 处理 groupImage 数据转换
+  groupImage.value = groupImageData?.data ?? [];
+  const transformedData = (groupImageData?.data ?? []).map((item: any) => {
     const imageUrls = item.imgUrl 
       ? (item.imgUrl.includes(';') ? item.imgUrl.split(';') : [item.imgUrl])
       : [];
     
-    // 生成 images 数组
     const images = imageUrls.map((url: string, index: number) => ({
       src: url,
       index: index + 1
@@ -1804,14 +1767,36 @@ watch(groupImageData, (newVal) => {
     };
   });
   
-  // 更新 imagesListGroup
   imagesListGroup.value = transformedData;
   hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
-}, { immediate: true });
-watch(clickImageListData, (newVal) => { clickImageList.value = newVal?.data ?? [];}, { immediate: true });
-
-
-onMounted(async() => {
+  
+  // 数据加载完成后，启动加载进度动画和视频显示
+  if (homeFixed.value && homeFixed.value.length > 0 && homeFixed.value[0]?.video) {
+    const duration = 4000; // 4秒
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1); // 0 到 1
+      loadingText.value = Math.floor(progress * 100); // 转换为 0-100
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // 进度到达100%后，开始淡出
+        loadingText.value = 100;
+        isVideoFadingOut.value = true;
+        // 等待淡出动画完成后再完全隐藏
+        setTimeout(() => {
+          showLoadingVideo.value = false;
+        }, 500); // 与 CSS transition 时间一致
+      }
+    };
+    
+    // 开始动画
+    requestAnimationFrame(animate);
+  }
+  
   initLenis(); // 初始化 Lenis 平滑滚动
   renderIndex();
   

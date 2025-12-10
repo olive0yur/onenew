@@ -201,7 +201,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useLenis } from "~/composables/useLenis";
-import { useDictList } from "~/composables/api/useHttpExample";
+import { getDictList } from "~/composables/api";
 import { imgBaseURL } from "~/utils";
 import ProjectCard from "~/components/ui/projectCard/index.vue";
 import BlogCard from "~/components/ui/blogCard/index.vue";
@@ -656,41 +656,29 @@ const setupHoverEffects = () => {
   }
 };
 
-// 使用独立的 key 确保每次进入页面都能重新获取数据
-const routeKey = ref(Date.now());
-
-const {data: caseListData} = await useDictList({ typeName: 'case' });
-const {data: projectListData} = await useDictList({ typeName: 'project' });
-const {data: projectSloganData} = await useDictList({ typeName:'project-slogan' });
-const {data: blogListData} = await useDictList({ typeName: 'blog' });
-
-watch(caseListData, (newVal) => {
-  caseList.value = newVal?.data ?? [];
-}, { immediate: true });
-
-watch(projectListData, (newVal) => {
-  projectList.value = newVal?.data ?? [];
-  const data = newVal?.data ?? [];
+onMounted(async() => {
+  // 请求数据
+  const caseListData: any = await getDictList({ typeName: 'case' });
+  const projectListData: any = await getDictList({ typeName: 'project' });
+  const projectSloganData: any = await getDictList({ typeName:'project-slogan' });
+  const blogListData: any = await getDictList({ typeName: 'blog' });
+  
+  // 初始化数据
+  caseList.value = caseListData?.data ?? [];
+  projectSlogan.value = projectSloganData?.data ?? [];
+  blogList.value = blogListData?.data ?? [];
+  
+  // 处理 projectList 数据
+  projectList.value = projectListData?.data ?? [];
+  const data = projectListData?.data ?? [];
   projectListArr.value = data.length > 0 ? data.slice(0, 2) : [];
   projectListArr2.value = data.length > 2 ? data.slice(2) : [];
-}, { immediate: true });
-
-watch(projectSloganData, (newVal) => {
-  projectSlogan.value = newVal?.data ?? [];
-}, { immediate: true });
-
-watch(blogListData, (newVal) => {
-  blogList.value = newVal?.data ?? [];
-  // 数据加载后初始化位置
-  if (import.meta.client) {
-    nextTick(() => {
-      initBlogListPosition();
-    });
-  }
-}, { immediate: true });
-
-
-onMounted(() => {
+  
+  // 数据加载后初始化博客列表位置
+  nextTick(() => {
+    initBlogListPosition();
+  });
+  
   initLenis(); // 初始化 Lenis 平滑滚动
   initAnimations(); // 初始化动画
   

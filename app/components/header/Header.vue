@@ -160,7 +160,7 @@ import GlitchText from "~/components/ui/GlitchText.vue";
 import ContactButton from "~/components/ui/ContactButton.vue";
 import { useLenis } from "~/composables/useLenis";
 import { imgBaseURL } from "~/utils";
-import { useGetCompanyInfo } from "~/composables/api/useHttpExample";
+import { useGetCompanyInfo } from "~/composables/api";
 const opacity = ref(1);
 const value = ref(false);
 const logoUrl = ref(imgBaseURL('logo.svg'));
@@ -190,10 +190,6 @@ const goPath = (path: string) => {
   closeMenu();
 }
 
-const {data: companyInfoData} = await useGetCompanyInfo();
-watch(companyInfoData, (newVal) => { companyInfo.value = newVal?.data ?? [];
-}, { immediate: true });
-
 // 使用 lenis composable
 const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
 
@@ -208,7 +204,11 @@ const isHeaderVisible = ref(true);
 // SSR hydration 标记 - 确保 transform 样式只在客户端渲染后才应用
 const isMounted = ref(false);
 
-onMounted(() => {
+onMounted(async() => {
+  // 请求公司信息数据
+  const companyInfoData: any = await useGetCompanyInfo();
+  companyInfo.value = companyInfoData?.data ?? [];
+  
   // 标记组件已挂载，用于 SSR hydration
   isMounted.value = true;
   

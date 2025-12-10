@@ -38,7 +38,7 @@ export default defineNuxtConfig({
       ],
     },
   },
-  ssr: true,
+  ssr: false,
   modules: [
     "@nuxt/icon",
     "@pinia/nuxt",

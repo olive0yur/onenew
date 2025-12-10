@@ -79,8 +79,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useGetCompanyInfo } from "~/composables/api/useHttpExample";
+import { ref, onMounted } from 'vue'
+import { useGetCompanyInfo } from "~/composables/api";
 
 // 定义 props
 interface FooterProps {
@@ -144,9 +144,11 @@ const scrollToTop = () => {
   })
 }
 
-const {data: companyInfoData} = await useGetCompanyInfo();
-watch(companyInfoData, (newVal) => { companyInfo.value = newVal?.data ?? [];
-}, { immediate: true });
+onMounted(async() => {
+  // 请求公司信息数据
+  const companyInfoData: any = await useGetCompanyInfo();
+  companyInfo.value = companyInfoData?.data ?? [];
+});
 </script>
 
 <style scoped>

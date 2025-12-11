@@ -112,10 +112,10 @@
 
           <div class="lg:h-[72px] h-[44px] flex lg:justify-end items-center text-[24px] text-[#EEE]">
             <span class="lg:mr-[60px] mr-[46px] text-[12px] lg:text-[24px] cursor-pointer">
-              <GlitchText @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
+              <GlitchText v-if="companyInfo?.x" @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
             </span>
             <span class="text-[12px] lg:text-[24px] cursor-pointer">
-              <GlitchText @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
+              <GlitchText v-if="companyInfo?.redbook" @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
             </span>
           </div>
         </div>

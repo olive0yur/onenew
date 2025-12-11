@@ -31,10 +31,10 @@
           <div class="flex flex-col mt-[-26px] lg:mt-0">
             <span class="text-[14px] lg:text-[16px] text-[#FFF] leading-[16px] mb-[12px] hidden lg:block">/跟随我们</span>
             <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
-              <GlitchText @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
+              <GlitchText v-if="companyInfo?.x" @click="goPage(companyInfo?.x ?? '')" :text="companyInfo?.x_name ?? ''" :speed="30" :iterations="3" />
             </span>
             <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
-              <GlitchText @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
+              <GlitchText v-if="companyInfo?.redbook" @click="goPage(companyInfo?.redbook ?? '')" :text="companyInfo?.redbook_name ?? ''" :speed="30" :iterations="3" />
             </span>
           </div>
         </div>

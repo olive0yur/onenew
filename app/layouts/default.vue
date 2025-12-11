@@ -4,7 +4,6 @@
     <div class="">
       <slot />
     </div>
-    <!-- <Footer /> -->
   </div>
 </template>
 

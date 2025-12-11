@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-hidden" :class="{'bg-[#283faa]': showLoadingVideo}">
-    <div v-if="showLoadingVideo" class="w-[100vw] h-[100dvh] fixed top-0 left-0 z-[100000] transition-opacity duration-500" :class="{ 'opacity-0': isVideoFadingOut }">
+    <div v-if="showLoadingVideo" class="w-[100vw] h-[100dvh] fixed top-0 left-0 z-[100000] transition-opacity duration-500 bg-[#283faa]" :class="{ 'opacity-0': isVideoFadingOut }">
       <div class="lg:h-[180px] h-[100px] w-[100vw] absolute top-0 left-0 flex items-center">
          <img src="/static/Subtract.svg"  class="lg:h-[180px] lg:w-[180px] h-[100px] w-[100px]"  alt=""></img>
          <div class="bg-[#FFFFFF33] h-[1px] w-[100%] flex-1"></div>

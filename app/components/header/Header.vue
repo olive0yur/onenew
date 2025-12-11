@@ -5,8 +5,9 @@
       color: headerColor,
       backgroundColor: headerBgColor,
       ...(isMounted ? { transform: isHeaderVisible ? 'translateY(0)' : 'translateY(-100%)' } : {}),
+      visibility: isInitializing ? 'hidden' : 'visible',
     }"
-    class="fixed top-0 left-0 right-0 z-[1000] pt-[24px] lg:px-[40px] px-[16px] flex justify-between items-center transition-all duration-500 ease-in-out"
+    class="fixed top-0 left-0 right-0 z-[100] pt-[24px] lg:px-[40px] px-[16px] flex justify-between items-center transition-all duration-500 ease-in-out"
   >
     <div>
       <img
@@ -204,6 +205,9 @@ const isHeaderVisible = ref(true);
 // SSR hydration 标记 - 确保 transform 样式只在客户端渲染后才应用
 const isMounted = ref(false);
 
+// 初始化状态 - 防止加载时闪烁
+const isInitializing = ref(true);
+
 onMounted(async() => {
   // 请求公司信息数据
   const companyInfoData: any = await useGetCompanyInfo();
@@ -211,6 +215,11 @@ onMounted(async() => {
   
   // 标记组件已挂载，用于 SSR hydration
   isMounted.value = true;
+  
+  // 延迟显示 Header，确保 loading 视频已经渲染
+  setTimeout(() => {
+    isInitializing.value = false;
+  }, 100);
   
   // 使用更密集的阈值，让监听更连续（每 5% 触发一次）
   observeSections('section', {

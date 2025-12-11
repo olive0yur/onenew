@@ -28,9 +28,9 @@ export const getImageGroup = async (data?: object) => {
 
 /** 收集访问信息 **/
 export const useWebCount = async (data?: object) => {
-  const url = formatQueryUrl(data);
+  // const url = formatQueryUrl(data);
   try {
-    return await $http.post<Response>("web-collection/record" + url, data);
+    return await $http.post<Response>("web-collection/record", data);
   } catch (e) {
     return e;
   }

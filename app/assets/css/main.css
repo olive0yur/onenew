@@ -50,6 +50,8 @@ body {
     scroll-behavior: smooth;
     overflow-x: hidden;
     scrollbar-width: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior: none;
     /* Firefox */
     -ms-overflow-style: none;
     /* IE */

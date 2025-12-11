@@ -4,14 +4,27 @@
       <div class="lg:h-[180px] h-[100px] w-[100vw] absolute top-0 left-0 flex items-center">
          <img src="/static/Subtract.svg"  class="lg:h-[180px] lg:w-[180px] h-[100px] w-[100px]"  alt=""></img>
          <div class="bg-[#FFFFFF33] h-[1px] w-[100%] flex-1"></div>
-         <span class="loading-text-remark">{{ homeFixed[0]?.remark }}</span>
+         <span v-if="homeFixed[0]?.remark" class="loading-text-remark">{{ homeFixed[0]?.remark }}</span>
       </div>
       <div class="h-[180px] absolute bottom-[80px] right-[80px] loading-text">
         <span>{{loadingText}}</span>
         <span>%</span>
       </div>
-      <video :src="imgBaseURL(homeFixed[0]?.video)" autoplay muted loop class="w-full h-full object-cover"></video>
+      <video 
+       v-if="homeFixed[0]?.video"
+        ref="loadingVideoRef"
+        :src="imgBaseURL(homeFixed[0]?.video)" 
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        webkit-playsinline
+        x5-playsinline
+        x-webkit-airplay="allow"
+        class="w-full h-full object-cover"
+      ></video>
     </div>
+
     <div :class="{ 'opacity-0': showLoadingVideo }">
       <section id="section-0" class="section-0 relative w-[100vw] h-[100dvh]">
         <div 
@@ -36,11 +49,23 @@
             <img :src="imgBaseURL('oneNew.svg')" alt="" class="w-[100%]" />
           </div>
         </div>
-        <img
+        <!-- <img
           :src="imgBaseURL(homeFixed[0]?.img)"
           alt=""
           class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
-        />
+        /> -->
+         <video 
+           v-if="homeFixed[0]?.video1"
+           ref="bgVideoRef"
+           :src="imgBaseURL(homeFixed[0]?.video1)" 
+           muted 
+           loop 
+           playsinline
+           webkit-playsinline
+           x5-playsinline
+           x-webkit-airplay="allow"
+           class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
+         ></video>
       </section>
 
       <section
@@ -473,6 +498,8 @@ const isMobile = ref(false);
 // 控制加载视频的显示
 const showLoadingVideo = ref(true);
 const isVideoFadingOut = ref(false);
+const loadingVideoRef = ref<HTMLVideoElement | null>(null);
+const bgVideoRef = ref<HTMLVideoElement | null>(null); // 背景视频引用
 
 // 检测移动端设备
 const detectMobile = () => {
@@ -1782,31 +1809,69 @@ onMounted(async() => {
   imagesListGroup.value = transformedData;
   hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
   
-  // 数据加载完成后，启动加载进度动画和视频显示
+  // 数据加载完成后，立即启动加载进度动画
+  const duration = 4000; // 4秒
+  const startTime = Date.now();
+  
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1); // 0 到 1
+    loadingText.value = Math.floor(progress * 100); // 转换为 0-100
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      // 进度到达100%后，开始淡出
+      loadingText.value = 100;
+      isVideoFadingOut.value = true;
+      // 等待淡出动画完成后再完全隐藏
+      setTimeout(() => {
+        showLoadingVideo.value = false;
+        
+        // 首屏加载完成后，播放背景视频
+        nextTick(() => {
+          const bgVideo = bgVideoRef.value;
+          if (bgVideo) {
+            const playPromise = bgVideo.play();
+            
+            if (playPromise !== undefined) {
+              playPromise.catch((error) => {
+                console.log('背景视频自动播放失败,尝试静音播放:', error);
+                bgVideo.muted = true;
+                bgVideo.play().catch(err => {
+                  console.log('背景视频播放失败:', err);
+                });
+              });
+            }
+          }
+        });
+      }, 500); // 与 CSS transition 时间一致
+    }
+  };
+  
+  // 立即开始动画,不等待视频
+  requestAnimationFrame(animate);
+  
+  // 视频准备好后尝试播放
   if (homeFixed.value && homeFixed.value.length > 0 && homeFixed.value[0]?.video) {
-    const duration = 4000; // 4秒
-    const startTime = Date.now();
-    
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1); // 0 到 1
-      loadingText.value = Math.floor(progress * 100); // 转换为 0-100
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        // 进度到达100%后，开始淡出
-        loadingText.value = 100;
-        isVideoFadingOut.value = true;
-        // 等待淡出动画完成后再完全隐藏
-        setTimeout(() => {
-          showLoadingVideo.value = false;
-        }, 500); // 与 CSS transition 时间一致
+    nextTick(() => {
+      const video = loadingVideoRef.value;
+      if (video) {
+        // 移动端需要手动触发播放
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log('视频自动播放失败,尝试静音播放:', error);
+            // 如果自动播放失败,确保视频是静音的并重试
+            video.muted = true;
+            video.play().catch(err => {
+              console.log('视频播放失败:', err);
+            });
+          });
+        }
       }
-    };
-    
-    // 开始动画
-    requestAnimationFrame(animate);
+    });
   }
   
   initLenis(); // 初始化 Lenis 平滑滚动

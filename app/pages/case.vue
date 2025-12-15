@@ -11,8 +11,38 @@
       </div>
     </div>
 
+    <!-- 图片循环 -->
+    <div v-if="viewMode === 'ring'" class="w-[100vw] h-[100dvh] bg-[#f7f7f7] lg:p-[40px] p-[16px] circle-images-list relative">
+      <!-- section3-head 部分 -->
+      <div class="flex lg:flex-row flex-col lg:justify-between">
+        <div class="flex flex-col project-title gap-[8px]">
+          <span class="title">/我们的作品</span>
+          <span class="subtitle">Projects</span>
+        </div>
+      </div>
+      <div class="flex gap-[20px] absolute bottom-[20px] right-[40px] z-[11111]">
+        <div 
+          class="list-button flex items-center justify-center cursor-pointer" 
+          :class="{ 'active': viewMode === 'list' }"
+          @click="viewMode = 'list'"
+        >
+          <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+          List
+        </div>
+        <div 
+          class="ring-button flex items-center justify-center cursor-pointer" 
+          :class="{ 'active': viewMode === 'ring' }"
+          @click="viewMode = 'ring'"
+        >
+          <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+          Ring
+        </div>
+      </div>
+      <CircleImagesList v-if="projectList.length > 0 && showCircleImages" :key="circleImagesKey" :images="projectList" />
+    </div>
+
     <!-- 第二部分 -->
-    <div class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2">
+    <div v-if="viewMode === 'list'" ref="section2Ref" class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2">
       <!-- section2-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -27,9 +57,27 @@
       <!-- section2-content 部分 -->
       <div class="project-list lg:mt-[80px] mt-[40px]">
         <!-- 前两个 -->
-        <div class="flex flex-col lg:flex-row gap-[20px]" v-if="projectListArr.length > 0">
+        <div class="flex flex-col lg:flex-row gap-[20px] relative" v-if="projectListArr.length > 0">
            <ProjectCard height="800px" :key="projectListArr[0].id" :project="projectListArr[0]" />
            <ProjectCard height="528px" :key="projectListArr[1].id" :project="projectListArr[1]" />
+           <div class="absolute bottom-[100px] right-[40px] z-[11111] flex gap-[20px]">
+             <div 
+               class="list-button flex items-center justify-center cursor-pointer" 
+               :class="{ 'active': viewMode === 'list' }"
+               @click="viewMode = 'list'"
+             >
+               <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+               List
+             </div>
+             <div 
+               class="ring-button flex items-center justify-center cursor-pointer" 
+               :class="{ 'active': viewMode === 'ring' }"
+               @click="viewMode = 'ring'"
+             >
+               <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+               Ring
+             </div>
+           </div>
         </div>
 
         <!-- 标语 -->
@@ -81,7 +129,7 @@
     </div>
 
     <!-- 第三部分 -->
-    <div class="bg-[#fff] lg:p-[40px] p-[16px] section3 lg:min-h-[100dvh] h-auto">
+    <div class="bg-[#fff] lg:p-[40px] p-[16px] section3 lg:min-h-[100dvh]  h-auto">
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -205,6 +253,7 @@ import { getDictList } from "~/composables/api";
 import { imgBaseURL } from "~/utils";
 import ProjectCard from "~/components/ui/projectCard/index.vue";
 import BlogCard from "~/components/ui/blogCard/index.vue";
+import CircleImagesList from "~/components/ui/circleImagesList/index.vue";
 
 const caseList: any = ref<any[]>([]);
 const projectList: any = ref<any[]>([]);
@@ -213,6 +262,11 @@ const projectListArr2: any = ref<any[]>([]);
 const projectSlogan: any = ref<any[]>([]);
 const blogList: any = ref<any[]>([]);
 const isMobile = ref(false);
+const viewMode: any = ref('ring'); // 默认显示 ring 模式
+const section2Ref = ref<HTMLElement | null>(null);
+let savedScrollPosition = 0; // 保存滚动位置
+const circleImagesKey = ref(0); // 用于强制重新加载 CircleImagesList
+const showCircleImages = ref(true); // 控制 CircleImagesList 的显示
 
 useHead({ 
   title: 'ONEW专业网站建设公司 云联在线 案例',
@@ -221,6 +275,40 @@ useHead({
     { name: 'keywords', content: 'ONEW专业网站建设公司 云联在线 案例 案例展示' },
   ],
 })
+
+// 监听视图模式切换
+watch(viewMode, (newMode, oldMode) => {
+  if (import.meta.client) {
+    if (newMode === 'list') {
+      // 切换到 list 模式时,隐藏圆环组件并保存滚动位置
+      showCircleImages.value = false;
+      savedScrollPosition = window.scrollY;
+      // 等待 DOM 更新后,保持在相同的位置
+      nextTick(() => {
+        if (section2Ref.value) {
+          window.scrollTo({
+            top: savedScrollPosition,
+            behavior: 'instant' as ScrollBehavior
+          });
+        }
+      });
+    } else if (newMode === 'ring') {
+      // 切换回 ring 模式时,先隐藏组件,等待一帧后重新显示
+      showCircleImages.value = false;
+      nextTick(() => {
+        window.scrollTo({
+          top: savedScrollPosition,
+          behavior: 'instant' as ScrollBehavior
+        });
+        // 等待组件完全卸载后再重新加载
+        setTimeout(() => {
+          circleImagesKey.value++;
+          showCircleImages.value = true;
+        }, 100);
+      });
+    }
+  }
+});
 
 // 博客列表滚动相关
 const currentVisibleIndex = ref(0); // 当前视觉上最左边（第一个）的卡片索引
@@ -860,35 +948,21 @@ onUnmounted(() => {
     .project-title {
       .title {
         color: #000;
-        font-size: 16px;
+        font-size: clamp(12px, 1.2vw, 16px);
         font-style: normal;
         font-weight: 400;
-        line-height: 16px; 
+        line-height: 1;
         font-family: "Noto";
-        @media screen and (max-width: 768px) {
-          font-size: 12px;
-          font-style: normal;
-          font-weight: 400;
-          line-height: 12px; /* 100% */
-        }
       }
       .subtitle {
         color: #0B0B0B;
         font-family: Inter;
-        font-size: 160px;
+        font-size: clamp(64px, 10vw, 160px);
         font-style: normal;
         font-weight: 500;
-        line-height: 160px; 
-        letter-spacing: -6px;
+        line-height: 1;
+        letter-spacing: clamp(-2px, -0.4vw, -6px);
         text-transform: capitalize;
-
-        @media screen and (max-width: 768px) {
-          font-size: 64px;
-          font-style: normal;
-          font-weight: 500;
-          line-height: 64px; /* 100% */
-          letter-spacing: -2px;
-        }
       }
     }
     .project-count {
@@ -1024,35 +1098,21 @@ onUnmounted(() => {
     .project-title {
       .title {
         color: #000;
-        font-size: 16px;
+        font-size: clamp(12px, 1.2vw, 16px);
         font-style: normal;
         font-weight: 400;
-        line-height: 16px; 
+        line-height: 1;
         font-family: "Noto";
-        @media screen and (max-width: 768px) {
-          font-size: 12px;
-          font-style: normal;
-          font-weight: 400;
-          line-height: 12px; /* 100% */
-        }
       }
       .subtitle {
         color: #0B0B0B;
         font-family: Inter;
-        font-size: 160px;
+        font-size: clamp(64px, 10vw, 160px);
         font-style: normal;
         font-weight: 500;
-        line-height: 160px; 
-        letter-spacing: -6px;
+        line-height: 1;
+        letter-spacing: clamp(-2px, -0.4vw, -6px);
         text-transform: capitalize;
-
-        @media screen and (max-width: 768px) {
-          font-size: 64px;
-          font-style: normal;
-          font-weight: 500;
-          line-height: 64px; /* 100% */
-          letter-spacing: -2px;
-        }
       }
     }
     .project-select {
@@ -1110,6 +1170,78 @@ onUnmounted(() => {
         justify-content: space-between;
         margin-bottom: 40px;
       }
+    }
+  }
+
+  .circle-images-list {
+    .project-title {
+      .title {
+        color: #000;
+        font-size: clamp(12px, 1.2vw, 16px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+      }
+      .subtitle {
+        color: #0B0B0B;
+        font-family: Inter;
+        font-size: clamp(64px, 10vw, 160px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: clamp(-2px, -0.4vw, -6px);
+      }
+    }
+  }
+
+  /* 按钮样式 - 全局使用 */
+  .list-button {
+    padding: 4px 16px;
+    font-family: Inter;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+    border-radius: 44.44px;
+    background: rgba(218, 218, 218, 0.60);
+    backdrop-filter: blur(12.5px);
+    gap: 8px;
+    color: #fff;
+    transition: all 0.3s ease;
+    
+    img {
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    &.active {
+      color: #3B4EFF;
+      background: rgba(59, 78, 255, 0.10);
+    }
+  }
+
+  .ring-button {
+    padding: 4px 16px;
+    font-family: Inter;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+    border-radius: 44.44px;
+    background: rgba(218, 218, 218, 0.60);
+    backdrop-filter: blur(12.5px);
+    gap: 8px;
+    color: #fff;
+    transition: all 0.3s ease;
+    
+    img {
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    &.active {
+      color: #3B4EFF;
+      background: rgba(59, 78, 255, 0.10);
     }
   }
 

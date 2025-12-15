@@ -20,6 +20,7 @@
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.4.1",
     "scrollreveal": "^4.0.9",
+    "three": "^0.182.0",
     "topojson-client": "^3.1.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@types/scrollreveal": "^0.0.11",
+    "@types/three": "^0.182.0",
     "@types/topojson-client": "^3.1.5",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",

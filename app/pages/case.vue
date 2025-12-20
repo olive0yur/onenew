@@ -60,7 +60,7 @@
         <div class="flex flex-col lg:flex-row gap-[20px] relative" v-if="projectListArr.length > 0">
            <ProjectCard height="800px" :key="projectListArr[0].id" :project="projectListArr[0]" />
            <ProjectCard height="528px" :key="projectListArr[1].id" :project="projectListArr[1]" />
-           <div class="absolute bottom-[100px] right-[40px] z-[11111] flex gap-[20px]">
+           <div class=" lg:flex hidden absolute bottom-[100px] right-[40px] z-[11111] gap-[20px]">
              <div 
                class="list-button flex items-center justify-center cursor-pointer" 
                :class="{ 'active': viewMode === 'list' }"
@@ -81,9 +81,29 @@
         </div>
 
         <!-- 标语 -->
-        <div class="project-slogan">
+        <div class="project-slogan relative">
           <div class="project-title">
             <label>/{{projectSlogan[0]?.label}}</label>
+            <div class="lg:hidden flex gap-[20px] absolute" style="top: 20px; right: 20px;">
+              <div 
+                class="list-button flex items-center justify-center cursor-pointer" 
+                :class="{ 'active': viewMode === 'list' }"
+                @click="viewMode = 'list'"
+                style="width: 56px; height: 20px; font-size: 12px;"
+              >
+                <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
+                List
+              </div>
+              <div 
+                class="ring-button flex items-center justify-center cursor-pointer" 
+                :class="{ 'active': viewMode === 'ring' }"
+                @click="viewMode = 'ring'"
+                style="width: 56px; height: 20px; font-size: 12px;"
+              >
+                <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
+                Ring
+              </div>
+            </div>
             <span>{{projectSlogan[0]?.dict_value}}</span>
           </div>
           <div class="project-content">{{projectSlogan[0]?.description}}</div>
@@ -443,35 +463,6 @@ const initAnimations = () => {
       },
     });
 
-    // line-w 横线扩展动画
-    gsap.to(".line-w", {
-      width: "100vw",
-      scrollTrigger: {
-        trigger: ".section-6",
-        start: "top center",
-        end: "top top",
-        toggleActions: "play none none reverse",
-        once: false,
-      },
-      duration: 1,
-      delay: 0.3,
-      ease: "power2.out",
-    });
-
-    // line-h 竖线扩展动画
-    gsap.to(".line-h", {
-      height: "100vh",
-      scrollTrigger: {
-        trigger: ".section-6",
-        start: "top center",
-        end: "top top",
-        toggleActions: "play none none reverse",
-        once: false,
-      },
-      duration: 1,
-      delay: 0.3,
-      ease: "power2.out",
-    });
 
     // section-5 继续向左旋转的动画(在第一个动画完成后)
 
@@ -1204,7 +1195,7 @@ onUnmounted(() => {
     border-radius: 44.44px;
     background: rgba(218, 218, 218, 0.60);
     backdrop-filter: blur(12.5px);
-    gap: 8px;
+    gap: 4px;
     color: #fff;
     transition: all 0.3s ease;
     
@@ -1229,7 +1220,7 @@ onUnmounted(() => {
     border-radius: 44.44px;
     background: rgba(218, 218, 218, 0.60);
     backdrop-filter: blur(12.5px);
-    gap: 8px;
+    gap: 4px;
     color: #fff;
     transition: all 0.3s ease;
     
@@ -1459,10 +1450,10 @@ onUnmounted(() => {
 
   /* 十字线初始样式 */
   .line-w {
-    width: 0;
+    width: 100vw;
   }
 
   .line-h {
-    height: 0;
+    height: 100vh;
   }
 </style>

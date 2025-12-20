@@ -679,6 +679,7 @@ onUnmounted(() => {
     height: 100%;
     background-color: #000;
     z-index: 1;
+    opacity: 0;
   }
   
   /* 白色文字层,显示在黑色背景上 - 默认不显示动画 */
@@ -695,6 +696,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
   }
   
   /* 当元素进入视口时添加动画 */
@@ -710,32 +712,49 @@ onUnmounted(() => {
 @keyframes progressBar {
   0% {
     width: 0;
+    opacity: 1;
   }
   50% {
     width: 100%;
+    opacity: 1;
   }
   51% {
     width: 100%;
     transform: translateX(0);
+    opacity: 1;
+  }
+  99% {
+    width: 100%;
+    transform: translateX(100%);
+    opacity: 1;
   }
   100% {
     width: 100%;
     transform: translateX(100%);
+    opacity: 0;
   }
 }
 
 @keyframes revealWhiteText {
   0% {
     clip-path: inset(0 100% 0 0);
+    opacity: 1;
   }
   50% {
     clip-path: inset(0 0 0 0);
+    opacity: 1;
   }
   51% {
     clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  99% {
+    clip-path: inset(0 100% 0 100%);
+    opacity: 1;
   }
   100% {
-    clip-path: inset(0 0 0 100%);
+    clip-path: inset(0 100% 0 100%);
+    opacity: 0;
   }
 }
 

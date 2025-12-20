@@ -94,8 +94,8 @@ let circleGroup: THREE.Group
 const getCircleParams = () => {
   // 固定圆盘半径，不会因为图片数量而改变
   const FIXED_RADIUS = 11 // 固定半径
-  const imageWidth = 1.2
-  const imageHeight = 0.7
+  const imageWidth = 1.5
+  const imageHeight = 1
   
   return {
     RING_RADIUS: FIXED_RADIUS,
@@ -290,12 +290,13 @@ const animate = () => {
     }
   })
 
-  // 根据鼠标位置调整相机 - 轻微的倾斜效果
-  const targetCameraX = (mouseXPosition - 0.5) * 4
-  const targetCameraY = -2 + (mouseYPosition - 0.5) * 3
+  // 根据鼠标位置调整相机 - 轻微的倾斜效果,像重力一样
+  // 鼠标在右下时,相机向左上移动,让圆盘看起来倾向右下
+  const targetCameraX = -(mouseXPosition - 0.5) * 8 // 增大X轴移动幅度
+  const targetCameraY = -2 + (mouseYPosition - 0.5) * 6 // 增大Y轴移动幅度
   
-  camera.position.x += (targetCameraX - camera.position.x) * 0.05
-  camera.position.y += (targetCameraY - camera.position.y) * 0.05
+  camera.position.x += (targetCameraX - camera.position.x) * 0.08 // 增加响应速度
+  camera.position.y += (targetCameraY - camera.position.y) * 0.08 // 增加响应速度
   camera.lookAt(0, 0, 0)
 
   // 渲染
@@ -602,13 +603,11 @@ onUnmounted(() => {
 
 .center-image {
   width: 20vw; /* 响应式宽度 */
-  max-width: 280px;
-  min-width: 180px;
+  max-width: 340px;
+  min-width: 240px;
   height: auto; /* 保持宽高比 */
   aspect-ratio: 16/9; /* 固定宽高比 */
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   order: 2; /* 图片排在第二位 */
   transition: transform 0.3s ease;
 }

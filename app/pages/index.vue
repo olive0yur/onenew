@@ -26,7 +26,7 @@
     </div>
 
     <div :class="{ 'opacity-0': showLoadingVideo }">
-      <section id="section-0" class="section-0 relative w-[100vw] h-[100dvh]">
+      <section id="section-0" class="section-0 relative w-[100vw] h-[100dvh]" data-header-theme="white">
         <div 
           class="section-0-warp w-full h-[100dvh] bg-[#3B4EFF]/50 blue-mask relative"
           @mouseenter="handleSection0MouseEnter"
@@ -71,6 +71,7 @@
       <section
         id="section-1"
         class="section-1 w-[100vw] h-auto bg-[#F8F8F8] lg:p-[40px] p-[16px] overflow-hidden rotate-[0deg] mt-[30vh]"
+        data-header-theme="black"
       >
         <div class="lg:text-[16px] text-[12px] text-[#000]">
           <span class="mr-[4px]"> /</span>
@@ -176,6 +177,7 @@
       <section
         id="section-2"
         class="section-2 h-[500vh] w-[100vw] bg-[#F3F3F3] relative overflow-hidden"
+        data-header-theme="black"
         style="
           clip-path: inset(0 0 -100vh 0);
         "
@@ -274,6 +276,7 @@
                 <section
                   id="section-3"
                   class="section-3 w-[100vw] min-h-[100dvh] bg-[#F8F8F8] overflow-hidden rotate-[0deg]"
+                  data-header-theme="black"
                 >
                   <div class="text-[16px] text-[#000] lg:px-[40px] px-[16px] lg:pt-[40px] pt-[16px]">
                     <span class="mr-[4px]"> /</span>
@@ -327,7 +330,7 @@
         </div>
       </section>
 
-      <section id="section-4" class="cover section-4 h-[300vh] w-[100vw] relative z-[31]">
+      <section id="section-4" class="cover section-4 h-[300vh] w-[100vw] relative z-[31]" data-header-theme="white">
         <div class="relative h-[100vh] w-[100vw] section-4-wrap            overflow-hidden">
 
           <canvas 
@@ -399,7 +402,7 @@
           </div>
 
           <!-- Let's talk -->
-          <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" style="grid-template-rows: 1fr 1.4fr;">
+          <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr;">
               <div class="lets-talk-top-left bg-[#fff] overflow-hidden relative">
                 <div class="flex items-center hover-container-left">
                   <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
@@ -459,7 +462,7 @@
         </div>
       </section>
 
-      <section id="section-6" class="section-6 relative mt-[-85vh] z-[30]">
+      <section id="section-6" class="section-6 relative mt-[-85vh] z-[30]" data-header-theme="black">
         <Footer />
       </section>
     </div>
@@ -496,10 +499,19 @@ const groupImage:any= ref<any>([]);
 const isMobile = ref(false);
 
 // 控制加载视频的显示
-const showLoadingVideo = ref(true);
+const showLoadingVideo = ref(false); // 默认不显示
 const isVideoFadingOut = ref(false);
 const loadingVideoRef = ref<HTMLVideoElement | null>(null);
 const bgVideoRef = ref<HTMLVideoElement | null>(null); // 背景视频引用
+
+// 检查是否应该显示加载视频（只在首次访问时显示）
+const shouldShowLoadingVideo = () => {
+  if (import.meta.client) {
+    const hasShownLoading = sessionStorage.getItem('hasShownLoadingVideo');
+    return !hasShownLoading;
+  }
+  return false;
+};
 
 // 检测移动端设备
 const detectMobile = () => {
@@ -786,8 +798,9 @@ const initLenis = () => {
 
 // ===== 背景和初始动画 =====
 const initBackgroundAnimations = () => {
-  // 初始动画timeline，延迟4秒开始（与加载视频显示时间一致）
-  const initialTl = gsap.timeline({ delay: 4 });
+  // 根据是否显示加载视频决定延迟时间
+  const delay = showLoadingVideo.value ? 4 : 0;
+  const initialTl = gsap.timeline({ delay });
 
   // 设置bg-image初始状态
   gsap.set(".bg-image", {
@@ -1809,51 +1822,63 @@ onMounted(async() => {
   imagesListGroup.value = transformedData;
   hoveredImageIndex.value = imagesListGroup.value[0]?.images?.length - 1;
   
-  // 数据加载完成后，立即启动加载进度动画
-  const duration = 4000; // 4秒
-  const startTime = Date.now();
+  // 检查是否有加载视频，并且是否应该显示
+  const hasLoadingVideo = homeFixed.value && homeFixed.value.length > 0 && homeFixed.value[0]?.video;
+  const shouldShow = shouldShowLoadingVideo() && hasLoadingVideo;
   
-  const animate = () => {
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(elapsed / duration, 1); // 0 到 1
-    loadingText.value = Math.floor(progress * 100); // 转换为 0-100
+  if (shouldShow) {
+    // 显示加载视频
+    showLoadingVideo.value = true;
     
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      // 进度到达100%后，开始淡出
-      loadingText.value = 100;
-      isVideoFadingOut.value = true;
-      // 等待淡出动画完成后再完全隐藏
-      setTimeout(() => {
-        showLoadingVideo.value = false;
-        
-        // 首屏加载完成后，播放背景视频
-        nextTick(() => {
-          const bgVideo = bgVideoRef.value;
-          if (bgVideo) {
-            const playPromise = bgVideo.play();
-            
-            if (playPromise !== undefined) {
-              playPromise.catch((error) => {
-                console.log('背景视频自动播放失败,尝试静音播放:', error);
-                bgVideo.muted = true;
-                bgVideo.play().catch(err => {
-                  console.log('背景视频播放失败:', err);
-                });
-              });
-            }
-          }
-        });
-      }, 500); // 与 CSS transition 时间一致
+    // 标记已显示过加载视频
+    if (import.meta.client) {
+      sessionStorage.setItem('hasShownLoadingVideo', 'true');
     }
-  };
-  
-  // 立即开始动画,不等待视频
-  requestAnimationFrame(animate);
-  
-  // 视频准备好后尝试播放
-  if (homeFixed.value && homeFixed.value.length > 0 && homeFixed.value[0]?.video) {
+    
+    // 数据加载完成后，立即启动加载进度动画
+    const duration = 4000; // 4秒
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1); // 0 到 1
+      loadingText.value = Math.floor(progress * 100); // 转换为 0-100
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // 进度到达100%后，开始淡出
+        loadingText.value = 100;
+        isVideoFadingOut.value = true;
+        // 等待淡出动画完成后再完全隐藏
+        setTimeout(() => {
+          showLoadingVideo.value = false;
+          
+          // 首屏加载完成后，播放背景视频
+          nextTick(() => {
+            const bgVideo = bgVideoRef.value;
+            if (bgVideo) {
+              const playPromise = bgVideo.play();
+              
+              if (playPromise !== undefined) {
+                playPromise.catch((error) => {
+                  console.log('背景视频自动播放失败,尝试静音播放:', error);
+                  bgVideo.muted = true;
+                  bgVideo.play().catch(err => {
+                    console.log('背景视频播放失败:', err);
+                  });
+                });
+              }
+            }
+          });
+        }, 500); // 与 CSS transition 时间一致
+      }
+    };
+    
+    // 立即开始动画,不等待视频
+    requestAnimationFrame(animate);
+    
+    // 视频准备好后尝试播放
     nextTick(() => {
       const video = loadingVideoRef.value;
       if (video) {
@@ -1867,6 +1892,25 @@ onMounted(async() => {
             video.muted = true;
             video.play().catch(err => {
               console.log('视频播放失败:', err);
+            });
+          });
+        }
+      }
+    });
+  } else {
+    // 没有加载视频或已经显示过，直接播放背景视频
+    showLoadingVideo.value = false;
+    nextTick(() => {
+      const bgVideo = bgVideoRef.value;
+      if (bgVideo) {
+        const playPromise = bgVideo.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log('背景视频自动播放失败,尝试静音播放:', error);
+            bgVideo.muted = true;
+            bgVideo.play().catch(err => {
+              console.log('背景视频播放失败:', err);
             });
           });
         }

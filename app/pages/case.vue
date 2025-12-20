@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-hidden">
     <!-- 第一部分 -->
-    <div class="w-[100vw] h-[100dvh] section1" :style="{ backgroundImage: `url(${imgBaseURL(caseList[0]?.img)})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
+    <div id="section-1" ref="section1Ref" class="w-[100vw] h-[100dvh] section1" data-header-theme="white" :style="{ backgroundImage: `url(${imgBaseURL(caseList[0]?.img)})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
       <div class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
@@ -12,7 +12,7 @@
     </div>
 
     <!-- 图片循环 -->
-    <div v-if="viewMode === 'ring'" class="w-[100vw] h-[100dvh] bg-[#f7f7f7] lg:p-[40px] p-[16px] circle-images-list relative">
+    <div id="section-2" v-if="viewMode === 'ring'" ref="ringModeRef" class="w-[100vw] h-[100dvh] bg-[#f7f7f7] lg:p-[40px] p-[16px] circle-images-list relative cover-section" data-header-theme="black">
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -42,7 +42,7 @@
     </div>
 
     <!-- 第二部分 -->
-    <div v-if="viewMode === 'list'" ref="section2Ref" class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2">
+    <div id="section-3" v-if="viewMode === 'list'" ref="section2Ref" class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2 cover-section" data-header-theme="black">
       <!-- section2-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -149,7 +149,7 @@
     </div>
 
     <!-- 第三部分 -->
-    <div class="bg-[#fff] lg:p-[40px] p-[16px] section3 lg:min-h-[100dvh]  h-auto">
+    <div id="section-4" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 lg:h-[100dvh] h-auto relative" data-header-theme="black">
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -198,12 +198,10 @@
         </div>
         <span>(<NumberScroll :target="blogList.length" />)</span>
       </div>
-    </div>
 
-    <section id="section-6" class="section-6 relative z-[30]">
-      <!-- Let's talk -->
-      <section id="section-5" class="section-5 rotate-[20deg] lg:h-[100vh] h-[60dvh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" style="grid-template-rows: 1fr 1.4fr;">
-          <div class="lets-talk-top-left bg-[#fff] overflow-hidden relative">
+      <!-- Let's talk 部分 - 移到第三部分内部 -->
+      <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
+          <div class="lets-talk-top-left overflow-hidden relative">
             <div class="flex items-center hover-container-left">
               <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
               <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
@@ -220,18 +218,18 @@
               </span>
             </div>
           </div>
-          <div class="lets-talk-top-right bg-[#fff] overflow-hidden">
+          <div class="lets-talk-top-right overflow-hidden">
             <div class="flex justify-end items-center hover-container-right ">
               <span class="lets-talk-title opacity-0">L</span>
               <img :src="imgBaseURL('right.png')" class="right-img hover-img-right m" alt=""></img>
             </div>
           </div>
-          <div class="lets-talk-bottom-left bg-[#fff] flex items-end">
+          <div class="lets-talk-bottom-left flex items-end">
             <img :src="imgBaseURL('o.png')" class="lets-talk-img" alt="">
             <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
             <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
           </div>
-          <div class="lets-talk-bottom-right bg-[#fff] flex justify-start items-end">
+          <div class="lets-talk-bottom-right flex justify-start items-end">
             <div class="flex">
               <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
               <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
@@ -241,7 +239,7 @@
           <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
             <svg class="star" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
               <!-- 灰色背景 -->
-              <rect width="288" height="288" fill="#fff"/>
+              <rect width="288" height="288" fill="#F8F8F8"/>
               
               <!-- 四角星形状：四条圆弧组成 -->
               <path d="
@@ -259,7 +257,10 @@
             <div class="line-w absolute h-[1px] z-[34] bg-[#000] bottom-[50%] right-[50%]"></div>
           </div>
       </section>
-      <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 250px)' : 'calc(100vh + 469px)'" />
+    </div>
+
+    <section id="section-6" class="section-6 relative" data-header-theme="white">
+      <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 250px)' : 'calc(100vh + 569px)'" />
     </section>
   </div>
 </template>
@@ -275,6 +276,7 @@ import ProjectCard from "~/components/ui/projectCard/index.vue";
 import BlogCard from "~/components/ui/blogCard/index.vue";
 import CircleImagesList from "~/components/ui/circleImagesList/index.vue";
 
+
 const caseList: any = ref<any[]>([]);
 const projectList: any = ref<any[]>([]);
 const projectListArr: any = ref<any[]>([]);
@@ -283,7 +285,10 @@ const projectSlogan: any = ref<any[]>([]);
 const blogList: any = ref<any[]>([]);
 const isMobile = ref(false);
 const viewMode: any = ref('ring'); // 默认显示 ring 模式
+const section1Ref = ref<HTMLElement | null>(null);
 const section2Ref = ref<HTMLElement | null>(null);
+const section3Ref = ref<HTMLElement | null>(null);
+const ringModeRef = ref<HTMLElement | null>(null);
 let savedScrollPosition = 0; // 保存滚动位置
 const circleImagesKey = ref(0); // 用于强制重新加载 CircleImagesList
 const showCircleImages = ref(true); // 控制 CircleImagesList 的显示
@@ -300,10 +305,8 @@ useHead({
 watch(viewMode, (newMode, oldMode) => {
   if (import.meta.client) {
     if (newMode === 'list') {
-      // 切换到 list 模式时,隐藏圆环组件并保存滚动位置
       showCircleImages.value = false;
       savedScrollPosition = window.scrollY;
-      // 等待 DOM 更新后,保持在相同的位置
       nextTick(() => {
         if (section2Ref.value) {
           window.scrollTo({
@@ -313,14 +316,12 @@ watch(viewMode, (newMode, oldMode) => {
         }
       });
     } else if (newMode === 'ring') {
-      // 切换回 ring 模式时,先隐藏组件,等待一帧后重新显示
       showCircleImages.value = false;
       nextTick(() => {
         window.scrollTo({
           top: savedScrollPosition,
           behavior: 'instant' as ScrollBehavior
         });
-        // 等待组件完全卸载后再重新加载
         setTimeout(() => {
           circleImagesKey.value++;
           showCircleImages.value = true;
@@ -408,24 +409,19 @@ const projectChunks = computed(() => {
 });
 
 // ===== 平滑滚动初始化 =====
-const { setLenis } = useLenis();
-
 const initLenis = () => {
-  // 移动端降低触摸滚动倍数，让滚动更平缓
   lenis.value = new Lenis({
     duration: 0,
     wheelMultiplier: 1,
-    touchMultiplier: isMobile.value ? 0.2 : 1, // 移动端降低到 0.2
+    touchMultiplier: isMobile.value ? 0.2 : 1,
     smoothWheel: true,
     syncTouch: false,
     easing: (t) => t,
     lerp: 0.1,
   });
 
-  // 注册到全局 composable
-  setLenis(lenis.value);
-
   lenis.value.on("scroll", ScrollTrigger.update);
+  
   gsap.ticker.add((time) => {
     lenis.value.raf(time * 1000);
   });
@@ -436,7 +432,7 @@ const initLenis = () => {
 // ===== 初始化动画 =====
 const initAnimations = () => {
   ctx.value = gsap.context(() => {
-    // section1-content 初始动画 - 从下方斜着弹出
+    // section1-content 初始动画 - 从下方斜着弹出 (保持不变)
     gsap.from(".section1-content", {
       y: 200,
       x: -100,
@@ -447,24 +443,133 @@ const initAnimations = () => {
       delay: 0.3,
     });
 
-    // section-5 (Let's Talk) 滚动进入动画
-    gsap.to(".section-5", {
+    // 第二部分和图片循环部分覆盖第一部分的动画
+    // 使用 pin 和 pinSpacing 来实现覆盖效果
+    if (section1Ref.value) {
+      ScrollTrigger.create({
+        trigger: section1Ref.value,
+        start: "top top",
+        end: "bottom top",
+        pin: true,
+        pinSpacing: false,
+      });
+      
+      // 监听 section1 的可见性，当向上滚动回到 section1 时，动态提升其 z-index
+      ScrollTrigger.create({
+        trigger: section1Ref.value,
+        start: "top top",
+        end: "bottom top",
+        onEnter: () => {
+          // 向下滚动进入 section1 时，降低 z-index（让 cover-section 可以覆盖）
+          if (section1Ref.value) {
+            section1Ref.value.style.zIndex = '1';
+          }
+        },
+        onLeaveBack: () => {
+          // 向上滚动离开 section1 时（回到顶部），保持 z-index
+          if (section1Ref.value) {
+            section1Ref.value.style.zIndex = '1';
+          }
+        },
+        onEnterBack: () => {
+          // 向上滚动回到 section1 时，提升 z-index（让它显示在 cover-section 上面）
+          if (section1Ref.value) {
+            section1Ref.value.style.zIndex = '20';
+          }
+        },
+        onLeave: () => {
+          // 向下滚动离开 section1 时，降低 z-index
+          if (section1Ref.value) {
+            section1Ref.value.style.zIndex = '1';
+          }
+        },
+      });
+    }
+
+    // section1-content 向左斜上旋转推动的动画 (新增)
+    // 以左下角为轴心,在覆盖时发生
+    // 等待 DOM 更新后再获取 cover-section
+    nextTick(() => {
+      const coverSection = document.querySelector('.cover-section');
+      if (coverSection) {
+        // 使用 fromTo 来明确起始和结束状态,确保能正确还原
+        // 左移和旋转 - 推的动画 (正常速率)
+        gsap.fromTo(".section1-content", 
+          {
+            x: 0,
+            rotation: 0,
+          },
+          {
+            x: -100, // 减少左移距离
+            rotation: -8, // 减少旋转角度
+            scrollTrigger: {
+              trigger: coverSection,
+              start: "top bottom",
+              end: "top top",
+              scrub: 1,
+            },
+          }
+        );
+
+        // 上移 - 同时进行但速率更慢
+        gsap.fromTo(".section1-content",
+          {
+            y: 0,
+          },
+          {
+            y: -400, // 大幅增加上移距离,让效果更明显
+            scrollTrigger: {
+              trigger: coverSection,
+              start: "top bottom",
+              end: "top 10%", // 缩短滚动距离,加快上移速率
+              scrub: 1,
+            },
+          }
+        );
+      }
+    });
+
+    // section-5 (Let's Talk) 根据滚动条慢慢滑出来盖住第三部分
+    // 当第三部分完全显示并 pin 住时立即开始
+    const letsTalkAnimation = gsap.to(".section-5", {
       y: 0,
       x: 0,
       rotate: 0,
-      duration: 2,
-      ease: "power2.inOut",
       scrollTrigger: {
-        trigger: ".section-6",
-        start: "top bottom",
-        end: "top center",
-        scrub: 1,
-        toggleActions: "play none none reverse",
+        trigger: section3Ref.value,
+        start: "bottom bottom", // 第三部分完全显示时立即开始
+        end: "bottom top", // 滚动一个视口高度后完成动画（Let's talk 完全盖住）
+        scrub: true, // 使用 true 让动画完全跟随滚动条，一步步滑出
+        markers: false, // 调试时可以设为 true
       },
     });
 
+    // 第三部分 pin 住，直到 Let's talk 完全盖住才结束 pin
+    if (section3Ref.value) {
+      ScrollTrigger.create({
+        trigger: section3Ref.value,
+        start: "bottom bottom", // 当第三部分底部到达视口底部时（完全显示）就 pin 住
+        end: "bottom top", // 和 Let's talk 动画结束时机一致，Let's talk 完全盖住时才结束 pin
+        pin: true,
+        pinSpacing: false,
+        markers: false, // 调试时可以设为 true
+      });
+    }
 
-    // section-5 继续向左旋转的动画(在第一个动画完成后)
+    // Let's talk 完全盖住后，section3 整体斜推动画（右斜上左上）
+    gsap.to(".section3", {
+      scrollTrigger: {
+        trigger: ".section-6",
+        start: "top 5%",
+        end: "bottom bottom",
+        scrub: 1,
+        toggleActions: "restart none none reverse",
+        markers: false, // 调试时可以设为 true
+      },
+      rotate: -5,
+      x: isMobile.value ? '-12vw' : '-6vw',
+      ease: "power2.inOut",
+    });
 
   });
 };
@@ -758,10 +863,9 @@ onMounted(async() => {
     initBlogListPosition();
   });
   
-  initLenis(); // 初始化 Lenis 平滑滚动
-  initAnimations(); // 初始化动画
+  initLenis();
+  initAnimations();
   
-  // 延迟设置hover效果，确保DOM已经完全渲染
   nextTick(() => {
     setupHoverEffects();
   });
@@ -784,9 +888,17 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+  /* 覆盖section的通用样式 */
+  .cover-section {
+    position: relative;
+    z-index: 10;
+  }
+
   .section1 {
     display: flex;
     align-items: flex-end;
+    position: relative;
+    z-index: 1;
     .section1-content {
       background: rgba(59, 78, 255, 0.50);
       padding-top: 80px;
@@ -796,6 +908,7 @@ onUnmounted(() => {
       width: 100%;
       height: 100%;
       aspect-ratio: 1600/760;
+      transform-origin: left bottom; /* 设置旋转轴心为左下角 */
       
       /* 1920px 以下 */
       @media screen and (max-width: 1920px) {
@@ -1086,6 +1199,9 @@ onUnmounted(() => {
   }
 
   .section3{
+    position: relative;
+    z-index: 20;
+    
     .project-title {
       .title {
         color: #000;

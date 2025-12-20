@@ -40,6 +40,13 @@
         </button> -->
       </span>
       <GlitchText
+        text="HOME 首页"
+        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
+        :speed="30"
+        :iterations="3"
+        @click="navigateTo('/')"
+      />
+      <GlitchText
         text="WORKS 案例"
         class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
         :speed="30"
@@ -154,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import GlitchText from "~/components/ui/GlitchText.vue";
@@ -170,6 +177,7 @@ const hoveredIndex = ref<number | null>(null);
 const underlineWidths = ref<number[]>([0, 0, 0, 0]);
 const menuItemRefs: (HTMLElement | null)[] = [];
 let timeInterval: NodeJS.Timeout | null = null;
+const route = useRoute();
 interface CompanyInfo {
   company_email: string;
   company_phone: string;
@@ -192,7 +200,7 @@ const goPath = (path: string) => {
 }
 
 // 使用 lenis composable
-const { stopScroll, startScroll, observeSections, activeSection,scrollY } = useLenis();
+const { stopScroll, startScroll } = useLenis();
 
 // Header 颜色状态
 const headerColor = ref('#ffffff');
@@ -208,6 +216,75 @@ const isMounted = ref(false);
 // 初始化状态 - 防止加载时闪烁
 const isInitializing = ref(true);
 
+// 初始化 Header 主题切换
+const initHeaderTheme = () => {
+  if (!import.meta.client) return;
+  
+  nextTick(() => {
+    // 多次尝试获取 section 元素，确保 DOM 已经渲染
+    setTimeout(() => {
+      // 获取所有 section 元素
+      const sections = document.querySelectorAll('section[data-header-theme], div[data-header-theme]');
+      
+      // 页面加载时立即检测第一个可见的 section 并设置主题
+      const setInitialTheme = () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        
+        // 如果在页面顶部（滚动距离小于 50px），直接使用第一个 section 的主题
+        if (scrollTop < 50 && sections.length > 0) {
+          const firstSection = sections[0] as Element;
+          const theme = firstSection?.getAttribute('data-header-theme');
+          if (theme) {
+            headerColor.value = theme === 'white' ? '#ffffff' : '#000000';
+            logoUrl.value = theme === 'white' ? imgBaseURL('logo.svg') : imgBaseURL('logo-b.svg');
+            return;
+          }
+        }
+        
+        // 否则检测当前可见的 section
+        for (const section of sections) {
+          const rect = section.getBoundingClientRect();
+          const sectionTop = rect.top + scrollTop;
+          const sectionBottom = sectionTop + rect.height;
+          
+          // 检查 section 是否在视口顶部 100px 范围内
+          if (sectionTop <= scrollTop + 100 && sectionBottom >= scrollTop + 100) {
+            const theme = section.getAttribute('data-header-theme');
+            if (theme) {
+              headerColor.value = theme === 'white' ? '#ffffff' : '#000000';
+              logoUrl.value = theme === 'white' ? imgBaseURL('logo.svg') : imgBaseURL('logo-b.svg');
+            }
+            break;
+          }
+        }
+      };
+      
+      // 立即设置初始主题
+      setInitialTheme();
+      
+      sections.forEach((section) => {
+        const theme = section.getAttribute('data-header-theme');
+        if (!theme) return;
+        
+        // 使用 ScrollTrigger 监听每个 section
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 100px',
+          end: 'bottom 100px',
+          onEnter: () => {
+            headerColor.value = theme === 'white' ? '#ffffff' : '#000000';
+            logoUrl.value = theme === 'white' ? imgBaseURL('logo.svg') : imgBaseURL('logo-b.svg');
+          },
+          onEnterBack: () => {
+            headerColor.value = theme === 'white' ? '#ffffff' : '#000000';
+            logoUrl.value = theme === 'white' ? imgBaseURL('logo.svg') : imgBaseURL('logo-b.svg');
+          },
+        });
+      });
+    }, 0);
+  });
+};
+
 onMounted(async() => {
   // 请求公司信息数据
   const companyInfoData: any = await useGetCompanyInfo();
@@ -221,10 +298,9 @@ onMounted(async() => {
     isInitializing.value = false;
   }, 100);
   
-  // 使用更密集的阈值，让监听更连续（每 5% 触发一次）
-  observeSections('section', {
-    threshold: Array.from({ length: 21 }, (_, i) => i * 0.05)
-  });
+  // 初始化 Header 主题切换
+  initHeaderTheme();
+  
   titleOpcity();
   navItemsDisappear();
   // 立即更新一次时间
@@ -233,6 +309,30 @@ onMounted(async() => {
   timeInterval = setInterval(updateTime, 1000);
   // 监听移动端滚动方向
   handleMobileScrollDirection();
+});
+
+// 监听路由变化，重新初始化
+watch(() => route.path, () => {
+  // 先重置为默认白色
+  headerColor.value = '#ffffff';
+  logoUrl.value = imgBaseURL('logo.svg');
+  
+  // 等待 DOM 更新后再初始化主题
+  nextTick(() => {
+    setTimeout(() => {
+      // 清除所有旧的 ScrollTrigger
+      ScrollTrigger.getAll().forEach(trigger => {
+        const triggerElement = trigger.vars.trigger;
+        if (triggerElement && typeof triggerElement !== 'string' && 'hasAttribute' in triggerElement) {
+          if ((triggerElement as Element).hasAttribute('data-header-theme')) {
+            trigger.kill();
+          }
+        }
+      });
+      
+      initHeaderTheme();
+    }, 100);
+  });
 });
 
 onUnmounted(() => {
@@ -248,25 +348,7 @@ const goPage = (url: string) => {
 }
 
 
-// 定义每个区域的主题配置（深色背景用白色文字，浅色背景用黑色文字）
-const sectionThemes:any = {
-  'section-0': { color: '#ffffff', logo: imgBaseURL('logo.svg') },      // 蓝色背景 -> 白色
-  'section-1': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅灰背景 -> 黑色
-  'section-2': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅色背景 -> 黑色
-  'section-3': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 浅色背景 -> 黑色
-  'section-4': { color: '#ffffff', logo: imgBaseURL('logo.svg') },      // 深色背景 -> 白色
-  'section-5': { color: '#000000', logo: imgBaseURL('logo-b.svg') },    // 白色背景 -> 黑色
-  'section-6': { color: '#000000', logo: imgBaseURL('logo-b.svg') },      // 深色背景 -> 白色
-};
 
-// 监听当前激活区域，根据区域 ID 直接切换主题
-watch(activeSection, (section) => {
-  if (section && sectionThemes[section.id]) {
-    const theme = sectionThemes[section.id];
-    headerColor.value = theme.color;
-    logoUrl.value = theme.logo;
-  }
-});
 
 // 菜单项数据
 const menuItems = [
@@ -439,8 +521,11 @@ const onContactLeave = () => {
 
 // 处理移动端滚动方向
 const handleMobileScrollDirection = () => {
-  // 监听 scrollY 的变化
-  watch(scrollY, (newScrollY) => {
+  if (!import.meta.client) return;
+  
+  const handleScroll = () => {
+    const newScrollY = window.scrollY || document.documentElement.scrollTop;
+    
     // 只在移动端生效（屏幕宽度小于 1024px）
     if (window.innerWidth >= 1024) {
       isHeaderVisible.value = true;
@@ -468,6 +553,13 @@ const handleMobileScrollDirection = () => {
       }
       lastScrollY.value = newScrollY;
     }
+  };
+  
+  window.addEventListener('scroll', handleScroll);
+  
+  // 清理函数
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
   });
 };
 </script>

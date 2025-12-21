@@ -226,13 +226,17 @@ const loadImages = () => {
 
 // 入场动画 - 圆盘旋转1到1.5圈出现
 const playEntranceAnimation = () => {
-  if (hasPlayedEntranceAnimation || !circleGroup || meshes.length === 0) return
-  hasPlayedEntranceAnimation = true
+  if (!circleGroup || meshes.length === 0) return
+  
+  // 设置初始旋转状态 - 从负1圈开始
+  circleGroup.rotation.y = -Math.PI * 1
+  
+  // 重置所有图片透明度
+  meshes.forEach((mesh) => {
+    (mesh.material as THREE.MeshStandardMaterial).opacity = 0
+  })
 
-  // 设置初始旋转状态 - 从负1.5圈开始
-  circleGroup.rotation.y = -Math.PI * 1 // -1.5圈 (Math.PI * 2 = 1圈)
-
-  // GSAP旋转动画 - 旋转到0度（完成1.5圈旋转）
+  // GSAP旋转动画 - 旋转到0度（完成1圈旋转）
   gsap.to(circleGroup.rotation, {
     y: 0,
     duration: 2.5,
@@ -252,6 +256,13 @@ const playEntranceAnimation = () => {
       ease: 'power2.out'
     })
   })
+}
+
+// 重新播放入场动画 - 供外部调用
+const replayEntranceAnimation = () => {
+  hasPlayedEntranceAnimation = false
+  playEntranceAnimation()
+  hasPlayedEntranceAnimation = true
 }
 
 // 动画循环
@@ -526,6 +537,11 @@ onMounted(() => {
     checkScrollTrigger()
     checkTextAnimation()
   }, 100)
+})
+
+// 暴露方法给父组件
+defineExpose({
+  replayEntranceAnimation
 })
 
 onUnmounted(() => {

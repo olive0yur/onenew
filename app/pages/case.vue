@@ -12,7 +12,13 @@
     </div>
 
     <!-- 图片循环 -->
-    <div id="section-2" v-if="viewMode === 'ring'" ref="ringModeRef" class="w-[100vw] h-[100dvh] bg-[#f7f7f7] lg:p-[40px] p-[16px] circle-images-list relative cover-section" data-header-theme="black">
+    <div 
+      id="section-2" 
+      v-show="viewMode === 'ring'" 
+      ref="ringModeRef" 
+      class="w-[100vw] h-[100dvh] bg-[#f7f7f7] lg:p-[40px] p-[16px] circle-images-list relative cover-section" 
+      data-header-theme="black"
+    >
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -23,26 +29,30 @@
       <div class="flex gap-[20px] absolute bottom-[20px] right-[40px] z-[11111]">
         <div 
           class="list-button flex items-center justify-center cursor-pointer" 
-          :class="{ 'active': viewMode === 'list' }"
-          @click="viewMode = 'list'"
+          :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
+          @click="!isTransitioning && (viewMode = 'list')"
         >
           <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
           List
         </div>
         <div 
           class="ring-button flex items-center justify-center cursor-pointer" 
-          :class="{ 'active': viewMode === 'ring' }"
-          @click="viewMode = 'ring'"
+          :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
+          @click="!isTransitioning && (viewMode = 'ring')"
         >
           <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
           Ring
         </div>
       </div>
-      <CircleImagesList v-if="projectList.length > 0 && showCircleImages" :key="circleImagesKey" :images="projectList" />
+      <CircleImagesList 
+        v-if="projectList.length > 0" 
+        ref="circleImagesListRef"
+        :images="projectList" 
+      />
     </div>
 
     <!-- 第二部分 -->
-    <div id="section-3" v-if="viewMode === 'list'" ref="section2Ref" class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2 cover-section" data-header-theme="black">
+    <div id="section-3" v-show="viewMode === 'list'" ref="section2Ref" class="bg-[#f7f7f7] lg:p-[40px] p-[16px] section2 cover-section" data-header-theme="black">
       <!-- section2-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -50,7 +60,7 @@
           <span class="subtitle">Projects</span>
         </div>
         <div class="project-count self-end mt-[20px] lg:mt-0">
-          <span>(<NumberScroll :target="projectList.length" />)</span>
+          <span>(<NumberScroll ref="projectCountRef" :target="projectList.length" />)</span>
         </div>
       </div>
 
@@ -60,19 +70,19 @@
         <div class="flex flex-col lg:flex-row gap-[20px] relative" v-if="projectListArr.length > 0">
            <ProjectCard height="800px" :key="projectListArr[0].id" :project="projectListArr[0]" />
            <ProjectCard height="528px" :key="projectListArr[1].id" :project="projectListArr[1]" />
-           <div class=" lg:flex hidden absolute bottom-[100px] right-[40px] z-[11111] gap-[20px]">
+           <div class=" lg:flex hidden absolute bottom-[100px] right-[0px] z-[11111] gap-[20px]">
              <div 
                class="list-button flex items-center justify-center cursor-pointer" 
-               :class="{ 'active': viewMode === 'list' }"
-               @click="viewMode = 'list'"
+               :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
+               @click="!isTransitioning && (viewMode = 'list')"
              >
                <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
                List
              </div>
              <div 
                class="ring-button flex items-center justify-center cursor-pointer" 
-               :class="{ 'active': viewMode === 'ring' }"
-               @click="viewMode = 'ring'"
+               :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
+               @click="!isTransitioning && (viewMode = 'ring')"
              >
                <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
                Ring
@@ -87,8 +97,8 @@
             <div class="lg:hidden flex gap-[20px] absolute" style="top: 20px; right: 20px;">
               <div 
                 class="list-button flex items-center justify-center cursor-pointer" 
-                :class="{ 'active': viewMode === 'list' }"
-                @click="viewMode = 'list'"
+                :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
+                @click="!isTransitioning && (viewMode = 'list')"
                 style="width: 56px; height: 20px; font-size: 12px;"
               >
                 <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
@@ -96,8 +106,8 @@
               </div>
               <div 
                 class="ring-button flex items-center justify-center cursor-pointer" 
-                :class="{ 'active': viewMode === 'ring' }"
-                @click="viewMode = 'ring'"
+                :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
+                @click="!isTransitioning && (viewMode = 'ring')"
                 style="width: 56px; height: 20px; font-size: 12px;"
               >
                 <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
@@ -149,7 +159,7 @@
     </div>
 
     <!-- 第三部分 -->
-    <div id="section-4" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 lg:h-[100dvh] h-auto relative" data-header-theme="black">
+    <div id="section-4" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 h-[100dvh] relative" data-header-theme="black">
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between">
         <div class="flex flex-col project-title gap-[8px]">
@@ -260,7 +270,7 @@
     </div>
 
     <section id="section-6" class="section-6 relative" data-header-theme="white">
-      <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 250px)' : 'calc(100vh + 569px)'" />
+      <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 530px)' : 'calc(100vh + 569px)'" />
     </section>
   </div>
 </template>
@@ -289,9 +299,10 @@ const section1Ref = ref<HTMLElement | null>(null);
 const section2Ref = ref<HTMLElement | null>(null);
 const section3Ref = ref<HTMLElement | null>(null);
 const ringModeRef = ref<HTMLElement | null>(null);
+const circleImagesListRef = ref<any>(null); // CircleImagesList 组件引用
+const projectCountRef = ref<any>(null); // NumberScroll 组件引用
 let savedScrollPosition = 0; // 保存滚动位置
-const circleImagesKey = ref(0); // 用于强制重新加载 CircleImagesList
-const showCircleImages = ref(true); // 控制 CircleImagesList 的显示
+const isTransitioning = ref(false); // 标记是否正在切换中
 
 useHead({ 
   title: 'ONEW专业网站建设公司 云联在线 案例',
@@ -301,33 +312,104 @@ useHead({
   ],
 })
 
-// 监听视图模式切换
-watch(viewMode, (newMode, oldMode) => {
-  if (import.meta.client) {
-    if (newMode === 'list') {
-      showCircleImages.value = false;
-      savedScrollPosition = window.scrollY;
-      nextTick(() => {
-        if (section2Ref.value) {
-          window.scrollTo({
-            top: savedScrollPosition,
-            behavior: 'instant' as ScrollBehavior
-          });
-        }
-      });
-    } else if (newMode === 'ring') {
-      showCircleImages.value = false;
-      nextTick(() => {
-        window.scrollTo({
-          top: savedScrollPosition,
-          behavior: 'instant' as ScrollBehavior
-        });
-        setTimeout(() => {
-          circleImagesKey.value++;
-          showCircleImages.value = true;
-        }, 100);
-      });
+// 重新初始化 section1-content 的滚动动画
+const reinitSection1ScrollAnimation = () => {
+  // 获取所有与 section1-content 相关的 ScrollTrigger 实例并杀掉
+  ScrollTrigger.getAll().forEach(trigger => {
+    const triggerElement = trigger.vars.trigger;
+    if (triggerElement === '.cover-section' || 
+        (triggerElement instanceof Element && triggerElement.classList?.contains('cover-section'))) {
+      trigger.kill();
     }
+  });
+  
+  // 重新创建 section1-content 的滚动动画
+  nextTick(() => {
+    const coverSection = document.querySelector('.cover-section');
+    if (coverSection) {
+      // 左移和旋转 - 推的动画 (快速响应)
+      gsap.fromTo(".section1-content", 
+        {
+          x: 0,
+          rotation: 0,
+        },
+        {
+          x: -100,
+          rotation: -8,
+          scrollTrigger: {
+            trigger: coverSection,
+            start: "top bottom",
+            end: "top top",
+            scrub: 0.3, // 减小 scrub 值,加快响应速度
+          },
+        }
+      );
+
+      // 上移动画 (快速响应)
+      gsap.fromTo(".section1-content",
+        {
+          y: 0,
+        },
+        {
+          y: -400,
+          scrollTrigger: {
+            trigger: coverSection,
+            start: "top bottom",
+            end: "top 10%",
+            scrub: 0.3, // 减小 scrub 值,加快响应速度
+          },
+        }
+      );
+    }
+  });
+};
+
+// 监听视图模式切换 - 使用 v-show 优化版本
+watch(viewMode, async (newMode, oldMode) => {
+  if (!import.meta.client || isTransitioning.value) return;
+  
+  isTransitioning.value = true;
+  savedScrollPosition = window.scrollY;
+  
+  try {
+    // 等待 DOM 更新
+    await nextTick();
+    
+    // 立即恢复滚动位置
+    window.scrollTo({
+      top: savedScrollPosition,
+      behavior: 'instant' as ScrollBehavior
+    });
+    
+    // 如果切换到 ring 模式,重新播放圆盘动画
+    if (newMode === 'ring' && circleImagesListRef.value?.replayEntranceAnimation) {
+      // 等待一帧确保元素可见
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      circleImagesListRef.value.replayEntranceAnimation();
+    }
+    
+    // 如果切换到 list 模式,重新播放数字滚动动画
+    if (newMode === 'list' && projectCountRef.value?.replay) {
+      // 等待一帧确保元素可见
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      projectCountRef.value.replay();
+    }
+    
+    // 单次 RAF 等待渲染
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    
+    // 重新初始化动画
+    reinitSection1ScrollAnimation();
+    
+    // 刷新 ScrollTrigger
+    await nextTick();
+    ScrollTrigger.refresh();
+    
+  } finally {
+    // 短延迟解锁
+    setTimeout(() => {
+      isTransitioning.value = false;
+    }, 150);
   }
 });
 
@@ -374,6 +456,17 @@ const detectMobile = () => {
   }
 };
 
+// 处理窗口 resize 时刷新 GSAP 动画
+const handleResize = () => {
+  if (import.meta.client) {
+    // 检测移动端
+    detectMobile();
+    
+    // 刷新 ScrollTrigger 以重新计算所有动画的触发点
+    ScrollTrigger.refresh();
+  }
+};
+
 // 更新所有博客卡片的高度
 const updateBlogCardsHeight = () => {
   if (!blogListRef.value || blogList.value.length === 0) return;
@@ -395,7 +488,7 @@ const updateBlogCardsHeight = () => {
 if(import.meta.client) {
   gsap.registerPlugin(ScrollTrigger);
   detectMobile(); // 初始化时检测
-  window.addEventListener('resize', detectMobile); // 监听窗口大小变化
+  window.addEventListener('resize', handleResize); // 监听窗口大小变化，使用新的 handleResize 函数
 }
 
 // 将 projectListArr2 按每11个分组
@@ -493,7 +586,7 @@ const initAnimations = () => {
       const coverSection = document.querySelector('.cover-section');
       if (coverSection) {
         // 使用 fromTo 来明确起始和结束状态,确保能正确还原
-        // 左移和旋转 - 推的动画 (正常速率)
+        // 左移和旋转 - 推的动画 (快速响应)
         gsap.fromTo(".section1-content", 
           {
             x: 0,
@@ -506,7 +599,7 @@ const initAnimations = () => {
               trigger: coverSection,
               start: "top bottom",
               end: "top top",
-              scrub: 1,
+              scrub: 0.3, // 减小 scrub 值,加快响应速度
             },
           }
         );
@@ -522,7 +615,7 @@ const initAnimations = () => {
               trigger: coverSection,
               start: "top bottom",
               end: "top 10%", // 缩短滚动距离,加快上移速率
-              scrub: 1,
+              scrub: 0.3, // 减小 scrub 值,加快响应速度
             },
           }
         );
@@ -880,9 +973,9 @@ onUnmounted(() => {
   if (ctx.value) {
     ctx.value.revert();
   }
-  // 清理移动端检测监听器
+  // 清理 resize 监听器
   if (import.meta.client) {
-    window.removeEventListener('resize', detectMobile);
+    window.removeEventListener('resize', handleResize);
   }
 });
 </script>
@@ -1571,5 +1664,28 @@ onUnmounted(() => {
 
   .line-h {
     height: 100vh;
+  }
+
+  /* 按钮禁用状态 */
+  .list-button.disabled,
+  .ring-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* 优化视图切换性能 - 使用硬件加速 */
+  .circle-images-list,
+  .section2 {
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* 隐藏时禁用指针事件 */
+  .circle-images-list[style*="display: none"],
+  .section2[style*="display: none"] {
+    pointer-events: none;
   }
 </style>

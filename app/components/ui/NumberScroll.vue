@@ -40,6 +40,13 @@ const animateNumber = () => {
   animate()
 }
 
+// 重新播放动画 - 供外部调用
+const replay = () => {
+  displayNumber.value = 0
+  hasAnimated.value = true
+  animateNumber()
+}
+
 // 监听元素是否进入视口
 onMounted(() => {
   if (!numberRef.value) return
@@ -69,6 +76,11 @@ watch(() => props.target, () => {
     hasAnimated.value = false
     animateNumber()
   }
+})
+
+// 暴露方法给父组件
+defineExpose({
+  replay
 })
 </script>
 

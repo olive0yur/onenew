@@ -31,16 +31,18 @@
           class="list-button flex items-center justify-center cursor-pointer" 
           :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
           @click="!isTransitioning && (viewMode = 'list')"
+          @mouseenter="handleButtonHover($event)"
         >
-          <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+          <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
           List
         </div>
         <div 
           class="ring-button flex items-center justify-center cursor-pointer" 
           :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
           @click="!isTransitioning && (viewMode = 'ring')"
+          @mouseenter="handleButtonHover($event)"
         >
-          <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+          <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
           Ring
         </div>
       </div>
@@ -75,16 +77,18 @@
                class="list-button flex items-center justify-center cursor-pointer" 
                :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
                @click="!isTransitioning && (viewMode = 'list')"
+               @mouseenter="handleButtonHover($event)"
              >
-               <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+               <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
                List
              </div>
              <div 
                class="ring-button flex items-center justify-center cursor-pointer" 
                :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
                @click="!isTransitioning && (viewMode = 'ring')"
+               @mouseenter="handleButtonHover($event)"
              >
-               <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="">
+               <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
                Ring
              </div>
            </div>
@@ -99,18 +103,20 @@
                 class="list-button flex items-center justify-center cursor-pointer" 
                 :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
                 @click="!isTransitioning && (viewMode = 'list')"
+                @mouseenter="handleButtonHover($event)"
                 style="width: 56px; height: 20px; font-size: 12px;"
               >
-                <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
+                <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon" style="width: 12px; height: 12px;">
                 List
               </div>
               <div 
                 class="ring-button flex items-center justify-center cursor-pointer" 
                 :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
                 @click="!isTransitioning && (viewMode = 'ring')"
+                @mouseenter="handleButtonHover($event)"
                 style="width: 56px; height: 20px; font-size: 12px;"
               >
-                <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" style="width: 12px; height: 12px;">
+                <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon" style="width: 12px; height: 12px;">
                 Ring
               </div>
             </div>
@@ -906,6 +912,20 @@ const scrollLeft = () => {
   });
 };
 
+// 处理按钮hover时SVG闪烁三次
+const handleButtonHover = (event: MouseEvent) => {
+  const button = event.currentTarget as HTMLElement;
+  const icon = button.querySelector('.button-icon') as HTMLElement;
+  
+  if (icon && !icon.classList.contains('blinking')) {
+    icon.classList.add('blinking');
+    // 动画结束后移除类（0.9s = 3次闪烁）
+    setTimeout(() => {
+      icon.classList.remove('blinking');
+    }, 900);
+  }
+};
+
 // 处理hover离开时的文字闪动
 const setupHoverEffects = () => {
   const leftContainer = document.querySelector('.hover-container-left');
@@ -1423,46 +1443,61 @@ onUnmounted(() => {
 
   /* 按钮样式 - 全局使用 */
   .list-button {
-    padding: 4px 16px;
+    /* 桌面端：自适应大小 */
+    padding: clamp(3px, 0.3vw, 4px) clamp(12px, 1vw, 16px);
     font-family: Inter;
-    font-size: 24px;
+    font-size: clamp(18px, 1.5vw, 24px);
     font-weight: 400;
-    line-height: 32px;
+    line-height: clamp(24px, 2vw, 32px);
     border-radius: 44.44px;
     background: rgba(218, 218, 218, 0.60);
     backdrop-filter: blur(12.5px);
-    gap: 4px;
+    gap: clamp(3px, 0.3vw, 4px);
     color: #fff;
     transition: all 0.3s ease;
     
     img {
-      width: 24px;
-      height: 24px;
+      width: clamp(18px, 1.5vw, 24px);
+      height: clamp(18px, 1.5vw, 24px);
       transition: all 0.3s ease;
     }
     
     &.active {
       color: #3B4EFF;
       background: rgba(59, 78, 255, 0.10);
+    }
+    
+    /* 移动端：固定较小尺寸 */
+    @media (max-width: 768px) {
+      padding: 3px 12px;
+      font-size: 12px;
+      line-height: 24px;
+      gap: 3px;
+      
+      img {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 
   .ring-button {
-    padding: 4px 16px;
+    /* 桌面端：自适应大小 */
+    padding: clamp(3px, 0.3vw, 4px) clamp(12px, 1vw, 16px);
     font-family: Inter;
-    font-size: 24px;
+    font-size: clamp(18px, 1.5vw, 24px);
     font-weight: 400;
-    line-height: 32px;
+    line-height: clamp(24px, 2vw, 32px);
     border-radius: 44.44px;
     background: rgba(218, 218, 218, 0.60);
     backdrop-filter: blur(12.5px);
-    gap: 4px;
+    gap: clamp(3px, 0.3vw, 4px);
     color: #fff;
     transition: all 0.3s ease;
     
     img {
-      width: 24px;
-      height: 24px;
+      width: clamp(18px, 1.5vw, 24px);
+      height: clamp(18px, 1.5vw, 24px);
       transition: all 0.3s ease;
     }
     
@@ -1470,6 +1505,33 @@ onUnmounted(() => {
       color: #3B4EFF;
       background: rgba(59, 78, 255, 0.10);
     }
+    
+    /* 移动端：固定较小尺寸 */
+    @media (max-width: 768px) {
+      padding: 3px 12px;
+      font-size: 12px;
+      line-height: 24px;
+      gap: 3px;
+      
+      img {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  /* SVG闪烁动画 - 闪烁三次 */
+  @keyframes iconBlink {
+    0%, 100% { opacity: 1; }
+    16.67% { opacity: 0; }
+    33.33% { opacity: 1; }
+    50% { opacity: 0; }
+    66.67% { opacity: 1; }
+    83.33% { opacity: 0; }
+  }
+
+  .button-icon.blinking {
+    animation: iconBlink 0.9s ease-in-out;
   }
 
   /* Let's Talk 响应式样式 */

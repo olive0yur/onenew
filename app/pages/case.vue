@@ -114,9 +114,32 @@
                 Ring
               </div>
             </div>
-            <span>{{projectSlogan[0]?.dict_value}}</span>
+            <ScrollReveal 
+            v-if="projectSlogan[0]?.description"
+            :text="projectSlogan[0]?.dict_value"
+            :base-opacity="0.1"
+            :enable-blur="true"
+            :base-rotation="5"
+            :blur-strength="10"
+            container-class-name="project-content"
+            text-class-name=""
+            rotation-end="top 45%"
+            word-animation-end="top 45%"
+          />
+            <!-- <span>{{projectSlogan[0]?.dict_value}}</span> -->
           </div>
-          <div class="project-content">{{projectSlogan[0]?.description}}</div>
+          <ScrollReveal 
+            v-if="projectSlogan[0]?.description"
+            :text="projectSlogan[0]?.description"
+            :base-opacity="0.1"
+            :enable-blur="true"
+            :base-rotation="5"
+            :blur-strength="10"
+            container-class-name="project-content"
+            text-class-name=""
+            rotation-end="top 45%"
+            word-animation-end="top 45%"
+          />
           <div class="project-bottom">{{projectSlogan[0]?.remark}}</div>
         </div>
 
@@ -303,6 +326,8 @@ const circleImagesListRef = ref<any>(null); // CircleImagesList 组件引用
 const projectCountRef = ref<any>(null); // NumberScroll 组件引用
 let savedScrollPosition = 0; // 保存滚动位置
 const isTransitioning = ref(false); // 标记是否正在切换中
+import GlitchText from "~/components/ui/GlitchText.vue";
+import ScrollReveal from "~/components/ui/ScrollReveal.vue";
 
 useHead({ 
   title: 'ONEW专业网站建设公司 云联在线 案例',
@@ -663,6 +688,7 @@ const initAnimations = () => {
       x: isMobile.value ? '-12vw' : '-6vw',
       ease: "power2.inOut",
     });
+
 
   });
 };
@@ -1234,6 +1260,7 @@ onUnmounted(() => {
           line-height: 64px; /* 100% */
           margin-top: 12px;
           max-width: 1540px;
+          
           @media screen and (max-width: 768px) {
             font-size: 24px;
             font-style: normal;

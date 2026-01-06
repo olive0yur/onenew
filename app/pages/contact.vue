@@ -279,22 +279,31 @@ const onContactLeave = () => {
   }
 };
 
+const isSubmitting = ref(false);
+
 const onSubmit = async () => {
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
+  
   // 校验必填字段
   if (!formData.value.name) {
     toast.warning('请填写您的称呼');
+    isSubmitting.value = false;
     return;
   }
   if (!formData.value.contact) {
     toast.warning('请填写您的联系方式');
+    isSubmitting.value = false;
     return;
   }
   if (!formData.value.business_type) {
     toast.warning('请选择咨询服务');
+    isSubmitting.value = false;
     return;
   }
   if (!formData.value.Budget) {
     toast.warning('请选择项目预算');
+    isSubmitting.value = false;
     return;
   }
 
@@ -317,6 +326,8 @@ const onSubmit = async () => {
     }
   } catch (e) {
     toast.error('提交失败');
+  } finally {
+    isSubmitting.value = false;
   }
 };
 

@@ -5,6 +5,7 @@
         <NuxtPage />
       </KeepAlive>
     </NuxtLayout>
+    <Toast />
   </div>
 </template>
 

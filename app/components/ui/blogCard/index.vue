@@ -119,6 +119,30 @@ const handleMouseMove = (e: MouseEvent) => {
   background-color: #f0f0f0;
   position: relative;
   
+  /* 1680px 以下 */
+  @media screen and (max-width: 1680px) {
+    width: 270px;
+    height: 360px;
+  }
+  
+  /* 1440px 以下 */
+  @media screen and (max-width: 1440px) {
+    width: 240px;
+    height: 320px;
+  }
+  
+  /* 1280px 以下 */
+  @media screen and (max-width: 1280px) {
+    width: 210px;
+    height: 280px;
+  }
+  
+  /* 1024px 以下 */
+  @media screen and (max-width: 1024px) {
+    width: 180px;
+    height: 240px;
+  }
+  
   /* 手机端样式 */
   @media screen and (max-width: 768px) {
     width: 110px;
@@ -141,6 +165,24 @@ const handleMouseMove = (e: MouseEvent) => {
   font-weight: 400;
   line-height: 32px;
   
+  /* 1440px 以下 */
+  @media screen and (max-width: 1440px) {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  
+  /* 1280px 以下 */
+  @media screen and (max-width: 1280px) {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  
+  /* 1024px 以下 */
+  @media screen and (max-width: 1024px) {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  
   /* 手机端样式 */
   @media screen and (max-width: 768px) {
     font-size: 16px;
@@ -157,6 +199,18 @@ const handleMouseMove = (e: MouseEvent) => {
   font-style: normal;
   font-weight: 400;
   line-height: 16px;
+  
+  /* 1280px 以下 */
+  @media screen and (max-width: 1280px) {
+    font-size: 14px;
+    line-height: 14px;
+  }
+  
+  /* 1024px 以下 */
+  @media screen and (max-width: 1024px) {
+    font-size: 13px;
+    line-height: 13px;
+  }
   
   /* 手机端样式 */
   @media screen and (max-width: 768px) {
@@ -190,6 +244,25 @@ const handleMouseMove = (e: MouseEvent) => {
   line-height: 16px;
   
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  /* 1440px 以下 */
+  @media screen and (max-width: 1440px) {
+    width: 70px;
+    height: 70px;
+    font-size: 14px;
+  }
+  
+  /* 1024px 以下 */
+  @media screen and (max-width: 1024px) {
+    width: 60px;
+    height: 60px;
+    font-size: 13px;
+  }
+  
+  /* 手机端隐藏 */
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 }
 </style>
 

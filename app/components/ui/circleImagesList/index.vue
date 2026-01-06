@@ -225,8 +225,8 @@ const loadImages = () => {
     textureLoader.load(
       imgBaseURL(item.img),
       (texture) => {
-        // 创建材质
-        const material = new THREE.MeshStandardMaterial({
+        // 创建材质 - 使用 BasicMaterial 不受光照影响，显示图片原始亮度
+        const material = new THREE.MeshBasicMaterial({
           map: texture,
           side: THREE.DoubleSide,
           transparent: true,
@@ -284,7 +284,7 @@ const playEntranceAnimation = () => {
   
   // 重置所有图片透明度
   meshes.forEach((mesh) => {
-    (mesh.material as THREE.MeshStandardMaterial).opacity = 0
+    (mesh.material as THREE.MeshBasicMaterial).opacity = 0
   })
 
   // GSAP旋转动画 - 旋转到0度（完成1圈旋转）
@@ -300,7 +300,7 @@ const playEntranceAnimation = () => {
 
   // 透明度动画 - 图片逐渐显现
   meshes.forEach((mesh, index) => {
-    gsap.to((mesh.material as THREE.MeshStandardMaterial), {
+    gsap.to((mesh.material as THREE.MeshBasicMaterial), {
       opacity: 1,
       duration: opacityDuration,
       delay: index * delayMultiplier,
@@ -858,7 +858,7 @@ onUnmounted(() => {
   // 清理Three.js资源
   meshes.forEach(mesh => {
     mesh.geometry.dispose()
-    const material = mesh.material as THREE.MeshStandardMaterial
+    const material = mesh.material as THREE.MeshBasicMaterial
     if (material.map) material.map.dispose()
     material.dispose()
   })

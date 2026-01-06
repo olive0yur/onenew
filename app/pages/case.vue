@@ -1,8 +1,14 @@
 <template>
   <div class="overflow-hidden">
     <!-- 第一部分 -->
-    <div id="section-1" ref="section1Ref" class="w-[100vw] h-[100dvh] section1" data-header-theme="white" :style="{ backgroundImage: `url(${imgBaseURL(caseList[0]?.img)})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
-      <div class="section1-content flex flex-col justify-between lg:justify-start">
+    <div 
+      id="section-1" 
+      ref="section1Ref" 
+      class="w-[100vw] h-[100dvh] section1" 
+      data-header-theme="white" 
+      :style="section1Style"
+    >
+      <div  class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
         <div class="flex justify-end mb-[16px]">
@@ -241,7 +247,7 @@
       <!-- Let's talk 部分 - 移到第三部分内部 -->
       <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
           <div class="lets-talk-top-left overflow-hidden relative">
-            <div class="flex items-center hover-container-left">
+            <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
               <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
               <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
                 <span class="hover-text-char">L</span>
@@ -342,6 +348,21 @@ useHead({
     { name: 'keywords', content: 'ONEW专业网站建设公司 云联在线 案例 案例展示' },
   ],
 })
+
+// 优化 section1 样式计算
+const section1Style = computed(() => {
+  if (caseList.value.length === 0) {
+    return {
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    };
+  }
+  return {
+    backgroundImage: `url(${imgBaseURL(caseList.value[0]?.img)})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  };
+});
 
 // 重新初始化 section1-content 的滚动动画
 const reinitSection1ScrollAnimation = () => {
@@ -459,6 +480,27 @@ const displayBlogList = computed(() => {
 const ctx: any = ref(null);
 const lenis: any = ref(null);
 
+// 根据窗口宽度获取卡片尺寸
+const getCardDimensions = () => {
+  if (!import.meta.client) return { cardWidth: 315, cardHeight: 420, gap: 20 };
+  
+  const width = window.innerWidth;
+  
+  if (width <= 768) {
+    return { cardWidth: 110, cardHeight: 148, gap: 12 };
+  } else if (width <= 1024) {
+    return { cardWidth: 180, cardHeight: 240, gap: 20 };
+  } else if (width <= 1280) {
+    return { cardWidth: 210, cardHeight: 280, gap: 20 };
+  } else if (width <= 1440) {
+    return { cardWidth: 240, cardHeight: 320, gap: 20 };
+  } else if (width <= 1680) {
+    return { cardWidth: 270, cardHeight: 360, gap: 20 };
+  } else {
+    return { cardWidth: 315, cardHeight: 420, gap: 20 };
+  }
+};
+
 // 检测移动端设备
 const detectMobile = () => {
   if (import.meta.client) {
@@ -469,8 +511,7 @@ const detectMobile = () => {
     if (wasMobile !== isMobile.value && blogList.value.length > 0) {
       nextTick(() => {
         // 重新计算并设置滚动位置
-        const gap = isMobile.value ? 12 : 20;
-        const cardWidth = isMobile.value ? 110 : 315;
+        const { cardWidth, gap } = getCardDimensions();
         const itemWidth = cardWidth + gap;
         
         // 根据当前的 currentVisibleIndex 计算应该滚动到的位置
@@ -503,14 +544,14 @@ const updateBlogCardsHeight = () => {
   if (!blogListRef.value || blogList.value.length === 0) return;
   
   const heightOffset = isMobile.value ? 40 : 80;
-  const baseHeight = isMobile.value ? 148 : 420;
+  const { cardHeight } = getCardDimensions();
   const listLength = blogList.value.length;
   const blogItems = blogListRef.value.querySelectorAll('.blog-item');
   
   blogItems.forEach((item, index) => {
     const positionInOriginalList = index % listLength;
     const isVisibleFirst = positionInOriginalList === currentVisibleIndex.value;
-    const height = isVisibleFirst ? baseHeight : baseHeight + heightOffset;
+    const height = isVisibleFirst ? cardHeight : cardHeight + heightOffset;
     (item as HTMLElement).style.height = `${height}px`;
   });
 };
@@ -641,7 +682,7 @@ const initAnimations = () => {
             y: 0,
           },
           {
-            y: -400, // 大幅增加上移距离,让效果更明显
+            y: -450, // 大幅增加上移距离,让效果更明显
             scrollTrigger: {
               trigger: coverSection,
               start: "top bottom",
@@ -702,7 +743,7 @@ const initAnimations = () => {
 // 获取每个博客卡片的样式
 const getBlogItemStyle = (index: number) => {
   const heightOffset = isMobile.value ? 40 : 80;
-  const baseHeight = isMobile.value ? 148 : 420;
+  const { cardHeight } = getCardDimensions();
   const listLength = blogList.value.length;
   
   // 计算这个卡片在原始列表中的位置
@@ -712,7 +753,7 @@ const getBlogItemStyle = (index: number) => {
   const isVisibleFirst = positionInOriginalList === currentVisibleIndex.value;
   
   return {
-    height: isVisibleFirst ? `${baseHeight}px` : `${baseHeight + heightOffset}px`,
+    height: isVisibleFirst ? `${cardHeight}px` : `${cardHeight + heightOffset}px`,
     flexShrink: 0,
     display: 'flex',
     alignItems: 'flex-end',
@@ -724,8 +765,7 @@ const initBlogListPosition = () => {
   if (!blogListRef.value || blogList.value.length === 0) return;
   
   nextTick(() => {
-    const gap = isMobile.value ? 12 : 20;
-    const cardWidth = isMobile.value ? 110 : 315;
+    const { cardWidth, gap } = getCardDimensions();
     const itemWidth = cardWidth + gap;
     // 定位到中间那组的起始位置
     blogListRef.value!.scrollLeft = itemWidth * blogList.value.length;
@@ -742,10 +782,8 @@ const scrollRight = () => {
   
   isAnimating.value = true;
   const listLength = blogList.value.length;
-  const gap = isMobile.value ? 12 : 20;
-  const cardWidth = isMobile.value ? 110 : 315;
+  const { cardWidth, cardHeight, gap } = getCardDimensions();
   const itemWidth = cardWidth + gap;
-  const baseHeight = isMobile.value ? 148 : 420;
   const heightOffset = isMobile.value ? 40 : 80;
   
   // 获取所有卡片元素
@@ -808,7 +846,7 @@ const scrollRight = () => {
   // 所有当前第一个位置的卡片高度升高（从矮变高）
   currentFirstCards.forEach(card => {
     tl.to(card, {
-      height: `${baseHeight + heightOffset}px`,
+      height: `${cardHeight + heightOffset}px`,
       duration: 0.6,
       ease: 'power2.inOut',
     }, 0);
@@ -817,7 +855,7 @@ const scrollRight = () => {
   // 所有新的第一个位置的卡片高度降低（从高变矮）
   nextFirstCards.forEach(card => {
     tl.to(card, {
-      height: `${baseHeight}px`,
+      height: `${cardHeight}px`,
       duration: 0.6,
       ease: 'power2.inOut',
     }, 0);
@@ -830,10 +868,8 @@ const scrollLeft = () => {
   
   isAnimating.value = true;
   const listLength = blogList.value.length;
-  const gap = isMobile.value ? 12 : 20;
-  const cardWidth = isMobile.value ? 110 : 315;
+  const { cardWidth, cardHeight, gap } = getCardDimensions();
   const itemWidth = cardWidth + gap;
-  const baseHeight = isMobile.value ? 148 : 420;
   const heightOffset = isMobile.value ? 40 : 80;
   
   // 获取所有卡片元素
@@ -896,7 +932,7 @@ const scrollLeft = () => {
   // 所有当前第一个位置的卡片高度升高（从矮变高）
   currentFirstCards.forEach(card => {
     tl.to(card, {
-      height: `${baseHeight + heightOffset}px`,
+      height: `${cardHeight + heightOffset}px`,
       duration: 0.6,
       ease: 'power2.inOut',
     }, 0);
@@ -905,7 +941,7 @@ const scrollLeft = () => {
   // 所有新的第一个位置的卡片高度降低（从高变矮）
   prevFirstCards.forEach(card => {
     tl.to(card, {
-      height: `${baseHeight}px`,
+      height: `${cardHeight}px`,
       duration: 0.6,
       ease: 'power2.inOut',
     }, 0);
@@ -982,9 +1018,9 @@ const setupHoverEffects = () => {
 onMounted(async() => {
   // 请求数据
   const caseListData: any = await getDictList({ typeName: 'case' });
+  const blogListData: any = await getDictList({ typeName: 'blog' });
   const projectListData: any = await getDictList({ typeName: 'project' });
   const projectSloganData: any = await getDictList({ typeName:'project-slogan' });
-  const blogListData: any = await getDictList({ typeName: 'blog' });
   
   // 初始化数据
   caseList.value = caseListData?.data ?? [];

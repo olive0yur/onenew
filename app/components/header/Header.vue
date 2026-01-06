@@ -40,30 +40,16 @@
         </button> -->
       </span>
       <GlitchText
-        text="HOME 首页"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
+        v-for="(item, index) in menuItems"
+        :key="item.path"
+        :text="`${item.enName} ${item.cnName}`"
+        :class="[
+          'cursor-pointer hover:underline underline-offset-4 nav-item hidden lg:block',
+          `nav-item-${index + 1}`
+        ]"
         :speed="30"
         :iterations="3"
-        @click="navigateTo('/')"
-      />
-      <GlitchText
-        text="WORKS 案例"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-1 hidden lg:block"
-        :speed="30"
-        :iterations="3"
-        @click="navigateTo('/case')"
-      />
-      <GlitchText
-        text="ABOUT 关于"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-2 hidden lg:block"
-        :speed="30"
-        :iterations="3"
-      />
-      <GlitchText
-        text="CONTACT 联系"
-        class="cursor-pointer hover:underline underline-offset-4 nav-item nav-item-3 hidden lg:block"
-        :speed="30"
-        :iterations="3"
+        @click="navigateTo(item.path)"
       />
     </div>
 
@@ -394,7 +380,7 @@ const navItemsDisappear = () => {
 
   // 计算按钮需要移动到最右边span位置的距离
   const button = document.querySelector(".nav-button");
-  const lastSpan = document.querySelector(".nav-item-3");
+  const lastSpan = document.querySelector(".nav-item-4");
   const menuItem = document.querySelector(".nav-item-menu");
 
   // 设置 MENU 的初始状态：隐藏在右边
@@ -439,6 +425,15 @@ const navItemsDisappear = () => {
       )
       .to(
         ".nav-item-3",
+        {
+          y: -30,
+          opacity: 0,
+          duration: 0.4,
+          ease: "power2.inOut",
+        },
+        "-=0.2" // 重叠0.2秒，创造流畅过渡
+      ).to(
+        ".nav-item-4",
         {
           y: -30,
           opacity: 0,

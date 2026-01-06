@@ -45,3 +45,12 @@ export const useGetCompanyInfo = async (data?: object) => {
     return e;
   }
 };
+
+/** 提交咨询信息 **/
+export const useSubmitConsultInfo = async (data?: object) => {
+  try {
+    return await $http.post<Response>("workspace", data);
+  } catch (e) {
+    return e;
+  }
+};

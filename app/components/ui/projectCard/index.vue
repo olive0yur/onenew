@@ -5,7 +5,7 @@
       flex: flexValue
     }"
   >
-    <!-- 项目图片 -->
+    <!-- 项目图片/视频 -->
     <div 
       class="project-image overflow-hidden relative"
       :style="{ height: height }"
@@ -13,7 +13,19 @@
       @mouseleave="handleMouseLeave"
       @mousemove="handleMouseMove"
     >
+      <!-- 如果有视频则展示视频 -->
+      <video 
+        v-if="project.video"
+        :src="imgBaseURL(project.video)" 
+        class="w-full h-full object-cover"
+        autoplay
+        muted
+        loop
+        playsinline
+      />
+      <!-- 否则展示图片 -->
       <img 
+        v-else
         :src="imgBaseURL(project.img)" 
         :alt="project.dict_value"
         class="w-full h-full object-cover"

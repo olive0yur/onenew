@@ -101,7 +101,6 @@
 
           <div class="lg:hidden h-[28px] w-[110px] text-[12px] bg-[#3B4EFF] text-[#fff] flex items-center justify-center border-l-[1px] border-[#000] border-solid">
             ABOUT 关于
-
             <svg 
               class="transition-colors duration-300 button-arrow ml-[8px]" 
               xmlns="http://www.w3.org/2000/svg" 
@@ -126,14 +125,14 @@
         <div class="flex flex-col items-end overflow-hidden">
           <div
             v-for="(describe, index) in aboutList"
-            :key="describe.index"
+            :key="describe.id || describe.dict_type_id || index"
             :ref="(el: any) => setDescribeRef(el, index)"
-            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] lg:py-[40px] py-[16px] lg:pr-[39px] w-full max-w-[1318px] cursor-pointer relative"
+            class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] lg:py-[40px] py-[16px] lg:pr-[39px] w-full max-w-[1218px] cursor-pointer relative"
           >
             <!-- index -->
             <span
               class="font-['Inter'] text-[16px] text-[#3B4EFF] absolute top-[40px] left-[-64px] uppercase font-[400] hidden lg:block"
-              >/ {{ '0' + (index+1) }}</span
+              >/ {{ '0' + (Number(index)+1) }}</span
             >
             <!-- 主要内容行 -->
             <div @click="toggleExpand(index)" class="flex items-center justify-between w-full">
@@ -233,7 +232,7 @@
               v-for="(item, index) in scrollImage"
               :key="index"
               :src="imgBaseURL(item?.img)"
-              :class="`hidden lg:block h-[90px] absolute scroll-img scroll-img-${index + 1} opacity-0`"
+              :class="`hidden lg:block h-[90px] absolute scroll-img scroll-img-${Number(index) + 1} opacity-0`"
               alt=""
             />
 
@@ -243,7 +242,7 @@
                 v-for="(item, index) in scrollImage"
                 :key="index"
                 :src="imgBaseURL(item?.img)"
-                :class="`scroll-img-mobile scroll-img-mobile-${index + 1} w-[100px] opacity-0 absolute`"
+                :class="`scroll-img-mobile scroll-img-mobile-${Number(index) + 1} w-[100px] opacity-0 absolute`"
                 :style="{ top: 'calc(58vh)', left: '0' }"
                 alt=""
               />
@@ -255,7 +254,7 @@
               <span 
                 v-for="(item, index) in scrollWords" 
                 :key="item?.id" 
-                :class="`scroll-text scroll-text-${index + 1} text-[64px] leading-[64px] text-[#FFF] absolute opacity-100`"
+                :class="`scroll-text scroll-text-${Number(index) + 1} text-[64px] leading-[64px] text-[#FFF] absolute opacity-100`"
               >{{ item?.dict_value }}</span>
             </div>
 
@@ -265,7 +264,7 @@
                 <span 
                   v-for="(item, index) in scrollWords" 
                   :key="item?.id" 
-                  :class="`scroll-text-mobile scroll-text-mobile-${index + 1} text-[24px] leading-[24px] text-[#FFF] opacity-30 w-[200px] h-auto text-center flex-shrink-0`"
+                  :class="`scroll-text-mobile scroll-text-mobile-${Number(index) + 1} text-[24px] leading-[24px] text-[#FFF] opacity-30 w-[200px] h-auto text-center flex-shrink-0`"
                 >{{ item?.dict_value }}</span>
               </div>
             </div> 
@@ -309,7 +308,7 @@
                                   </div>
                                 </div>
                                 <div class="lg:text-[16px] text-[12px] text-[#666]">
-                                  / 0{{ index+1 }}
+                                  / 0{{ Number(index)+1 }}
                                 </div>
                               </div>
                             </div>
@@ -404,7 +403,7 @@
           <!-- Let's talk -->
           <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr;">
               <div class="lets-talk-top-left bg-[#fff] overflow-hidden relative">
-                <div class="flex items-center hover-container-left">
+                <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
                   <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
                   <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
                     <span class="hover-text-char">L</span>
@@ -630,14 +629,14 @@ const hoveredImageIndex = ref(0);
 
 
 // 设置每个describe item的ref
-const setDescribeRef = (el: any, index: number) => {
+const setDescribeRef = (el: any, index: string | number) => {
   if (el) {
     describeRefs.value[index] = el;
   }
 };
 
 // 切换展开状态的函数（手风琴效果 - 同时只能展开一个）
-const toggleExpand = (index: number) => {
+const toggleExpand = (index: string | number) => {
   // 如果当前item已经展开，则收起它
   if (expandedItems.value[index]) {
     expandedItems.value[index] = false;
@@ -825,8 +824,8 @@ const initBackgroundAnimations = () => {
     scrollTrigger: {
       trigger: "body",
       start: "top top",
-      end: "100vh top",
-      scrub: isMobile.value ? 3 : 1.5, // 移动端使用 3，桌面端使用 1.5
+      end: "300vh top", // 增加滚动距离，让动画完成得更慢
+      scrub: isMobile.value ? 5 : 3, // 增加 scrub 值，让动画响应更平滑
     },
     x: isMobile.value ? "-30vw" : "-10vw",
     y: isMobile.value ? "-100dvh" : "-100vh",

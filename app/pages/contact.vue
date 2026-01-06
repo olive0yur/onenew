@@ -113,7 +113,7 @@
               class="lg:ml-[56px]"
               borderColor="#000"
               borderWidth="2px"
-              width="165px"
+              width="230px"
               textColor="#000"
               bgColorHover="#3B4EFF"
               textColorHover="#fff"

@@ -1,5 +1,5 @@
 <template>
-  <div class="blog-card">
+  <div class="blog-card" @click="handleCardClick">
     <!-- 博客图片 -->
     <div 
       class="blog-image overflow-hidden relative"
@@ -99,6 +99,13 @@ const handleMouseMove = (e: MouseEvent) => {
   mousePosition.value = {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
+  }
+}
+
+// 点击卡片 - route有值则新窗口打开
+const handleCardClick = () => {
+  if (props.blog.route) {
+    window.open(props.blog.route, '_blank')
   }
 }
 </script>

@@ -96,6 +96,7 @@
         <div class="absolute bottom-0 left-[16px] right-[16px] lg:relative lg:left-0 lg:right-0">
           <div class="mt-[40px] flex flex-col w-[288px] lg:text-[16px] text-[12px]">
             <ContactButton 
+              @click="openContactModal"
               text="GET IN TOUCH 联系"
               @hover="onContactHover"
               @leave="onContactLeave"
@@ -271,10 +272,16 @@ const initHeaderTheme = () => {
   });
 };
 
+const openContactModal = () => {
+  closeMenu();
+  navigateTo('/contact');
+}
+
 onMounted(async() => {
   // 请求公司信息数据
   const companyInfoData: any = await useGetCompanyInfo();
   companyInfo.value = companyInfoData?.data ?? [];
+  window.localStorage.setItem('companyInfo', JSON.stringify(companyInfoData?.data));
   
   // 标记组件已挂载，用于 SSR hydration
   isMounted.value = true;

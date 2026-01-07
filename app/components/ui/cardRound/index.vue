@@ -39,6 +39,40 @@ const cards: Array<{
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
 
+// 响应式尺寸配置
+const sizeConfig = {
+  mobile: {
+    radius: 3,
+    cardW: 1.3,
+    cardH: 1.7,
+    cameraZ: 18,
+    fov: 35,
+    baseOffset: 0.6,
+  },
+  tablet: {
+    radius: 6,
+    cardW: 2.5,
+    cardH: 3.2,
+    cameraZ: 25,
+    fov: 32,
+    baseOffset: 1,
+  },
+  desktop: {
+    radius: 15,
+    cardW: 6.5,
+    cardH: 8,
+    cameraZ: 38,
+    fov: 30,
+    baseOffset: 2.5,
+  },
+}
+
+const getConfig = () => {
+  if (isMobile()) return sizeConfig.mobile
+  if (isTablet()) return sizeConfig.tablet
+  return sizeConfig.desktop
+}
+
 const resolveImg = (img?: string) => {
   if (!img) return ''
   // 兼容绝对地址/本地 public 资源
@@ -78,7 +112,8 @@ const applyLayout = () => {
   // 圆环在 XZ 平面，相机正对屏幕看过去
   ringGroup.position.set(0, 0, 0)
   // 相机在 Z 轴正方向，正对圆环中心
-  camera.position.set(0, 0, isMobile() ? 18 : isTablet() ? 25 : 40)
+  const config = getConfig()
+  camera.position.set(0, 0, config.cameraZ)
   camera.lookAt(0, 0, 0)
 }
 
@@ -92,8 +127,8 @@ const initThree = () => {
 
   const aspect = container.clientWidth / container.clientHeight
   // 较小的 FOV 减少透视变形，后面的卡片不会太小
-  const fov = isMobile() ? 35 : isTablet() ? 32 : 30
-  camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 200)
+  const config = getConfig()
+  camera = new THREE.PerspectiveCamera(config.fov, aspect, 0.1, 200)
 
   renderer = new THREE.WebGLRenderer({
     canvas,
@@ -123,11 +158,9 @@ const buildRing = async () => {
   const list = (props.items || []).filter((x) => !!resolveImg(x?.img))
   if (list.length === 0) return
 
-  // 圆环半径
-  const radius = isMobile() ? 3 : isTablet() ? 6 : 13
-  // 卡片尺寸（只有图片，没有边框）
-  const cardW = isMobile() ? 1.3 : isTablet() ? 2.5 : 5
-  const cardH = isMobile() ? 1.7 : isTablet() ? 3.2 : 6.2
+  // 从配置获取尺寸
+  const config = getConfig()
+  const { radius, cardW, cardH, baseOffset } = config
 
   const loader = new THREE.TextureLoader()
   const angleStep = (Math.PI * 2) / list.length

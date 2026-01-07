@@ -4,20 +4,22 @@
     <div 
       id="section-1" 
       ref="section1Ref" 
-      class="w-[100vw] h-[100dvh] section1 relative" 
+      class="w-[100vw] h-[100dvh] section1" 
       data-header-theme="white"
     >
-      <!-- 背景图层 -->
-      <div 
-        v-if="caseList[0]?.img"
-        class="bg-image w-full h-full absolute top-0 left-0 z-[-1]"
-        :style="{
-          backgroundImage: `url(${imgBaseURL(caseList[0]?.img)})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }"
-      ></div>
-      
+      <video 
+        v-if="caseList[0]?.video"
+        ref="bgVideoRef"
+        :src="imgBaseURL(caseList[0]?.video)" 
+        muted 
+        loop 
+        playsinline
+        webkit-playsinline
+        x5-playsinline
+        x-webkit-airplay="allow"
+        autoplay
+        class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
+      ></video>
       <div class="section1-content flex flex-col justify-between ">
         <div class="flex flex-col">
           <p v-if="splitTitle.firstPart">{{splitTitle.firstPart}}</p>
@@ -95,12 +97,12 @@
             v-for="(item, index) in contact_workflow" 
             :key="index"
             :ref="el => setWorkflowRef(el, index)"
-            class="workflow-item w-[500px] h-full border-l-[1px] border-[#D9D9D9] flex flex-col px-[16px] flex-shrink-0"
+            class="workflow-item w-[681px] h-full border-l-[1px] border-[#D9D9D9] flex flex-col px-[16px] flex-shrink-0"
             :class="{ 'border-r-[1px]': index === contact_workflow.length - 1 }"
           >
             <div class="mask-cover">
-              <span class="font-bold text-[24px]">{{item?.label}}</span>
-              <span class="mt-[10px] text-[16px]">{{item?.dict_value}}</span>
+              <span class="text-[32px] leading-[32px]">{{item?.label}}</span>
+              <span class="mt-[10px] text-[16px] leading-[24px] text-[#00000066]">{{item?.dict_value}}</span>
             </div>
           </div>
         </div>
@@ -149,131 +151,134 @@
     </div>
 
     <!-- 第四部分 -->
-    <div id="section-4" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 h-[100dvh] relative" data-header-theme="black">
-      <!-- section3-head 部分 -->
-      <div class="flex lg:flex-row flex-col lg:justify-between">
-        <div class="flex flex-col project-title gap-[8px]">
-          <span class="title">/价值观</span>
-          <span class="subtitle">Values</span>
-        </div>
-      </div>
-
-      <!-- 展开折叠列表部分 -->
-      <div class="flex flex-col items-end lg:pt-[40px] pt-[24px]">
-        <div
-          v-for="(describe, index) in aboutList"
-          :key="describe.id || describe.dict_type_id || index"
-          :ref="(el: any) => setDescribeRef(el, index)"
-          class="describe-item-wrapper flex items-start w-full lg:max-w-[1282px] cursor-pointer relative"
-          :style="{ opacity: 0, transform: 'translateX(100px)' }"
-        >
-          <!-- 左侧图片 -->
-          <div class="describe-icon flex-shrink-0 flex w-[24px] h-[24px] lg:w-[3.3vw] lg:h-[3.3vw] mr-[8px] lg:mr-[16px] mt-[12px] lg:mt-[2.5vh]">
-            <img class="w-full h-full object-contain" :src="imgBaseURL(describe?.img)" alt="">
+    <div ref="section4WrapRef" class="relative section4 z-[20] lg:mt-[160vh] mt-0">
+      <div id="section-4" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 h-[100dvh] relative" data-header-theme="black">
+        <!-- section3-head 部分 -->
+        <div class="flex lg:flex-row flex-col lg:justify-between">
+          <div class="flex flex-col project-title gap-[8px]">
+            <span class="title">/价值观</span>
+            <span class="subtitle">Values</span>
           </div>
-          
-          <!-- 右侧内容区域 -->
-          <div class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] lg:py-[2.5vh] py-[12px] lg:pr-[39px] flex-1">
-            <!-- 主要内容行 -->
-            <div @click="toggleExpand(index)" class="flex items-center justify-between w-full">
-            <div class="flex flex-col lg:flex-row lg:items-center items-start">
+        </div>
+
+        <!-- 展开折叠列表部分 -->
+        <div class="flex flex-col items-end lg:pt-[40px] pt-[24px]">
+          <div
+            v-for="(describe, index) in aboutList"
+            :key="describe.id || describe.dict_type_id || index"
+            :ref="(el: any) => setDescribeRef(el, index)"
+            class="describe-item-wrapper flex items-start w-full lg:max-w-[1282px] cursor-pointer relative"
+            :style="{ opacity: 0, transform: 'translateX(100px)' }"
+          >
+            <!-- index -->
               <span
-                class="font-['Inter'] lg:text-[3.3vw] text-[20px] font-normal lg:leading-[3.3vw] leading-[24px] text-[#000] lg:mr-[16px] mr-[8px]"
-                >{{ describe?.label }}</span
+                class="font-['Inter'] text-[16px] text-[#3B4EFF] absolute top-[40px] left-[-64px] uppercase font-[400] hidden lg:block"
+                >/ {{ '0' + (Number(index)+1) }}</span
               >
-              <span class="font-['Noto'] lg:text-[1.67vw] text-[14px] lg:mt-0 mt-[4px]">{{
-                describe?.remark
-              }}</span>
-            </div>
-            <img
-              :src="imgBaseURL('add.svg')"
-              alt=""
-              :class="[
-                'lg:w-[24px] lg:h-[24px] w-[14px] h-[14px] cursor-pointer transition-transform duration-300 hover:scale-110',
-                { 'rotate-45': expandedItems[index] }
-              ]"
-              @click.stop.prevent="toggleExpand(index)"
-            />
-          </div> 
-            <!-- 展开的remark内容 -->
-            <transition name="expand" @enter="onEnter" @leave="onLeave">
-              <div
-                v-if="expandedItems[index]"
-                class="remark-content w-full overflow-hidde"
-              >
-                <p class="lg:h-[40px] h-[16px]"></p>
-                <p
-                  class="font-['Noto'] lg:text-[16px] text-[12px] lg:leading-[32px] leading-[20px] text-[#666] whitespace-pre-line max-w-[935px]"
+            
+            <!-- 右侧内容区域 -->
+            <div class="describe-item flex flex-col border-b-[1px] border-[#DCDCDC] lg:py-[2.5vh] py-[12px] lg:pr-[39px] flex-1">
+              <!-- 主要内容行 -->
+              <div @click="toggleExpand(index)" class="flex items-center justify-between w-full">
+              <div class="flex flex-col lg:flex-row lg:items-center items-start">
+                <span
+                  class="font-['Inter'] lg:text-[3.3vw] text-[20px] font-normal lg:leading-[3.3vw] leading-[24px] text-[#000] lg:mr-[16px] mr-[8px]"
+                  >{{ describe?.label }}</span
                 >
-                  {{ describe?.description }}
-                </p>
+                <span class="font-['Noto'] lg:text-[1.67vw] text-[14px] lg:mt-0 mt-[4px]">{{
+                  describe?.remark
+                }}</span>
               </div>
-            </transition>
+              <img
+                :src="imgBaseURL('add.svg')"
+                alt=""
+                :class="[
+                  'lg:w-[24px] lg:h-[24px] w-[14px] h-[14px] cursor-pointer transition-transform duration-300 hover:scale-110',
+                  { 'rotate-45': expandedItems[index] }
+                ]"
+                @click.stop.prevent="toggleExpand(index)"
+              />
+            </div> 
+              <!-- 展开的remark内容 -->
+              <transition name="expand" @enter="onEnter" @leave="onLeave">
+                <div
+                  v-if="expandedItems[index]"
+                  class="remark-content w-full overflow-hidde"
+                >
+                  <p class="lg:h-[40px] h-[16px]"></p>
+                  <p
+                    class="font-['Noto'] lg:text-[16px] text-[12px] lg:leading-[32px] leading-[20px] text-[#666] whitespace-pre-line max-w-[935px]"
+                  >
+                    {{ describe?.description }}
+                  </p>
+                </div>
+              </transition>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Let's talk 部分 - 移到第三部分内部 -->
-      <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
-          <div class="lets-talk-top-left overflow-hidden relative">
-            <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
-              <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
-              <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
-                <span class="hover-text-char">L</span>
-                <span class="hover-text-char">e</span>
-                <span class="hover-text-char">t</span>
-                <span class="hover-text-char">'</span>
-                <span class="hover-text-char">s</span>
-                <span class="hover-text-char"> </span>
-                <span class="hover-text-char">T</span>
-                <span class="hover-text-char">a</span>
-                <span class="hover-text-char">l</span>
-                <span class="hover-text-char">k</span>
-              </span>
-            </div>
+      </div>
+    </div>
+
+    <!-- Let's talk 部分 - 独立 section（不再依赖 fixed/覆盖定位） -->
+    <div ref="section5WrapRef" class="relative section5-wrap z-[25]">
+    <section id="section-5" class="section-5 relative h-[100vh] w-[100vw] box-border grid grid-cols-2 bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr;">
+        <div class="lets-talk-top-left overflow-hidden relative">
+          <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
+            <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
+            <span class="lets-talk-title text-[#0B0B0B] hover-text-container">
+              <span class="hover-text-char">L</span>
+              <span class="hover-text-char">e</span>
+              <span class="hover-text-char">t</span>
+              <span class="hover-text-char">'</span>
+              <span class="hover-text-char">s</span>
+              <span class="hover-text-char"> </span>
+              <span class="hover-text-char">T</span>
+              <span class="hover-text-char">a</span>
+              <span class="hover-text-char">l</span>
+              <span class="hover-text-char">k</span>
+            </span>
           </div>
-          <div class="lets-talk-top-right overflow-hidden">
-            <div class="flex justify-end items-center hover-container-right ">
-              <span class="lets-talk-title opacity-0">L</span>
-              <img :src="imgBaseURL('right.png')" class="right-img hover-img-right m" alt=""></img>
-            </div>
+        </div>
+        <div class="lets-talk-top-right overflow-hidden">
+          <div class="flex justify-end items-center hover-container-right ">
+            <span class="lets-talk-title opacity-0">L</span>
+            <img :src="imgBaseURL('right.png')" class="right-img hover-img-right m" alt=""></img>
           </div>
-          <div class="lets-talk-bottom-left flex items-end">
-            <img :src="imgBaseURL('o.png')" class="lets-talk-img" alt="">
+        </div>
+        <div class="lets-talk-bottom-left flex items-end">
+          <img :src="imgBaseURL('o.png')" class="lets-talk-img" alt="">
+          <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
+          <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
+        </div>
+        <div class="lets-talk-bottom-right flex justify-start items-end">
+          <div class="flex">
             <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
             <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
+            <img :src="imgBaseURL('w.png')" class="lets-talk-img" alt="">
           </div>
-          <div class="lets-talk-bottom-right flex justify-start items-end">
-            <div class="flex">
-              <img :src="imgBaseURL('n.png')" class="lets-talk-img" alt="">
-              <img :src="imgBaseURL('e.png')" class="lets-talk-img" alt="">
-              <img :src="imgBaseURL('w.png')" class="lets-talk-img" alt="">
-            </div>
-          </div>
-          <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
-            <svg class="star" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
-              <!-- 灰色背景 -->
-              <rect width="288" height="288" fill="#F8F8F8"/>
-              
-              <!-- 四角星形状：四条圆弧组成 -->
-              <path d="
-                M 144 0
-                A 144 144 0 0 0 288 144
-                A 144 144 0 0 0 144 288
-                A 144 144 0 0 0 0 144
-                A 144 144 0 0 0 144 0
-                Z
-              " fill="black"/>
-            </svg>
-            <div class="line-h absolute w-[1px] z-[34] bg-[#000] left-[50%] top-[50%]"></div>
-            <div class="line-h absolute w-[1px] z-[34] bg-[#000] right-[50%]  bottom-[50%]"></div>
-            <div class="line-w absolute h-[1px] z-[34] bg-[#000] top-[50%] left-[50%]"></div>
-            <div class="line-w absolute h-[1px] z-[34] bg-[#000] bottom-[50%] right-[50%]"></div>
-          </div>
-      </section>
+        </div>
+        <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
+          <svg class="star" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
+            <rect width="288" height="288" fill="#F8F8F8"/>
+            <path d="
+              M 144 0
+              A 144 144 0 0 0 288 144
+              A 144 144 0 0 0 144 288
+              A 144 144 0 0 0 0 144
+              A 144 144 0 0 0 144 0
+              Z
+            " fill="black"/>
+          </svg>
+          <div class="line-h absolute w-[1px] z-[34] bg-[#000] left-[50%] top-[50%]"></div>
+          <div class="line-h absolute w-[1px] z-[34] bg-[#000] right-[50%]  bottom-[50%]"></div>
+          <div class="line-w absolute h-[1px] z-[34] bg-[#000] top-[50%] left-[50%]"></div>
+          <div class="line-w absolute h-[1px] z-[34] bg-[#000] bottom-[50%] right-[50%]"></div>
+        </div>
+    </section>
     </div>
     
-    <section id="section-6" class="section-6 relative" data-header-theme="white">
+    <section id="section-6" class="section-6 relative z-[-111] mt-[-100dvh]" data-header-theme="white">
       <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 530px)' : 'calc(100vh + 569px)'" />
     </section>
   </div>
@@ -291,10 +296,13 @@ const caseList: any = ref<any[]>([]);
 const aboutList: any = ref<any[]>([]);
 const isMobile = ref(false);
 const section1Ref = ref<HTMLElement | null>(null);
+const bgVideoRef = ref<HTMLVideoElement | null>(null);
 const section2Ref = ref<HTMLElement | null>(null);
 const insertedSectionRef = ref<HTMLElement | null>(null);
 const workflowSectionRef = ref<HTMLElement | null>(null);
 const section3Ref = ref<HTMLElement | null>(null);
+const section4WrapRef = ref<HTMLElement | null>(null);
+const section5WrapRef = ref<HTMLElement | null>(null);
 const businessImgs:any = ref([]);
 const businessTitle:any = ref([]);
 const contact_workflow:any = ref([]);
@@ -546,6 +554,45 @@ const initAnimations = () => {
       });
     }
 
+    // 第二部分（我们的业务）斜着盖住第一部分：只在进入 section-2 的过渡区间(top bottom -> top top)做 transform，
+    // 到达 top top（也就是后面 section2 pin 开始的位置）立刻清理 transform，避免影响 pin/触发点计算
+    if (section2Ref.value) {
+      const section2CoverTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section2Ref.value,
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
+          markers: false,
+          invalidateOnRefresh: true,
+          onLeave: () => {
+            gsap.set(section2Ref.value, { clearProps: "transform" });
+          },
+          onLeaveBack: () => {
+            gsap.set(section2Ref.value, { clearProps: "transform" });
+          },
+        },
+      });
+
+      section2CoverTl.fromTo(
+        section2Ref.value,
+        {
+          rotate: 20,
+          x: "-20vw",
+          y: "30vh",
+          transformOrigin: "50% 50%",
+        },
+        {
+          rotate: 0,
+          x: 0,
+          y: 0,
+          ease: "none",
+          // 防止创建时立刻把 section-2 变形，影响 ScrollTrigger 的测量
+          immediateRender: false,
+        }
+      );
+    }
+
     // 插入部分 pin 住，让第三部分从上方覆盖
     if (insertedSectionRef.value) {
       ScrollTrigger.create({
@@ -563,16 +610,108 @@ const initAnimations = () => {
       });
     }
 
-    // workflow (第三部分) pin 住 - 仅桌面端
-    if (workflowSectionRef.value && window.innerWidth >= 1024) {
-      ScrollTrigger.create({
-        trigger: workflowSectionRef.value,
-        start: "top top",
-        end: "+=200%", // pin住的总滚动距离
-        pin: true,
-        pinSpacing: true,
-        markers: false,
+    // 插入部分（我们的团队）斜着盖住第二部分：保留自然滚动的 y，只做 rotate + x 偏移动画
+    // 这样不会引入额外“空白区”，也更接近 section-5 的斜盖观感
+    if (insertedSectionRef.value) {
+      gsap.set(insertedSectionRef.value, {
+        rotate: 20,
+        x: "-20vw",
+        // 往下压一点，避免刚进入视口就露出旋转后的“尖角”
+        y: "30vh",
+        transformOrigin: "50% 50%",
       });
+
+      gsap.to(insertedSectionRef.value, {
+        rotate: 0,
+        x: 0,
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          // 以 section2 的结束段作为“开始盖”的时间点，观感更像 section-5
+          trigger: section2Ref.value || insertedSectionRef.value,
+          start: "bottom bottom",
+          end: "bottom top",
+          scrub: true,
+          markers: false,
+        },
+      });
+    }
+
+    // 第三部分（workflow）斜着盖住插入部分
+    // 关键点：只在进入 section-3 的过渡区间(top bottom -> top top)做 transform，
+    // 到达 top top（也就是后面 workflow pin 开始的位置）立刻清理 transform，避免影响后续 pin/触发点计算
+    if (workflowSectionRef.value) {
+      // 移动端使用较小的旋转和偏移值
+      const rotateVal = isMobile.value ? 10 : 20;
+      const xVal = isMobile.value ? "-10vw" : "-20vw";
+      const yVal = isMobile.value ? "15vh" : "30vh";
+      
+      const workflowCoverTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: workflowSectionRef.value,
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
+          markers: false,
+          invalidateOnRefresh: true,
+          onLeave: () => {
+            // 进入 pin 前清干净，保证后续动画不被 transform 干扰
+            gsap.set(workflowSectionRef.value, { clearProps: "transform" });
+          },
+          onLeaveBack: () => {
+            // 向上回滚离开时也清理，避免状态残留
+            gsap.set(workflowSectionRef.value, { clearProps: "transform" });
+          },
+        },
+      });
+
+      workflowCoverTl.fromTo(
+        workflowSectionRef.value,
+        {
+          rotate: rotateVal,
+          x: xVal,
+          y: yVal,
+          transformOrigin: "50% 50%",
+        },
+        {
+          rotate: 0,
+          x: 0,
+          y: 0,
+          ease: "none",
+          // 防止创建时立刻把 section-3 变形，影响 ScrollTrigger 的测量
+          immediateRender: false,
+        }
+      );
+    }
+
+    // workflow (第三部分) pin 住
+    // 桌面端：横向滚动结束后仍保持 pin，直到下一段（section-4）盖上来
+    // 移动端：简单 pin 住，让 section-4 覆盖上来
+    if (workflowSectionRef.value) {
+      if (window.innerWidth >= 1024) {
+        // 桌面端：需要更长的 pin 距离来配合横向滚动
+        const WORKFLOW_PIN_DISTANCE = 260;
+        ScrollTrigger.create({
+          trigger: workflowSectionRef.value,
+          start: "top top",
+          end: `+=${WORKFLOW_PIN_DISTANCE}%`,
+          pin: true,
+          pinSpacing: false,
+          markers: false,
+          invalidateOnRefresh: true,
+        });
+      } else {
+        // 移动端：简单 pin 住一屏，让 section-4 可以覆盖上来
+        ScrollTrigger.create({
+          trigger: workflowSectionRef.value,
+          start: "top top",
+          end: "+=100%",
+          pin: true,
+          pinSpacing: false,
+          markers: false,
+          invalidateOnRefresh: true,
+        });
+      }
     }
 
     // workflow 容器整体从右边滑到左边的动画，同时更新 canvas 显示 - 仅桌面端
@@ -581,7 +720,7 @@ const initAnimations = () => {
         const workflowContainer = document.querySelector('.workflow-container');
         if (workflowContainer) {
           // 精确计算：容器总宽度 = item数量 * 每个item宽度(500px)
-          const totalWidth = contact_workflow.value.length * 500;
+          const totalWidth = contact_workflow.value.length * 681;
           
           gsap.fromTo(workflowContainer,
             {
@@ -635,35 +774,110 @@ const initAnimations = () => {
       });
     });
 
-    // section-5 (Let's Talk) 根据滚动条慢慢滑出来盖住第三部分
-    // 当第三部分完全显示并 pin 住时立即开始
-    const letsTalkAnimation = gsap.to(".section-5", {
-      y: 0,
-      x: 0,
-      rotate: 0,
-      scrollTrigger: {
-        trigger: section3Ref.value,
-        start: "bottom bottom", // 第三部分完全显示时立即开始
-        end: "bottom top", // 滚动一个视口高度后完成动画（Let's talk 完全盖住）
-        scrub: true, // 使用 true 让动画完全跟随滚动条，一步步滑出
-        markers: false, // 调试时可以设为 true
-      },
-    });
+    if (section4WrapRef.value) {
+      // 移动端使用较小的旋转和偏移值
+      const rotateVal = isMobile.value ? 10 : 20;
+      const xVal = isMobile.value ? "-10vw" : "-20vw";
+      const yVal = isMobile.value ? "15vh" : "30vh";
+      
+      const valuesCoverTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section4WrapRef.value,
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
+          markers: false,
+          invalidateOnRefresh: true,
+          onLeave: () => {
+            gsap.set(section4WrapRef.value, { clearProps: "transform" });
+          },
+          onLeaveBack: () => {
+            gsap.set(section4WrapRef.value, { clearProps: "transform" });
+          },
+        },
+      });
 
-    // 第三部分 pin 住，直到 Let's talk 完全盖住才结束 pin
-    if (section3Ref.value) {
+      valuesCoverTl.fromTo(
+        section4WrapRef.value,
+        {
+          rotate: rotateVal,
+          x: xVal,
+          // 往下压一点，避免刚进入视口就露出旋转后的"尖角"
+          y: yVal,
+          transformOrigin: "50% 50%",
+        },
+        {
+          rotate: 0,
+          x: 0,
+          y: 0,
+          ease: "none",
+          // 防止创建时立刻把 section-4 变形，影响 ScrollTrigger 的测量
+          immediateRender: false,
+        }
+      );
+    }
+
+    // section-4 (价值观) pin 住，让 section-5 从上方覆盖
+    if (section4WrapRef.value) {
       ScrollTrigger.create({
-        trigger: section3Ref.value,
-        start: "bottom bottom", // 当第三部分底部到达视口底部时（完全显示）就 pin 住
-        end: "bottom top", // 和 Let's talk 动画结束时机一致，Let's talk 完全盖住时才结束 pin
+        trigger: section4WrapRef.value,
+        start: "top top",
+        end: "+=100%", // 延长 pin 时间，确保 section-5 完全盖住后才释放
         pin: true,
         pinSpacing: false,
-        markers: false, // 调试时可以设为 true
+        markers: false,
+        onEnter: () => {
+          if (section4WrapRef.value) {
+            section4WrapRef.value.style.zIndex = '20';
+          }
+        },
       });
     }
 
-    // Let's talk 完全盖住后，section3 整体斜推动画（右斜上左上）
-    gsap.to(".section3", {
+    // section-5 (Let's Talk) 斜着盖住 section-4
+    if (section5WrapRef.value) {
+      // 移动端使用较小的旋转和偏移值
+      const rotateVal = isMobile.value ? 10 : 20;
+      const xVal = isMobile.value ? "-10vw" : "-20vw";
+      const yVal = isMobile.value ? "15vh" : "30vh";
+      
+      const letsTalkCoverTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section5WrapRef.value,
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
+          markers: false,
+          invalidateOnRefresh: true,
+          onLeave: () => {
+            gsap.set(section5WrapRef.value, { clearProps: "transform" });
+          },
+          onLeaveBack: () => {
+            gsap.set(section5WrapRef.value, { clearProps: "transform" });
+          },
+        },
+      });
+
+      letsTalkCoverTl.fromTo(
+        section5WrapRef.value,
+        {
+          rotate: rotateVal,
+          x: xVal,
+          y: yVal,
+          transformOrigin: "50% 50%",
+        },
+        {
+          rotate: 0,
+          x: 0,
+          y: 0,
+          ease: "none",
+          immediateRender: false,
+        }
+      );
+    }
+
+    // Let's talk 完全盖住后，section4 整体斜推动画（右斜上左上）
+    gsap.to(".section5-wrap,.section4", {
       scrollTrigger: {
         trigger: ".section-6",
         start: "top 5%",
@@ -985,13 +1199,13 @@ const setupHoverEffects = () => {
 
 onMounted(async() => {
   // 请求数据
-  const caseListData: any = await getDictList({ typeName: 'contact' });
-  const aboutListData: any = await getDictList({ typeName: 'contact_value_list' });
-  const businessImgsData: any = await getDictList({ typeName: 'contact_business_imgs' });
-  const businessListData: any = await getDictList({ typeName: 'contact_business_list' });
-  const cardListData: any = await getDictList({ typeName: 'contact_team' });
-  const title: any = await getDictList({ typeName: 'contact_business_title' });
-  const workflowImgsData: any = await getDictList({ typeName: 'contact_workflow' });
+  const caseListData: any = await getDictList({ typeName: 'about' });
+  const aboutListData: any = await getDictList({ typeName: 'about_value_list' });
+  const businessImgsData: any = await getDictList({ typeName: 'about_business_imgs' });
+  const businessListData: any = await getDictList({ typeName: 'about_business_list' });
+  const cardListData: any = await getDictList({ typeName: 'about_team' });
+  const title: any = await getDictList({ typeName: 'about_business_title' });
+  const workflowImgsData: any = await getDictList({ typeName: 'about_workflow' });
   
   // 初始化数据
   caseList.value = caseListData?.data ?? [];
@@ -1329,6 +1543,12 @@ onUnmounted(() => {
         }
       }
     }
+  }
+
+  /* section5-wrap 样式 */
+  .section5-wrap {
+    position: relative;
+    z-index: 25;
   }
 
   .section3{
@@ -1738,6 +1958,7 @@ onUnmounted(() => {
         flex-direction: column;
         left: 16px;
         right: 16px;
+        max-width: 544px;
       }
     }
     

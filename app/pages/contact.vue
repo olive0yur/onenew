@@ -1,7 +1,20 @@
 <template>
   <div class="overflow-hidden">
     <!-- 第一部分 -->
-    <div id="section-1" ref="section1Ref" class="w-[100vw] h-[100dvh] section1" data-header-theme="white" :style="{ backgroundImage: `url(${imgBaseURL(caseList[0]?.img)})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
+    <div id="section-1" ref="section1Ref" class="w-[100vw] h-[100dvh] section1" data-header-theme="white">
+      <video 
+        v-if="caseList[0]?.video"
+        ref="bgVideoRef"
+        :src="imgBaseURL(caseList[0]?.video)" 
+        muted 
+        loop 
+        playsinline
+        webkit-playsinline
+        x5-playsinline
+        x-webkit-airplay="allow"
+        autoplay
+        class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
+      ></video>
       <div class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
@@ -11,7 +24,7 @@
       </div>
     </div>
 
-    <!-- 第三部分 -->
+    <!-- 第二部分 -->
     <div id="section-3" ref="section3Ref" class="bg-[#fff] lg:p-[40px] p-[16px] section3 h-[100dvh] relative cover-section flex flex-col" data-header-theme="black">
       <!-- section3-head 部分 -->
       <div class="flex lg:flex-row flex-col lg:justify-between relative">
@@ -19,14 +32,21 @@
           <span class="title">/联系我们</span>
           <span class="subtitle">Let’s talk</span>
         </div>
-        <div class="absolute top-0 left-[15vw] z-[10] section-card" >
-          <IDCard />
+        <div class="absolute top-0 z-[10] left-[15vw] section-card" >
+          <!-- <IDCard /> -->
         </div>
       </div>
       
       <div class="flex-1 section3-content">
         <div class="section3-left-content">
-
+          <div class="flex flex-col mt-[30vh] w-[100%]">
+            <span class="text-[#00000099] text-[clamp(12px,1.8vw,24px)] leading-[1] whitespace-nowrap">/联系方式</span>
+            <div class="text-[#000000] text-[clamp(18px,3.5vw,48px)] leading-[1] mt-[clamp(8px,1.5vw,24px)] whitespace-nowrap flex flex-wrap items-center">
+              +86 {{companyInfo.company_phone}}
+              <span class="text-[#000000] text-[clamp(10px,1.8vw,24px)] leading-[1] ml-[clamp(4px,1vw,16px)] mr-[75px]">/微信同号</span>
+              <img :src="imgBaseURL(caseList[0]?.img1)" alt="微信二维码" class="w-[204px] h-[112px]">
+            </div>
+          </div>
         </div>
         <div ref="section3RightContentRef" class="section3-right-content">
           <div class="section3-right-item">
@@ -206,11 +226,11 @@ import { useSubmitConsultInfo } from "~/composables/api";
 import { useToast } from "~/composables/useToast";
 
 const toast = useToast();
-
-
+const companyInfo:any = ref(JSON.parse(window.localStorage.getItem('companyInfo') ?? '[]'));
 const caseList: any = ref<any[]>([]);
 const isMobile = ref(false);
 const section1Ref = ref<HTMLElement | null>(null);
+const bgVideoRef = ref<HTMLVideoElement | null>(null);
 const section3Ref = ref<HTMLElement | null>(null);
 const section3RightContentRef = ref<HTMLElement | null>(null);
 const aboutGlitchRef = ref<any>(null);
@@ -491,6 +511,8 @@ const initAnimations = () => {
           scrub: true, // 改为 true 让动画更紧跟滚动，避免卡顿感
           pin: true,
           pinSpacing: true,
+          anticipatePin: 1, // 减少 pin 释放/进入时的抖动
+          invalidateOnRefresh: true,
           markers: false,
         },
       });
@@ -510,22 +532,40 @@ const initAnimations = () => {
         ease: "none",
         duration: window.innerHeight / totalScrollDist, // 按比例分配时间
       });
+
+      // Let’s talk 完全盖住后：再做 section3 整体斜推动画
+      // 注意：section-6 使用了负 margin（mt-[-100dvh]），触发点会提前进入视口；
+      // 如果直接用 trigger: ".section-6" 很容易和上面的 pin 区间重叠，导致 transform 被两段动画同时写入而“晃”。
+      // 这里用 pin 的 end 作为数值 start，确保严格在 pin 结束后才开始。
+      const pinST = section3Timeline.scrollTrigger;
+      if (pinST && section3Ref.value) {
+        // 用像素位移 + 3D 合成，减少旋转时的渲染抖动
+        const targetX = () => (isMobile.value ? -window.innerWidth * 0.12 : -window.innerWidth * 0.06);
+
+        gsap.set(section3Ref.value, {
+          force3D: true,
+          transformOrigin: "50% 50%",
+          willChange: "transform",
+        });
+
+        gsap.to(section3Ref.value, {
+          scrollTrigger: {
+            trigger: section3Ref.value,
+            // 避开 pin 释放的同一像素点，减少同帧竞争导致的微抖
+            start: () => pinST.end + 1,
+            end: () => pinST.end + 1 + window.innerHeight,
+            scrub: true,
+            invalidateOnRefresh: true,
+            markers: false,
+          },
+          rotation: -5,
+          x: targetX,
+          force3D: true,
+          ease: "none",
+        });
+      }
     }
 
-    // Let's talk 完全盖住后，section3 整体斜推动画（右斜上左上）
-    gsap.to(".section3", {
-      scrollTrigger: {
-        trigger: ".section-6",
-        start: "top 5%",
-        end: "bottom bottom",
-        scrub: true,
-        toggleActions: "restart none none reverse",
-        markers: false, // 调试时可以设为 true
-      },
-      rotate: -5,
-      x: isMobile.value ? '-12vw' : '-6vw',
-      ease: "power2.inOut",
-    });
   });
 };
 
@@ -584,7 +624,7 @@ const setupHoverEffects = () => {
 
 onMounted(async() => {
   // 请求数据
-  const caseListData: any = await getDictList({ typeName: 'about' });
+  const caseListData: any = await getDictList({ typeName: 'contact' });
 
   const budgetOptionsData: any = await getDictList({ typeName: 'project_budget' });
   const consultTypesData: any = await getDictList({ typeName: 'consult_type' });
@@ -793,6 +833,9 @@ onUnmounted(() => {
   .section3{
     position: relative;
     z-index: 20;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
     
     .project-title {
       .title {
@@ -843,14 +886,12 @@ onUnmounted(() => {
       
       .section3-left-content {
         flex: 1;
-        /* position: sticky; */
         top: -100px;
         align-self: flex-start;
         flex-shrink: 0;
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        /* padding-top: 40px; */
         
         /* 手机端隐藏 */
         @media screen and (max-width: 1068px) {

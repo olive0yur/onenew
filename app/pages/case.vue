@@ -1,13 +1,33 @@
 <template>
   <div class="overflow-hidden">
+    <ViewModeToggle 
+      ref="fixedToggleRef"
+      v-model="viewMode" 
+      v-if="viewMode === 'list'"
+      :disabled="isTransitioning"
+      :size="isMobile ? 'small' : 'default'"
+      container-class="view-mode-toggle-fixed"
+    />
     <!-- 第一部分 -->
     <div 
       id="section-1" 
       ref="section1Ref" 
       class="w-[100vw] h-[100dvh] section1" 
-      data-header-theme="white" 
-      :style="section1Style"
+      data-header-theme="white"
     >
+      <video 
+        v-if="caseList[0]?.video"
+        ref="bgVideoRef"
+        :src="imgBaseURL(caseList[0]?.video)" 
+        muted 
+        loop 
+        playsinline
+        webkit-playsinline
+        x5-playsinline
+        x-webkit-airplay="allow"
+        autoplay
+        class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
+      ></video>
       <div  class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
@@ -32,26 +52,11 @@
           <span class="subtitle">Projects</span>
         </div>
       </div>
-      <div class="flex gap-[20px] absolute bottom-[20px] right-[40px] z-[11111]">
-        <div 
-          class="list-button flex items-center justify-center cursor-pointer" 
-          :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
-          @click="!isTransitioning && (viewMode = 'list')"
-          @mouseenter="handleButtonHover($event)"
-        >
-          <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
-          List
-        </div>
-        <div 
-          class="ring-button flex items-center justify-center cursor-pointer" 
-          :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
-          @click="!isTransitioning && (viewMode = 'ring')"
-          @mouseenter="handleButtonHover($event)"
-        >
-          <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
-          Ring
-        </div>
-      </div>
+      <ViewModeToggle 
+        v-model="viewMode" 
+        :disabled="isTransitioning"
+        container-class="absolute bottom-[20px] right-[40px] z-[11111]"
+      />
       <CircleImagesList 
         v-if="projectList.length > 0" 
         ref="circleImagesListRef"
@@ -78,54 +83,12 @@
         <div class="flex flex-col lg:flex-row gap-[20px] relative" v-if="projectListArr.length > 0">
            <ProjectCard height="800px" :key="projectListArr[0].id" :project="projectListArr[0]" />
            <ProjectCard height="528px" :key="projectListArr[1].id" :project="projectListArr[1]" />
-           <div class=" lg:flex hidden absolute bottom-[100px] right-[0px] z-[11111] gap-[20px]">
-             <div 
-               class="list-button flex items-center justify-center cursor-pointer" 
-               :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
-               @click="!isTransitioning && (viewMode = 'list')"
-               @mouseenter="handleButtonHover($event)"
-             >
-               <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
-               List
-             </div>
-             <div 
-               class="ring-button flex items-center justify-center cursor-pointer" 
-               :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
-               @click="!isTransitioning && (viewMode = 'ring')"
-               @mouseenter="handleButtonHover($event)"
-             >
-               <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon">
-               Ring
-             </div>
-           </div>
         </div>
 
         <!-- 标语 -->
         <div class="project-slogan relative">
           <div class="project-title">
             <label>/{{projectSlogan[0]?.label}}</label>
-            <div class="lg:hidden flex gap-[20px] absolute" style="top: 20px; right: 20px;">
-              <div 
-                class="list-button flex items-center justify-center cursor-pointer" 
-                :class="{ 'active': viewMode === 'list', 'disabled': isTransitioning }"
-                @click="!isTransitioning && (viewMode = 'list')"
-                @mouseenter="handleButtonHover($event)"
-                style="width: 56px; height: 20px; font-size: 12px;"
-              >
-                <img :src="viewMode === 'list' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon" style="width: 12px; height: 12px;">
-                List
-              </div>
-              <div 
-                class="ring-button flex items-center justify-center cursor-pointer" 
-                :class="{ 'active': viewMode === 'ring', 'disabled': isTransitioning }"
-                @click="!isTransitioning && (viewMode = 'ring')"
-                @mouseenter="handleButtonHover($event)"
-                style="width: 56px; height: 20px; font-size: 12px;"
-              >
-                <img :src="viewMode === 'ring' ? '/static/star.svg' : '/static/star-white.svg'" alt="" class="button-icon" style="width: 12px; height: 12px;">
-                Ring
-              </div>
-            </div>
             <ScrollReveal 
             v-if="projectSlogan[0]?.description"
             :text="projectSlogan[0]?.dict_value"
@@ -320,6 +283,7 @@ import { imgBaseURL } from "~/utils";
 import ProjectCard from "~/components/ui/projectCard/index.vue";
 import BlogCard from "~/components/ui/blogCard/index.vue";
 import CircleImagesList from "~/components/ui/circleImagesList/index.vue";
+import ViewModeToggle from "~/components/ui/ViewModeToggle/index.vue";
 
 
 const caseList: any = ref<any[]>([]);
@@ -336,9 +300,10 @@ const section3Ref = ref<HTMLElement | null>(null);
 const ringModeRef = ref<HTMLElement | null>(null);
 const circleImagesListRef = ref<any>(null); // CircleImagesList 组件引用
 const projectCountRef = ref<any>(null); // NumberScroll 组件引用
+const bgVideoRef = ref<HTMLVideoElement | null>(null); // 背景视频引用
+const fixedToggleRef = ref<any>(null); // ViewModeToggle 组件引用
 let savedScrollPosition = 0; // 保存滚动位置
 const isTransitioning = ref(false); // 标记是否正在切换中
-import GlitchText from "~/components/ui/GlitchText.vue";
 import ScrollReveal from "~/components/ui/ScrollReveal.vue";
 
 useHead({ 
@@ -349,31 +314,21 @@ useHead({
   ],
 })
 
-// 优化 section1 样式计算
-const section1Style = computed(() => {
-  if (caseList.value.length === 0) {
-    return {
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    };
-  }
-  return {
-    backgroundImage: `url(${imgBaseURL(caseList.value[0]?.img)})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center'
-  };
-});
 
 // 重新初始化 section1-content 的滚动动画
 const reinitSection1ScrollAnimation = () => {
-  // 获取所有与 section1-content 相关的 ScrollTrigger 实例并杀掉
+  // 获取所有与 section1-content 和固定按钮相关的 ScrollTrigger 实例并杀掉
   ScrollTrigger.getAll().forEach(trigger => {
     const triggerElement = trigger.vars.trigger;
     if (triggerElement === '.cover-section' || 
-        (triggerElement instanceof Element && triggerElement.classList?.contains('cover-section'))) {
+        (triggerElement instanceof Element && triggerElement.classList?.contains('cover-section')) ||
+        triggerElement === section2Ref.value) {
       trigger.kill();
     }
   });
+  
+  // 重置固定按钮的状态
+  gsap.set('.view-mode-toggle-fixed', { opacity: 0, y: 60 });
   
   // 重新创建 section1-content 的滚动动画
   nextTick(() => {
@@ -413,8 +368,25 @@ const reinitSection1ScrollAnimation = () => {
         }
       );
     }
+    
+    // 重新创建固定按钮动画
+    if (section2Ref.value) {
+      gsap.to('.view-mode-toggle-fixed', {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+          trigger: section2Ref.value,
+          start: 'top 35%',
+          end: 'bottom bottom',
+          toggleActions: 'play none none reverse',
+        }
+      });
+    }
   });
 };
+
 
 // 监听视图模式切换 - 使用 v-show 优化版本
 watch(viewMode, async (newMode, oldMode) => {
@@ -650,6 +622,21 @@ const initAnimations = () => {
         },
       });
     }
+
+    // 固定按钮动画
+    gsap.set('.view-mode-toggle-fixed', { opacity: 0, y: 60 });
+    gsap.to('.view-mode-toggle-fixed', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'back.out(1.7)',
+      scrollTrigger: {
+        trigger: section2Ref.value,
+        start: 'top 35%',
+        end: 'bottom bottom',
+        toggleActions: 'play none none reverse',
+      }
+    });
 
     // section1-content 向左斜上旋转推动的动画 (新增)
     // 以左下角为轴心,在覆盖时发生
@@ -948,20 +935,6 @@ const scrollLeft = () => {
   });
 };
 
-// 处理按钮hover时SVG闪烁三次
-const handleButtonHover = (event: MouseEvent) => {
-  const button = event.currentTarget as HTMLElement;
-  const icon = button.querySelector('.button-icon') as HTMLElement;
-  
-  if (icon && !icon.classList.contains('blinking')) {
-    icon.classList.add('blinking');
-    // 动画结束后移除类（0.9s = 3次闪烁）
-    setTimeout(() => {
-      icon.classList.remove('blinking');
-    }, 900);
-  }
-};
-
 // 处理hover离开时的文字闪动
 const setupHoverEffects = () => {
   const leftContainer = document.querySelector('.hover-container-left');
@@ -1036,6 +1009,22 @@ onMounted(async() => {
   // 数据加载后初始化博客列表位置
   nextTick(() => {
     initBlogListPosition();
+    
+    // 尝试播放背景视频
+    const bgVideo = bgVideoRef.value;
+    if (bgVideo) {
+      const playPromise = bgVideo.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.log('背景视频自动播放失败,尝试静音播放:', error);
+          bgVideo.muted = true;
+          bgVideo.play().catch(err => {
+            console.log('背景视频播放失败:', err);
+          });
+        });
+      }
+    }
   });
   
   initLenis();
@@ -1074,7 +1063,21 @@ onUnmounted(() => {
     align-items: flex-end;
     position: relative;
     z-index: 1;
+    overflow: hidden;
+    
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    
     .section1-content {
+      position: relative;
+      z-index: 1;
       background: rgba(59, 78, 255, 0.50);
       padding-top: 80px;
       padding-left: 40px;
@@ -1477,97 +1480,20 @@ onUnmounted(() => {
     }
   }
 
-  /* 按钮样式 - 全局使用 */
-  .list-button {
-    /* 桌面端：自适应大小 */
-    padding: clamp(3px, 0.3vw, 4px) clamp(12px, 1vw, 16px);
-    font-family: Inter;
-    font-size: clamp(18px, 1.5vw, 24px);
-    font-weight: 400;
-    line-height: clamp(24px, 2vw, 32px);
-    border-radius: 44.44px;
-    background: rgba(218, 218, 218, 0.60);
-    backdrop-filter: blur(12.5px);
-    gap: clamp(3px, 0.3vw, 4px);
-    color: #fff;
-    transition: all 0.3s ease;
+  /* 固定按钮样式 */
+  .view-mode-toggle-fixed {
+    position: fixed !important;
+    bottom: 40px !important;
+    right: 40px !important;
+    z-index: 99999 !important;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;
     
-    img {
-      width: clamp(18px, 1.5vw, 24px);
-      height: clamp(18px, 1.5vw, 24px);
-      transition: all 0.3s ease;
+    /* 移动端样式 */
+    @media screen and (max-width: 768px) {
+      bottom: 20px !important;
+      right: 20px !important;
     }
-    
-    &.active {
-      color: #3B4EFF;
-      background: rgba(59, 78, 255, 0.10);
-    }
-    
-    /* 移动端：固定较小尺寸 */
-    @media (max-width: 768px) {
-      padding: 3px 12px;
-      font-size: 12px;
-      line-height: 24px;
-      gap: 3px;
-      
-      img {
-        width: 16px;
-        height: 16px;
-      }
-    }
-  }
-
-  .ring-button {
-    /* 桌面端：自适应大小 */
-    padding: clamp(3px, 0.3vw, 4px) clamp(12px, 1vw, 16px);
-    font-family: Inter;
-    font-size: clamp(18px, 1.5vw, 24px);
-    font-weight: 400;
-    line-height: clamp(24px, 2vw, 32px);
-    border-radius: 44.44px;
-    background: rgba(218, 218, 218, 0.60);
-    backdrop-filter: blur(12.5px);
-    gap: clamp(3px, 0.3vw, 4px);
-    color: #fff;
-    transition: all 0.3s ease;
-    
-    img {
-      width: clamp(18px, 1.5vw, 24px);
-      height: clamp(18px, 1.5vw, 24px);
-      transition: all 0.3s ease;
-    }
-    
-    &.active {
-      color: #3B4EFF;
-      background: rgba(59, 78, 255, 0.10);
-    }
-    
-    /* 移动端：固定较小尺寸 */
-    @media (max-width: 768px) {
-      padding: 3px 12px;
-      font-size: 12px;
-      line-height: 24px;
-      gap: 3px;
-      
-      img {
-        width: 16px;
-        height: 16px;
-      }
-    }
-  }
-
-  /* SVG闪烁动画 - 闪烁三次 */
-  @keyframes iconBlink {
-    0%, 100% { opacity: 1; }
-    16.67% { opacity: 0; }
-    33.33% { opacity: 1; }
-    50% { opacity: 0; }
-    66.67% { opacity: 1; }
-    83.33% { opacity: 0; }
-  }
-
-  .button-icon.blinking {
-    animation: iconBlink 0.9s ease-in-out;
   }
 
   /* Let's Talk 响应式样式 */
@@ -1789,14 +1715,6 @@ onUnmounted(() => {
 
   .line-h {
     height: 100vh;
-  }
-
-  /* 按钮禁用状态 */
-  .list-button.disabled,
-  .ring-button.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
   }
 
   /* 优化视图切换性能 - 使用硬件加速 */

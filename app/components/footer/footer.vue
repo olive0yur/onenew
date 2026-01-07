@@ -18,13 +18,16 @@
         <div class="flex flex-col lg:flex-row gap-[40px] lg:gap-0">
           <div class="flex flex-col lg:mr-[120px]">
             <span class="text-[14px] lg:text-[16px] text-[#FFF] leading-[16px] mb-[12px] hidden lg:block">/导航</span>
-            <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
+            <span @click="navigateTo('/')" class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
+              <GlitchText text="HOME 首页" :speed="30" :iterations="3" />
+            </span>
+            <span @click="navigateTo('/case')" class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
               <GlitchText text="WORKS 案例" :speed="30" :iterations="3" />
             </span>
-            <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
+            <span @click="navigateTo('/about')" class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px] mb-[16px]  cursor-pointer">
               <GlitchText text="ABOUT 关于" :speed="30" :iterations="3" />
             </span>
-            <span class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px]  cursor-pointer">
+            <span @click="navigateTo('/contact')" class="text-[20px] lg:text-[24px] text-[#EEE] leading-[28px] lg:leading-[32px]  cursor-pointer">
               <GlitchText text="CONTACT 联系" :speed="30" :iterations="3" />
             </span>
           </div>
@@ -146,8 +149,10 @@ const scrollToTop = () => {
 
 onMounted(async() => {
   // 请求公司信息数据
-  const companyInfoData: any = await useGetCompanyInfo();
-  companyInfo.value = companyInfoData?.data ?? [];
+  // const companyInfoData: any = await useGetCompanyInfo();
+  // companyInfo.value = companyInfoData?.data ?? [];
+  // window.localStorage.setItem('companyInfo', JSON.stringify(companyInfoData?.data));
+  companyInfo.value = JSON.parse(window.localStorage.getItem('companyInfo') ?? '[]');
 });
 </script>
 

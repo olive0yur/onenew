@@ -4,6 +4,7 @@
     :style="{
       flex: flexValue
     }"
+    @click="handleCardClick"
   >
     <!-- 项目图片/视频 -->
     <div 
@@ -125,6 +126,13 @@ const handleMouseMove = (e: MouseEvent) => {
   mousePosition.value = {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
+  }
+}
+
+// 点击卡片 - route有值则新窗口打开
+const handleCardClick = () => {
+  if (props.project.route) {
+    window.open(props.project.route, '_blank')
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="rotating-cards-container" :style="containerStyle">
+  <div ref="containerRef" class="rotating-cards-container" :style="containerStyle">
     <!-- 旋转卡片区域 -->
     <div class="rotating-cards-area">
       <!-- 中心文字 -->
@@ -31,6 +31,8 @@
 import { getDictList } from "~/composables/api";
 type AnyFn = (...args: any[]) => any;
 
+const containerRef = ref<HTMLElement | null>(null);
+
 const props = withDefaults(
   defineProps<{
     items?: any[];
@@ -52,11 +54,74 @@ const props = withDefaults(
   }
 );
 
+const orbitRadiusPx = ref<number | null>(null);
+const orbitCenterOffset = ref<number | null>(null);
+
+const clampNumber = (min: number, value: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+const calcOrbitVars = () => {
+  if (!import.meta.client) return;
+  const el = containerRef.value;
+  if (!el) return;
+
+  const rect = el.getBoundingClientRect();
+  const h = rect.height || 0;
+  const vw = window.innerWidth || 0;
+  if (h <= 0 || vw <= 0) return;
+
+  const baseRadius = clampNumber(props.minRadius, vw * 0.4, props.maxRadius);
+
+  // 给卡片本身尺寸 + 阴影留安全边距，避免“刚好贴边”仍然露出
+  const safeMargin = 80;
+  const mobile = window.matchMedia?.("(max-width: 768px)")?.matches ?? vw <= 768;
+
+  // 桌面：circle(r at 50% (100% + r*offset)) => top = h - r*(1-offset)
+  // 移动：circle(r at 50% (100% - r*0.2)) => top = h - 1.2r
+  let allowedByHeight = Infinity;
+  if (mobile) {
+    const k = 1.2;
+    allowedByHeight = (h - safeMargin) / k;
+    orbitCenterOffset.value = null; // 移动端不依赖 offset 变量
+  } else {
+    const offset = vw >= 1600 ? 0.18 : 0.23;
+    allowedByHeight = (h - safeMargin) / (1 - offset);
+    orbitCenterOffset.value = offset;
+  }
+
+  const finalRadius = Math.max(0, Math.min(baseRadius, allowedByHeight));
+  orbitRadiusPx.value = Number.isFinite(finalRadius) ? finalRadius : baseRadius;
+};
+
+onMounted(() => {
+  calcOrbitVars();
+
+  if (!import.meta.client) return;
+  const el = containerRef.value;
+  if (!el) return;
+
+  const ro = new ResizeObserver(() => {
+    calcOrbitVars();
+  });
+  ro.observe(el);
+
+  window.addEventListener("resize", calcOrbitVars, { passive: true });
+
+  onUnmounted(() => {
+    ro.disconnect();
+    window.removeEventListener("resize", calcOrbitVars);
+  });
+});
+
 const containerStyle = computed(() => {
   return {
     "--orbit-duration": `${props.orbitDurationSec}s`,
     "--max-radius": `${props.maxRadius}px`,
     "--min-radius": `${props.minRadius}px`,
+    ...(orbitRadiusPx.value != null ? { "--orbit-radius": `${orbitRadiusPx.value}px` } : {}),
+    ...(orbitCenterOffset.value != null
+      ? { "--orbit-center-offset": String(orbitCenterOffset.value) }
+      : {}),
   } as any;
 });
 
@@ -125,25 +190,6 @@ onMounted(async () => {
   --orbit-duration: var(--orbit-duration, 32s);
   /* 圆心偏移系数：屏幕越宽，系数越小（圆心越往上） */
   --orbit-center-offset: 0.23;
-}
-
-/* 根据屏幕宽度调整圆心位置 */
-@media screen and (min-width: 1600px) {
-  .rotating-cards-container {
-    --orbit-center-offset: 0.18;
-  }
-}
-
-@media screen and (min-width: 1920px) {
-  .rotating-cards-container {
-    --orbit-center-offset: 0.12;
-  }
-}
-
-@media screen and (min-width: 2560px) {
-  .rotating-cards-container {
-    --orbit-center-offset: 0.05;
-  }
 }
 
 .rotating-cards-container::after {
@@ -248,8 +294,9 @@ onMounted(async () => {
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
+  z-index: 20;
   width: 100%;
+  pointer-events: auto;
 }
 
 @media screen and (max-width: 768px) {
@@ -260,6 +307,7 @@ onMounted(async () => {
     bottom: auto;
     margin-top: -300px;
     width: 100%;
+    pointer-events: auto;
   }
 }
 
@@ -326,10 +374,10 @@ onMounted(async () => {
 
   @keyframes fallbackOrbit {
     from {
-      transform: rotate(0deg) translateY(-280px) rotate(0deg);
+      transform: rotate(0deg) translateY(calc(var(--orbit-radius) * -0.54)) rotate(0deg);
     }
     to {
-      transform: rotate(360deg) translateY(-280px) rotate(-360deg);
+      transform: rotate(360deg) translateY(calc(var(--orbit-radius) * -0.54)) rotate(-360deg);
     }
   }
 }

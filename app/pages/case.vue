@@ -546,6 +546,8 @@ const projectChunks = computed(() => {
 });
 
 // ===== 平滑滚动初始化 =====
+const { setLenis } = useLenis();
+
 const initLenis = () => {
   lenis.value = new Lenis({
     duration: 0,
@@ -556,6 +558,9 @@ const initLenis = () => {
     easing: (t) => t,
     lerp: 0.1,
   });
+
+  // 注册到全局 composable
+  setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
   

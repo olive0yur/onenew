@@ -155,7 +155,7 @@ const centerTextLines = ref<string[]>([]);
 onMounted(async () => {
   try {
     const res: any = await getDictList({
-      typeName: "contact_business_title",
+      typeName: "about_business_title",
     });
     
     if (res?.data?.length > 0) {

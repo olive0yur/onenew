@@ -221,7 +221,7 @@
     </div>
 
     <!-- Let's talk 部分 - 独立 section（不再依赖 fixed/覆盖定位） -->
-    <div ref="section5WrapRef" class="relative section5-wrap z-[25]">
+    <div ref="section5WrapRef" class="relative section5-wrap z-[1]">
     <section id="section-5" class="section-5 relative h-[100vh] w-[100vw] box-border grid grid-cols-2 bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr;">
         <div class="lets-talk-top-left overflow-hidden relative">
           <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
@@ -258,7 +258,7 @@
             <img :src="imgBaseURL('w.png')" class="lets-talk-img" alt="">
           </div>
         </div>
-        <div class="absolute w-[288px] h-[288px] z-[33] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap">
+        <div class="absolute w-[288px] h-[288px] z-[3] top-[38%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-wrap pointer-events-none">
           <svg class="star" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
             <rect width="288" height="288" fill="#F8F8F8"/>
             <path d="
@@ -270,15 +270,15 @@
               Z
             " fill="black"/>
           </svg>
-          <div class="line-h absolute w-[1px] z-[34] bg-[#000] left-[50%] top-[50%]"></div>
-          <div class="line-h absolute w-[1px] z-[34] bg-[#000] right-[50%]  bottom-[50%]"></div>
-          <div class="line-w absolute h-[1px] z-[34] bg-[#000] top-[50%] left-[50%]"></div>
-          <div class="line-w absolute h-[1px] z-[34] bg-[#000] bottom-[50%] right-[50%]"></div>
+          <div class="line-h absolute w-[1px] z-[4] bg-[#000] left-[50%] top-[50%]"></div>
+          <div class="line-h absolute w-[1px] z-[4] bg-[#000] right-[50%]  bottom-[50%]"></div>
+          <div class="line-w absolute h-[1px] z-[4] bg-[#000] top-[50%] left-[50%]"></div>
+          <div class="line-w absolute h-[1px] z-[4] bg-[#000] bottom-[50%] right-[50%]"></div>
         </div>
     </section>
     </div>
     
-    <section id="section-6" class="section-6 relative z-[-111] mt-[-100dvh]" data-header-theme="white">
+    <section id="section-6" class="section-6 relative z-[2] mt-[-100dvh]" data-header-theme="white">
       <Footer :padding-top="isMobile ? 0 : 100" :height="isMobile ? 'calc(100dvh + 530px)' : 'calc(100vh + 569px)'" />
     </section>
   </div>

@@ -149,10 +149,10 @@ const scrollToTop = () => {
 
 onMounted(async() => {
   // 请求公司信息数据
-  // const companyInfoData: any = await useGetCompanyInfo();
-  // companyInfo.value = companyInfoData?.data ?? [];
+  const companyInfoData: any = await useGetCompanyInfo();
+  companyInfo.value = companyInfoData?.data ?? [];
   // window.localStorage.setItem('companyInfo', JSON.stringify(companyInfoData?.data));
-  companyInfo.value = JSON.parse(window.localStorage.getItem('companyInfo') ?? '[]');
+  // companyInfo.value = JSON.parse(window.localStorage.getItem('companyInfo') ?? '[]');
 });
 </script>
 

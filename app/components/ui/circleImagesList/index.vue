@@ -14,7 +14,7 @@
         class="center-image"
       />
       <!-- 桌面端：显示 remark -->
-      <p class="center-text">{{ lastHoveredItem.remark }}</p>
+      <p class="center-text">{{ lastHoveredItem.dict_value }}</p>
       <!-- 移动端：显示 label 和 remark -->
       <div class="center-text-group">
         <p class="center-remark">{{ lastHoveredItem.remark }}</p>

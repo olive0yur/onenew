@@ -172,28 +172,43 @@ const handleCardClick = () => {
   font-weight: 400;
   line-height: 32px;
   
+  /* 文本溢出显示省略号 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 315px;
+  
+  /* 1680px 以下 */
+  @media screen and (max-width: 1680px) {
+    width: 270px;
+  }
+  
   /* 1440px 以下 */
   @media screen and (max-width: 1440px) {
     font-size: 22px;
     line-height: 28px;
+    width: 240px;
   }
   
   /* 1280px 以下 */
   @media screen and (max-width: 1280px) {
     font-size: 20px;
     line-height: 26px;
+    width: 210px;
   }
   
   /* 1024px 以下 */
   @media screen and (max-width: 1024px) {
     font-size: 18px;
     line-height: 24px;
+    width: 180px;
   }
   
   /* 手机端样式 */
   @media screen and (max-width: 768px) {
     font-size: 16px;
     line-height: 16px;
+    width: 110px;
   }
 }
 

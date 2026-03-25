@@ -99,7 +99,7 @@
             <div class="section3-right-item-content lg:flex-row lg:items-center flex flex-col">
               <label class="section3-right-item-label lg:inline-block hidden">/03</label>
               <span class="section3-right-item-title lg:ml-[56px]">Project Budget</span>
-              <span class="section3-right-item-desc">项目预算（人名币） *</span>
+              <span class="section3-right-item-desc">项目预算（人民币） *</span>
             </div>
             <div class="lg:ml-[56px] lg:mt-[40px] mt-[20px] flex flex-wrap lg:gap-[24px] gap-[12px]">
               <OptionButton

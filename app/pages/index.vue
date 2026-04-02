@@ -480,10 +480,39 @@ import { getDictList, getImageGroup } from "~/composables/api";
 
 
 useHead({
-  title: 'ONEW专业网站建设公司 云联在线',
+  title: 'ONEW-创意美学重塑竞争优势',
   meta: [
-    { name: 'description', content: 'ONEW专业网站建设公司 云联在线' },
-    { name: 'keywords', content: 'ONEW专业网站建设公司 云联在线' },
+    { name: 'description', content: 'ONEW是一家以技术逻辑支撑视觉美学，驱动商业增长的互联网公司，业务涵盖高端官网建设、App/小程序开发、新媒体营销、搜索引擎营销等服务。ONEW团队通过创意与经验的深度融合，助力从初创精英到行业巨头的各界品牌获取稳健的商业成果，重塑竞争优势，好作品，看得见。' },
+    { name: 'keywords', content: '高端网站建设,宁波网站建设,专业网站制作,高端网站设计,网站定制开发,数字营销服务商,网络营销,APP开发,小程序开发,ONEW' },
+    { name: 'author', content: 'ONEW' },
+    { name: 'robots', content: 'index, follow' },
+    { name: 'baidu-site-verification', content: 'codeva-wfQpOkY5TS' },
+    { name: 'baidu-site-verification', content: 'codeva-0B01XoDg32' },
+    { name: 'google-site-verification', content: 'MUFic713TNgobaJRAArUHYh20tbNaUudxFe33OIXG8s' },
+    // Open Graph（微信/Facebook 分享预览）
+    { property: 'og:title', content: 'ONEW-创意美学重塑竞争优势' },
+    { property: 'og:description', content: 'ONEW是一家以技术逻辑支撑视觉美学，驱动商业增长的互联网公司，业务涵盖高端官网建设、App/小程序开发、新媒体营销、搜索引擎营销等服务。' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://www.onew.design/' },
+    { property: 'og:site_name', content: 'ONEW' },
+    { property: 'og:image', content: 'https://static.onew.design/onew-introduce.png' },
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://www.onew.design/' },
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'ONEW',
+        url: 'https://www.onew.design/',
+        logo: 'https://static.onew.design/onew-introduce.png',
+        image: 'https://static.onew.design/onew-introduce.png',
+        description: 'ONEW是一家以技术逻辑支撑视觉美学，驱动商业增长的互联网公司，业务涵盖高端官网建设、App/小程序开发、新媒体营销、搜索引擎营销等服务。',
+      })
+    }
   ],
 })
 

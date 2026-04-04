@@ -44,6 +44,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "pinia-plugin-persistedstate/nuxt",
     "lenis/nuxt",
+    "@nuxtjs/sitemap",
   ],
   postcss: {
     plugins: {

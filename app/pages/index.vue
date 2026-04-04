@@ -489,6 +489,7 @@ useHead({
     { name: 'baidu-site-verification', content: 'codeva-wfQpOkY5TS' },
     { name: 'baidu-site-verification', content: 'codeva-0B01XoDg32' },
     { name: 'google-site-verification', content: 'MUFic713TNgobaJRAArUHYh20tbNaUudxFe33OIXG8s' },
+    { name: 'msvalidate.01', content: '3D82EBA41CBF7C183BA0BD332F546D06' },
     // Open Graph（微信/Facebook 分享预览）
     { property: 'og:title', content: 'ONEW-创意美学重塑竞争优势' },
     { property: 'og:description', content: 'ONEW是一家以技术逻辑支撑视觉美学，驱动商业增长的互联网公司，业务涵盖高端官网建设、App/小程序开发、新媒体营销、搜索引擎营销等服务。' },

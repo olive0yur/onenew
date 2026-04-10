@@ -486,8 +486,7 @@ useHead({
     { name: 'keywords', content: '高端网站建设,宁波网站建设,专业网站制作,高端网站设计,网站定制开发,数字营销服务商,网络营销,APP开发,小程序开发,ONEW' },
     { name: 'author', content: 'ONEW' },
     { name: 'robots', content: 'index, follow' },
-    { name: 'baidu-site-verification', content: 'codeva-wfQpOkY5TS' },
-    { name: 'baidu-site-verification', content: 'codeva-0B01XoDg32' },
+    { name: 'baidu-site-verification', content: 'codeva-Y04Py9jkZR' },
     { name: 'google-site-verification', content: 'MUFic713TNgobaJRAArUHYh20tbNaUudxFe33OIXG8s' },
     { name: 'msvalidate.01', content: '3D82EBA41CBF7C183BA0BD332F546D06' },
     // Open Graph（微信/Facebook 分享预览）

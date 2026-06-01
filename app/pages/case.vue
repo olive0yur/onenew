@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden">
+  <div class="overflow-hidden" ref="mainContainerRef">
     <ViewModeToggle 
       ref="fixedToggleRef"
       v-model="viewMode" 
@@ -28,6 +28,11 @@
         autoplay
         class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
       ></video>
+      <img
+        v-else-if="caseList[0]?.img"
+        :src="imgBaseURL(caseList[0]?.img)"
+        class="w-full h-[100vh] object-cover absolute top-0 left-0 z-[0]"
+      />
       <div  class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
@@ -208,7 +213,7 @@
       </div>
 
       <!-- Let's talk 部分 - 移到第三部分内部 -->
-      <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
+      <section id="section-5" class="section-5 h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
           <div class="lets-talk-top-left overflow-hidden relative">
             <div class="flex items-center hover-container-left" @click="navigateTo('/contact')">
               <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
@@ -294,6 +299,7 @@ const projectSlogan: any = ref<any[]>([]);
 const blogList: any = ref<any[]>([]);
 const isMobile = ref(false);
 const viewMode: any = ref('ring'); // 默认显示 ring 模式
+const mainContainerRef = ref<HTMLElement | null>(null);
 const section1Ref = ref<HTMLElement | null>(null);
 const section2Ref = ref<HTMLElement | null>(null);
 const section3Ref = ref<HTMLElement | null>(null);
@@ -328,14 +334,16 @@ const reinitSection1ScrollAnimation = () => {
   });
   
   // 重置固定按钮的状态
-  gsap.set('.view-mode-toggle-fixed', { opacity: 0, y: 60 });
+  const toggleFixed = mainContainerRef.value?.querySelector('.view-mode-toggle-fixed') || document.querySelector('.view-mode-toggle-fixed');
+  if (toggleFixed) gsap.set(toggleFixed, { opacity: 0, y: 60 });
   
   // 重新创建 section1-content 的滚动动画
   nextTick(() => {
-    const coverSection = document.querySelector('.cover-section');
+    const coverSection = mainContainerRef.value?.querySelector('.cover-section') || document.querySelector('.cover-section');
     if (coverSection) {
+      const section1Content = mainContainerRef.value?.querySelector('.section1-content') || ".section1-content";
       // 左移和旋转 - 推的动画 (快速响应)
-      gsap.fromTo(".section1-content", 
+      gsap.fromTo(section1Content, 
         {
           x: 0,
           rotation: 0,
@@ -353,7 +361,7 @@ const reinitSection1ScrollAnimation = () => {
       );
 
       // 上移动画 (快速响应)
-      gsap.fromTo(".section1-content",
+      gsap.fromTo(section1Content,
         {
           y: 0,
         },
@@ -370,8 +378,8 @@ const reinitSection1ScrollAnimation = () => {
     }
     
     // 重新创建固定按钮动画
-    if (section2Ref.value) {
-      gsap.to('.view-mode-toggle-fixed', {
+    if (section2Ref.value && toggleFixed) {
+      gsap.to(toggleFixed, {
         opacity: 1,
         y: 0,
         duration: 0.8,
@@ -388,49 +396,38 @@ const reinitSection1ScrollAnimation = () => {
 };
 
 
-// 监听视图模式切换 - 使用 v-show 优化版本
-watch(viewMode, async (newMode, oldMode) => {
+// 监听视图模式切换
+watch(viewMode, async (newMode) => {
   if (!import.meta.client || isTransitioning.value) return;
-  
+
   isTransitioning.value = true;
   savedScrollPosition = window.scrollY;
-  
+
   try {
-    // 等待 DOM 更新
     await nextTick();
-    
-    // 立即恢复滚动位置
-    window.scrollTo({
-      top: savedScrollPosition,
-      behavior: 'instant' as ScrollBehavior
-    });
-    
-    // 如果切换到 ring 模式,重新播放圆盘动画
+
+    window.scrollTo({ top: savedScrollPosition, behavior: 'instant' as ScrollBehavior });
+
+    // 等一帧确保 v-if/v-show 的 DOM 已更新
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
     if (newMode === 'ring' && circleImagesListRef.value?.replayEntranceAnimation) {
-      // 等待一帧确保元素可见
-      await new Promise(resolve => requestAnimationFrame(resolve));
       circleImagesListRef.value.replayEntranceAnimation();
     }
-    
-    // 如果切换到 list 模式,重新播放数字滚动动画
     if (newMode === 'list' && projectCountRef.value?.replay) {
-      // 等待一帧确保元素可见
-      await new Promise(resolve => requestAnimationFrame(resolve));
       projectCountRef.value.replay();
     }
-    
-    // 单次 RAF 等待渲染
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    
-    // 重新初始化动画
-    reinitSection1ScrollAnimation();
-    
-    // 刷新 ScrollTrigger
+
+    // 整体重建 GSAP：revert 清理旧实例，再重跑 initAnimations
+    if (ctx.value) {
+      ctx.value.revert();
+      ctx.value = null;
+    }
     await nextTick();
+    initAnimations();
     ScrollTrigger.refresh();
-    
+
   } finally {
-    // 短延迟解锁
     setTimeout(() => {
       isTransitioning.value = false;
     }, 150);
@@ -548,6 +545,9 @@ const projectChunks = computed(() => {
 // ===== 平滑滚动初始化 =====
 const { setLenis } = useLenis();
 
+// 保存 ticker 回调引用，用于 onUnmounted 时精确 remove
+let lenisRafFn: ((time: number) => void) | null = null;
+
 const initLenis = () => {
   lenis.value = new Lenis({
     duration: 0,
@@ -559,14 +559,14 @@ const initLenis = () => {
     lerp: 0.1,
   });
 
-  // 注册到全局 composable
   setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
-  
-  gsap.ticker.add((time) => {
-    lenis.value.raf(time * 1000);
-  });
+
+  lenisRafFn = (time: number) => {
+    lenis.value?.raf(time * 1000);
+  };
+  gsap.ticker.add(lenisRafFn);
   gsap.ticker.lagSmoothing(0);
   gsap.ticker.fps(120);
 };
@@ -574,16 +574,11 @@ const initLenis = () => {
 // ===== 初始化动画 =====
 const initAnimations = () => {
   ctx.value = gsap.context(() => {
-    // section1-content 初始动画 - 从下方斜着弹出 (保持不变)
-    gsap.from(".section1-content", {
-      y: 200,
-      x: -100,
-      opacity: 0,
-      rotation: -5,
-      duration: 1.2,
-      ease: "back.out(1.2)",
-      delay: 0.3,
-    });
+    // section1-content 开场动画（fromTo 明确起点，路由切换重进也能正确播放）
+    gsap.fromTo(".section1-content",
+      { y: 200, x: -100, opacity: 0, rotation: -5 },
+      { y: 0, x: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.2)", delay: 0.3 }
+    );
 
     // 第二部分和图片循环部分覆盖第一部分的动画
     // 使用 pin 和 pinSpacing 来实现覆盖效果
@@ -628,78 +623,71 @@ const initAnimations = () => {
       });
     }
 
-    // 固定按钮动画
-    gsap.set('.view-mode-toggle-fixed', { opacity: 0, y: 60 });
-    gsap.to('.view-mode-toggle-fixed', {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: 'back.out(1.7)',
-      scrollTrigger: {
-        trigger: section2Ref.value,
-        start: 'top 35%',
-        end: 'bottom bottom',
-        toggleActions: 'play none none reverse',
-      }
-    });
+    // 固定按钮动画（仅在 list 模式下元素存在时执行）
+    const toggleFixed = mainContainerRef.value?.querySelector('.view-mode-toggle-fixed') || document.querySelector('.view-mode-toggle-fixed');
+    if (toggleFixed) {
+      gsap.set(toggleFixed, { opacity: 0, y: 60 });
+      gsap.to(toggleFixed, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+          trigger: section2Ref.value,
+          start: 'top 35%',
+          end: 'bottom bottom',
+          toggleActions: 'play none none reverse',
+        }
+      });
+    }
 
-    // section1-content 向左斜上旋转推动的动画 (新增)
-    // 以左下角为轴心,在覆盖时发生
-    // 等待 DOM 更新后再获取 cover-section
-    nextTick(() => {
-      const coverSection = document.querySelector('.cover-section');
-      if (coverSection) {
-        // 使用 fromTo 来明确起始和结束状态,确保能正确还原
-        // 左移和旋转 - 推的动画 (快速响应)
-        gsap.fromTo(".section1-content", 
-          {
-            x: 0,
-            rotation: 0,
+    // section1-content 向左斜上旋转推动的动画
+    const coverSection = mainContainerRef.value?.querySelector('.cover-section') || document.querySelector('.cover-section');
+    if (coverSection) {
+      gsap.fromTo(".section1-content",
+        { x: 0, rotation: 0 },
+        {
+          x: -100,
+          rotation: -8,
+          scrollTrigger: {
+            trigger: coverSection,
+            start: "top bottom",
+            end: "top top",
+            scrub: 0.3,
           },
-          {
-            x: -100, // 减少左移距离
-            rotation: -8, // 减少旋转角度
-            scrollTrigger: {
-              trigger: coverSection,
-              start: "top bottom",
-              end: "top top",
-              scrub: 0.3, // 减小 scrub 值,加快响应速度
-            },
-          }
-        );
-
-        // 上移 - 同时进行但速率更慢
-        gsap.fromTo(".section1-content",
-          {
-            y: 0,
+        }
+      );
+      gsap.fromTo(".section1-content",
+        { y: 0 },
+        {
+          y: -450,
+          scrollTrigger: {
+            trigger: coverSection,
+            start: "top bottom",
+            end: "top 10%",
+            scrub: 0.3,
           },
-          {
-            y: -450, // 大幅增加上移距离,让效果更明显
-            scrollTrigger: {
-              trigger: coverSection,
-              start: "top bottom",
-              end: "top 10%", // 缩短滚动距离,加快上移速率
-              scrub: 0.3, // 减小 scrub 值,加快响应速度
-            },
-          }
-        );
-      }
-    });
+        }
+      );
+    }
 
     // section-5 (Let's Talk) 根据滚动条慢慢滑出来盖住第三部分
-    // 当第三部分完全显示并 pin 住时立即开始
-    const letsTalkAnimation = gsap.to(".section-5", {
-      y: 0,
-      x: 0,
-      rotate: 0,
-      scrollTrigger: {
-        trigger: section3Ref.value,
-        start: "bottom bottom", // 第三部分完全显示时立即开始
-        end: "bottom top", // 滚动一个视口高度后完成动画（Let's talk 完全盖住）
-        scrub: true, // 使用 true 让动画完全跟随滚动条，一步步滑出
-        markers: false, // 调试时可以设为 true
-      },
-    });
+    gsap.set(".section-5", { y: "140vh", x: "-20vw", rotate: 20 });
+    gsap.fromTo(".section-5",
+      { y: "140vh", x: "-20vw", rotate: 20 },
+      {
+        y: 0,
+        x: 0,
+        rotate: 0,
+        scrollTrigger: {
+          trigger: section3Ref.value,
+          start: "bottom bottom",
+          end: "bottom top",
+          scrub: true,
+          markers: false,
+        },
+      }
+    );
 
     // 第三部分 pin 住，直到 Let's talk 完全盖住才结束 pin
     if (section3Ref.value) {
@@ -729,7 +717,7 @@ const initAnimations = () => {
     });
 
 
-  });
+  }, mainContainerRef.value);
 };
 
 // 获取每个博客卡片的样式
@@ -942,9 +930,9 @@ const scrollLeft = () => {
 
 // 处理hover离开时的文字闪动
 const setupHoverEffects = () => {
-  const leftContainer = document.querySelector('.hover-container-left');
-  const rightContainer = document.querySelector('.hover-container-right');
-  const textChars = document.querySelectorAll('.hover-text-char');
+  const leftContainer = mainContainerRef.value?.querySelector('.hover-container-left');
+  const rightContainer = mainContainerRef.value?.querySelector('.hover-container-right');
+  const textChars = mainContainerRef.value?.querySelectorAll('.hover-text-char') || [];
 
   // 清理动画类的函数
   const clearAnimation = (char: Element) => {
@@ -1033,23 +1021,39 @@ onMounted(async() => {
   });
   
   initLenis();
+  window.scrollTo(0, 0);
+  await nextTick();
   initAnimations();
-  
+
+  // 路由切换进入时，window.load 不会再触发，必须主动等图片/视频加载完成再 refresh，
+  // 否则基于 px / vh 计算的 ScrollTrigger 触发点会全部错位。
+  useScrollTriggerRefresh().refreshAfterAssetsReady();
+
   nextTick(() => {
     setupHoverEffects();
   });
 });
 
 onUnmounted(() => {
-  // 清理 Lenis
+  if (lenisRafFn) {
+    gsap.ticker.remove(lenisRafFn);
+    lenisRafFn = null;
+  }
   if (lenis.value) {
     lenis.value.destroy();
+    lenis.value = null;
   }
-  // 清理 GSAP context
+  if (mainContainerRef.value) {
+    const elementsToClear = gsap.utils.toArray([".section-5", ".section1-content", ".section3"], mainContainerRef.value);
+    if (elementsToClear.length) {
+      gsap.set(elementsToClear, { clearProps: "all" });
+    }
+  }
+
   if (ctx.value) {
     ctx.value.revert();
+    ctx.value = null;
   }
-  // 清理 resize 监听器
   if (import.meta.client) {
     window.removeEventListener('resize', handleResize);
   }
@@ -1069,6 +1073,7 @@ onUnmounted(() => {
     position: relative;
     z-index: 1;
     overflow: hidden;
+    background: #111;
     
     .bg-video {
       position: absolute;

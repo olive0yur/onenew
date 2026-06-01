@@ -66,6 +66,11 @@
            x-webkit-airplay="allow"
            class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
          ></video>
+         <img
+           v-else-if="homeFixed[0]?.img"
+           :src="imgBaseURL(homeFixed[0]?.img)"
+           class="w-full h-[100vh] object-cover bg-image fixed top-0 left-0 z-[-1]"
+         />
       </section>
 
       <section
@@ -387,18 +392,18 @@
             </div>
           </div>
          
-          <div
-            ref="currentImagesContainer"
-            :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
-            class="absolute bottom-[40px] right-[40px] hidden lg:flex">
-          </div>
+        <div
+          ref="currentImagesContainer"
+          :style="{ width: `${172 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
+          class="absolute bottom-[40px] right-[40px] hidden lg:flex h-[172px]">
+        </div>
 
-          <div 
-            ref="previousImagesContainer"
-            :style="{ width: `${306 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
-            class="previous-image-group hidden lg:flex"
-          >
-          </div>
+        <div 
+          ref="previousImagesContainer"
+          :style="{ width: `${172 + (imagesListGroup[0]?.images?.length - 1) * 40}px` }"
+          class="previous-image-group hidden lg:flex h-[172px]"
+        >
+        </div>
 
           <!-- Let's talk -->
           <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#fff] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr;">
@@ -801,25 +806,26 @@ const onLeave = (el: Element, done: () => void) => {
 // ===== 平滑滚动初始化 =====
 const { setLenis } = useLenis();
 
+let lenisRafFn: ((time: number) => void) | null = null;
+
 const initLenis = () => {
-  // 移动端降低触摸滚动倍数，让滚动更平缓
   lenis.value = new Lenis({
     duration: 0,
     wheelMultiplier: 1,
-    touchMultiplier: isMobile.value ? 0.2 : 1, // 移动端降低到 0.5
+    touchMultiplier: isMobile.value ? 0.2 : 1,
     smoothWheel: true,
     syncTouch: false,
     easing: (t) => t,
     lerp: 0.1,
   });
 
-  // 注册到全局 composable
   setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
-  gsap.ticker.add((time) => {
-    lenis.value.raf(time * 1000);
-  });
+  lenisRafFn = (time: number) => {
+    lenis.value?.raf(time * 1000);
+  };
+  gsap.ticker.add(lenisRafFn);
   gsap.ticker.lagSmoothing(0);
   gsap.ticker.fps(120);
 };
@@ -1113,7 +1119,7 @@ const renderCurrentImages = () => {
     img.alt = '';
     img.className = 'current-imgs h-[172px] object-cover z-[21] overflow-hidden transition-all ease-in-out cursor-pointer image-list-item';
     img.style.left = `${index * 40}px`;
-    img.style.width = index === hoveredImageIndex.value ? '306px' : '40px';
+    img.style.width = index === hoveredImageIndex.value ? '172px' : '40px';
     img.style.transitionDuration = '500ms';
     
     // 添加事件监听
@@ -1144,7 +1150,7 @@ const renderPreviousImages = (overrideIndex?: number) => {
     const img = document.createElement('img');
     img.src = imgBaseURL(item.src);
     img.alt = '';
-    img.className = 'last-imgs h-[172px] w-[306px] object-cover overflow-hidden transition-all ease-in-out previous-image-item absolute';
+    img.className = 'last-imgs h-[172px] w-[172px] object-cover overflow-hidden transition-all ease-in-out previous-image-item absolute';
     img.style.zIndex = String(index + 22);
     img.style.transitionDuration = '500ms';
     img.style.right = `${images.length * 40}px`;
@@ -1240,15 +1246,15 @@ const lastImgAnimations = (isFirstTime = false) => {
   });
   
   // 等待一下
-  tl.addLabel("expand", "+=0.1"); // 🎯 上升和展开之间的等待时间（缩短等待）
+  tl.addLabel("expand", "+=0"); // 🎯 上升和展开之间的等待时间（缩短等待）
   
   // 横向展开 - 从右到左依次执行（反向）
   items.forEach((item: any, index: number) => {
     const reverseIndex = items.length - 1 - index; // 反转顺序
     tl.to(item, {
       x: `${(index)*40}px`,
-      duration: 0.6, // 🎯 动画时长（横向展开，加长时间更丝滑）
-      ease: "power1.inOut", // 🎯 使用更平滑的缓动函数
+      duration: 0.4, // 🎯 动画时长保持和上升一致
+      ease: "power2.out", // 🎯 缓动函数保持和上升一致
     }, `expand+=${reverseIndex * 0.1}`); // 🎯 间隔时间（横向展开的stagger，反向，缩短间隔）
   });
 };
@@ -1946,12 +1952,15 @@ onMounted(async() => {
     });
   }
   
-  initLenis(); // 初始化 Lenis 平滑滚动
-  
-  // 等待 DOM 渲染完成后再初始化 GSAP 动画
+  initLenis();
+  window.scrollTo(0, 0);
   await nextTick();
   renderIndex();
-  
+
+  // 路由切换进入时，window.load 不会再触发，必须主动等图片/视频加载完成再 refresh，
+  // 否则基于 px / vh 计算的 ScrollTrigger 触发点会全部错位。
+  useScrollTriggerRefresh().refreshAfterAssetsReady();
+
   // 延迟设置hover效果，确保DOM已经完全渲染
   nextTick(() => {
     setupHoverEffects();
@@ -2234,7 +2243,7 @@ watch(hoveredImageIndex, (newIndex) => {
   
   const images = currentImagesContainer.value.querySelectorAll('.current-imgs');
   images.forEach((img: any, index: number) => {
-    img.style.width = index === newIndex ? '306px' : '40px';
+    img.style.width = index === newIndex ? '172px' : '40px';
   });
 });
 
@@ -2292,19 +2301,25 @@ const setupHoverEffects = () => {
 };
 
 onUnmounted(() => {
-  // 清理 Lenis
+  if (lenisRafFn) {
+    gsap.ticker.remove(lenisRafFn);
+    lenisRafFn = null;
+  }
   if (lenis.value) {
     lenis.value.destroy();
+    lenis.value = null;
   }
-  // 清理 GSAP context
+  // gsap.set() 用字符串选择器写入的 inline style 不会被 ctx.revert() 清理，
+  // 必须在卸载时手动 clearProps，否则这些 style 会污染下一个页面进入时的初始状态。
+  gsap.set([".bg-image", ".section-1", ".cover-mask", ".list-card-item-wrap"], { clearProps: "all" });
+
   if (ctx.value) {
     ctx.value.revert();
+    ctx.value = null;
   }
-  // 清理Canvas动画循环
   if (canvasAnimationId.value) {
     cancelAnimationFrame(canvasAnimationId.value);
   }
-  // 清理移动端检测监听器
   if (import.meta.client) {
     window.removeEventListener('resize', detectMobile);
   }

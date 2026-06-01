@@ -3,8 +3,8 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 // 创建 axios 实例
 const service = axios.create({
-  // baseURL: "http://127.0.0.1:9000/api/",
-    baseURL: "/api/",
+  baseURL: "http://127.0.0.1:9000/api/",
+  // baseURL: "/api/",
   timeout: 25000,
   headers: {
     "Content-Type": "application/json",
@@ -24,8 +24,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    const res = response.data;
-    return res;
+    return response.data;
   },
   (error) => {
     return Promise.reject(error.response);
@@ -39,7 +38,7 @@ export const http = {
     params?: object,
     config?: AxiosRequestConfig
   ): Promise<T> {
-    return service.get(url, { params, ...config });
+    return service.get(url, { params, ...config }).then((res) => res as T);
   },
 
   post<T = any>(

@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden">
+  <div class="overflow-hidden" ref="mainContainerRef">
     <!-- 第一部分 -->
     <div 
       id="section-1" 
@@ -20,6 +20,11 @@
         autoplay
         class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
       ></video>
+      <img
+        v-else-if="caseList[0]?.img"
+        :src="imgBaseURL(caseList[0]?.img)"
+        class="w-full h-[100vh] object-cover absolute top-0 left-0 z-[0]"
+      />
       <div class="section1-content flex flex-col justify-between ">
         <div class="flex flex-col">
           <p v-if="splitTitle.firstPart">{{splitTitle.firstPart}}</p>
@@ -296,6 +301,7 @@ import { useLenis } from "~/composables/useLenis";
 const caseList: any = ref<any[]>([]);
 const aboutList: any = ref<any[]>([]);
 const isMobile = ref(false);
+const mainContainerRef = ref<HTMLElement | null>(null);
 const section1Ref = ref<HTMLElement | null>(null);
 const bgVideoRef = ref<HTMLVideoElement | null>(null);
 const section2Ref = ref<HTMLElement | null>(null);
@@ -439,6 +445,8 @@ if(import.meta.client) {
 // ===== 平滑滚动初始化 =====
 const { setLenis } = useLenis();
 
+let lenisRafFn: ((time: number) => void) | null = null;
+
 const initLenis = () => {
   lenis.value = new Lenis({
     duration: 0,
@@ -450,14 +458,13 @@ const initLenis = () => {
     lerp: 0.1,
   });
 
-  // 注册到全局 composable
   setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
-  
-  gsap.ticker.add((time) => {
-    lenis.value.raf(time * 1000);
-  });
+  lenisRafFn = (time: number) => {
+    lenis.value?.raf(time * 1000);
+  };
+  gsap.ticker.add(lenisRafFn);
   gsap.ticker.lagSmoothing(0);
   gsap.ticker.fps(120);
 };
@@ -465,25 +472,11 @@ const initLenis = () => {
 // ===== 初始化动画 =====
 const initAnimations = () => {
   ctx.value = gsap.context(() => {
-    // ===== 背景图片开场动画 - 类似 index.vue 的 bg-image =====
-    const initialTl = gsap.timeline();
-    
-    // 设置背景图的初始状态
-    gsap.set(".bg-image", {
-      transformOrigin: "50% 50%",
-      x: "-5vw",
-      y: "60vh",
-      rotation: 5,
-    });
-    
-    // 背景图入场动画
-    initialTl.to(".bg-image", {
-      x: 0,
-      y: 0,
-      rotation: 0,
-      duration: 1.2,
-      ease: "power2.inOut",
-    });
+    // section1-content 开场动画（fromTo 明确起点，路由切换重进也能正确播放）
+    gsap.fromTo(".section1-content",
+      { y: 200, x: -100, opacity: 0, rotation: -5 },
+      { y: 0, x: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.2)", delay: 0.3 }
+    );
 
     // 第二部分和图片循环部分覆盖第一部分的动画
     // 使用 pin 和 pinSpacing 来实现覆盖效果
@@ -528,19 +521,26 @@ const initAnimations = () => {
       });
     }
 
-    // ===== section1-content "掀上去"的动画 - 类似 index.vue 的 blue-mask =====
-    gsap.to(".section1-content", {
-      x: isMobile.value ? "-30vw" : "-10vw",
-      y: isMobile.value ? "-100dvh" : "-100vh",
-      rotation: -15,
-      ease: "sine.inOut",
-      scrollTrigger: {
-        trigger: "body",
-        start: "top top",
-        end: "300vh top", // 和 index.vue 一致
-        scrub: isMobile.value ? 5 : 3, // 和 index.vue 一致
-      },
-    });
+    // section1-content "掀上去"的动画
+    if (section1Ref.value) {
+      gsap.fromTo(".section1-content",
+        { x: 0, y: 0, rotation: 0 },
+        {
+          x: isMobile.value ? "-30vw" : "-10vw",
+          y: isMobile.value ? "-100dvh" : "-100vh",
+          rotation: -15,
+          ease: "sine.inOut",
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: section1Ref.value,
+            start: "top top",
+            end: "bottom top",
+            scrub: isMobile.value ? 5 : 3,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+    }
 
     // section2 (业务部分) pin 住，让插入部分从上方覆盖
     if (section2Ref.value) {
@@ -723,7 +723,7 @@ const initAnimations = () => {
     // workflow 容器整体从右边滑到左边的动画，同时更新 canvas 显示 - 仅桌面端
     if (window.innerWidth >= 1024) {
       nextTick(() => {
-        const workflowContainer = document.querySelector('.workflow-container');
+        const workflowContainer = mainContainerRef.value?.querySelector('.workflow-container');
         if (workflowContainer) {
           // 精确计算：容器总宽度 = item数量 * 每个item宽度(500px)
           const totalWidth = contact_workflow.value.length * 681;
@@ -897,7 +897,7 @@ const initAnimations = () => {
       ease: "power2.inOut",
     });
 
-  });
+  }, mainContainerRef.value);
 };
 
 // 设置每个describe item的ref
@@ -1152,9 +1152,9 @@ const renderInitialCanvas = () => {
 
 // 处理hover离开时的文字闪动
 const setupHoverEffects = () => {
-  const leftContainer = document.querySelector('.hover-container-left');
-  const rightContainer = document.querySelector('.hover-container-right');
-  const textChars = document.querySelectorAll('.hover-text-char');
+  const leftContainer = mainContainerRef.value?.querySelector('.hover-container-left');
+  const rightContainer = mainContainerRef.value?.querySelector('.hover-container-right');
+  const textChars = mainContainerRef.value?.querySelectorAll('.hover-text-char') || [];
 
   // 清理动画类的函数
   const clearAnimation = (char: Element) => {
@@ -1228,9 +1228,14 @@ onMounted(async() => {
   await loadWorkflowImages();
   
   initLenis();
+  window.scrollTo(0, 0);
+  await nextTick();
   initAnimations();
-  
-  // 延迟一点再渲染，确保所有元素已经布局完成
+
+  // 路由切换进入时，window.load 不会再触发，必须主动等图片/视频加载完成再 refresh，
+  // 否则基于 px / vh 计算的 ScrollTrigger 触发点会全部错位。
+  useScrollTriggerRefresh().refreshAfterAssetsReady();
+
   setTimeout(() => {
     setupHoverEffects();
     renderInitialCanvas();
@@ -1238,15 +1243,21 @@ onMounted(async() => {
 });
 
 onUnmounted(() => {
-  // 清理 Lenis
+  if (lenisRafFn) {
+    gsap.ticker.remove(lenisRafFn);
+    lenisRafFn = null;
+  }
   if (lenis.value) {
     lenis.value.destroy();
+    lenis.value = null;
   }
-  // 清理 GSAP context
   if (ctx.value) {
+    // ctx.revert() 会自动 kill 当前页面 context 内创建的所有 tween 与 ScrollTrigger，
+    // 不要再调用 ScrollTrigger.getAll().kill()，避免误伤 Header 等常驻组件的 trigger；
+    // 也不要调用 gsap.globalTimeline.clear()，它会破坏 ticker 状态导致下一页面动画错乱。
     ctx.value.revert();
+    ctx.value = null;
   }
-  // 清理 resize 监听器
   if (import.meta.client) {
     window.removeEventListener('resize', handleResize);
   }

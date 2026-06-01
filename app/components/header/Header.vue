@@ -255,6 +255,7 @@ const initHeaderTheme = () => {
         
         // 使用 ScrollTrigger 监听每个 section
         ScrollTrigger.create({
+          id: 'header-theme',
           trigger: section,
           start: 'top 100px',
           end: 'bottom 100px',
@@ -315,11 +316,8 @@ watch(() => route.path, () => {
     setTimeout(() => {
       // 清除所有旧的 ScrollTrigger
       ScrollTrigger.getAll().forEach(trigger => {
-        const triggerElement = trigger.vars.trigger;
-        if (triggerElement && typeof triggerElement !== 'string' && 'hasAttribute' in triggerElement) {
-          if ((triggerElement as Element).hasAttribute('data-header-theme')) {
-            trigger.kill();
-          }
+        if (trigger.vars.id === 'header-theme') {
+          trigger.kill();
         }
       });
       

@@ -1,9 +1,7 @@
 <template>
   <div>
     <NuxtLayout>
-      <KeepAlive>
         <NuxtPage />
-      </KeepAlive>
     </NuxtLayout>
     <Toast />
   </div>
@@ -12,22 +10,32 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useWebCount } from '~/composables/api';
+import { useLenis } from '~/composables/useLenis';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const router = useRouter();
+const { scrollToTop } = useLenis();
 
 onMounted(() => {
-  // 检测设备类型
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const deviceType = isMobile ? 'mobile' : 'pc';
-  
   useWebCount({ type: deviceType });
 });
 
-// 监听路由变化,确保页面滚动到顶部
+// 离开旧页面前立即重置滚动，确保新页面 onMounted 时 scrollY 已经是 0
+router.beforeEach(() => {
+  scrollToTop();
+});
+
+// 路由切换后，等待 DOM 稳定（旧页面卸载、新页面渲染完毕）后强制刷新 ScrollTrigger
 router.afterEach(() => {
-  // 使用 nextTick 确保 DOM 更新后再滚动
-  nextTick(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  });
+  if (import.meta.client) {
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 600);
+  }
 });
 </script>

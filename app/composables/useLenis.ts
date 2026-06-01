@@ -57,6 +57,15 @@ export const useLenis = () => {
     }
   };
 
+  // 立即回到顶部（不走缓动，用于路由切换）
+  const scrollToTop = () => {
+    if (lenisInstance.value) {
+      lenisInstance.value.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  };
+
   // 开始观察指定的区域元素
   const observeSections = (
     selector: string,
@@ -183,6 +192,7 @@ export const useLenis = () => {
     stopScroll,
     startScroll,
     scrollTo,
+    scrollToTop,
     observeSections, // 开始观察区域（通过选择器）
     observeSectionElements, // 便捷方法：直接观察所有 section 元素
     unobserveSections, // 停止观察

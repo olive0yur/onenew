@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden">
+  <div class="overflow-hidden" ref="mainContainerRef">
     <!-- 第一部分 -->
     <div id="section-1" ref="section1Ref" class="w-[100vw] h-[100dvh] section1" data-header-theme="white">
       <video 
@@ -15,6 +15,11 @@
         autoplay
         class="w-full h-[100vh] object-cover bg-video absolute top-0 left-0 z-[0]"
       ></video>
+      <img
+        v-else-if="caseList[0]?.img"
+        :src="imgBaseURL(caseList[0]?.img)"
+        class="w-full h-[100vh] object-cover absolute top-0 left-0 z-[0]"
+      />
       <div class="section1-content flex flex-col justify-between lg:justify-start">
         <p>{{caseList[0]?.dict_value}}</p>
         <span class="hidden lg:flex">{{caseList[0]?.remark}}</span>
@@ -149,7 +154,7 @@
 
 
       <!-- Let's talk 部分 - 移到第三部分内部 -->
-      <section id="section-5" class="section-5 rotate-[20deg] h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute translate-y-[140vh] translate-x-[-20vw] z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
+      <section id="section-5" class="section-5 h-[100vh] w-[100vw] box-border grid grid-cols-2 absolute z-[32] bg-[#F8F8F8] overflow-hidden" data-header-theme="black" style="grid-template-rows: 1fr 1.4fr; top: 0; left: 0;">
           <div class="lets-talk-top-left overflow-hidden relative">
             <div class="flex items-center hover-container-left" @click="navigateTo('/case')">
               <img :src="imgBaseURL('right.png')" class="right-img hover-img-left" alt=""></img>
@@ -229,6 +234,7 @@ const toast = useToast();
 const companyInfo:any = ref(JSON.parse(window.localStorage.getItem('companyInfo') ?? '[]'));
 const caseList: any = ref<any[]>([]);
 const isMobile = ref(false);
+const mainContainerRef = ref<HTMLElement | null>(null);
 const section1Ref = ref<HTMLElement | null>(null);
 const bgVideoRef = ref<HTMLVideoElement | null>(null);
 const section3Ref = ref<HTMLElement | null>(null);
@@ -373,6 +379,8 @@ if(import.meta.client) {
 // ===== 平滑滚动初始化 =====
 const { setLenis } = useLenis();
 
+let lenisRafFn: ((time: number) => void) | null = null;
+
 const initLenis = () => {
   lenis.value = new Lenis({
     duration: 0,
@@ -384,14 +392,13 @@ const initLenis = () => {
     lerp: 0.1,
   });
 
-  // 注册到全局 composable
   setLenis(lenis.value);
 
   lenis.value.on("scroll", ScrollTrigger.update);
-  
-  gsap.ticker.add((time) => {
-    lenis.value.raf(time * 1000);
-  });
+  lenisRafFn = (time: number) => {
+    lenis.value?.raf(time * 1000);
+  };
+  gsap.ticker.add(lenisRafFn);
   gsap.ticker.lagSmoothing(0);
   gsap.ticker.fps(120);
 };
@@ -399,16 +406,11 @@ const initLenis = () => {
 // ===== 初始化动画 =====
 const initAnimations = () => {
   ctx.value = gsap.context(() => {
-    // section1-content 初始动画 - 从下方斜着弹出 (保持不变)
-    gsap.from(".section1-content", {
-      y: 200,
-      x: -100,
-      opacity: 0,
-      rotation: -5,
-      duration: 1.2,
-      ease: "back.out(1.2)",
-      delay: 0.3,
-    });
+    // section1-content 开场动画（fromTo 明确起点，路由切换重进也能正确播放）
+    gsap.fromTo(".section1-content",
+      { y: 200, x: -100, opacity: 0, rotation: -5 },
+      { y: 0, x: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.2)", delay: 0.3 }
+    );
 
     // 第二部分和图片循环部分覆盖第一部分的动画
     // 使用 pin 和 pinSpacing 来实现覆盖效果
@@ -530,13 +532,17 @@ const initAnimations = () => {
       });
 
       // 第二阶段：section-5 盖上来 (scrollDist/totalScrollDist 到 1 的进度)
-      section3Timeline.to(".section-5", {
-        y: 0,
-        x: 0,
-        rotate: 0,
-        ease: "none",
-        duration: window.innerHeight / totalScrollDist, // 按比例分配时间
-      });
+      gsap.set(".section-5", { y: "140vh", x: "-20vw", rotate: 20 });
+      section3Timeline.fromTo(".section-5",
+        { y: "140vh", x: "-20vw", rotate: 20 },
+        {
+          y: 0,
+          x: 0,
+          rotate: 0,
+          ease: "none",
+          duration: window.innerHeight / totalScrollDist,
+        }
+      );
 
       // Let’s talk 完全盖住后：再做 section3 整体斜推动画
       // 注意：section-6 使用了负 margin（mt-[-100dvh]），触发点会提前进入视口；
@@ -571,14 +577,14 @@ const initAnimations = () => {
       }
     }
 
-  });
+  }, mainContainerRef.value);
 };
 
 // 处理hover离开时的文字闪动
 const setupHoverEffects = () => {
-  const leftContainer = document.querySelector('.hover-container-left');
-  const rightContainer = document.querySelector('.hover-container-right');
-  const textChars = document.querySelectorAll('.hover-text-char');
+  const leftContainer = mainContainerRef.value?.querySelector('.hover-container-left');
+  const rightContainer = mainContainerRef.value?.querySelector('.hover-container-right');
+  const textChars = mainContainerRef.value?.querySelectorAll('.hover-text-char') || [];
 
   // 清理动画类的函数
   const clearAnimation = (char: Element) => {
@@ -638,29 +644,38 @@ onMounted(async() => {
   // 初始化数据
   caseList.value = caseListData?.data ?? [];
   
-  // 初始化 Lenis
   initLenis();
-  
-  // 等待 DOM 完全渲染后再初始化动画
+  window.scrollTo(0, 0);
   await nextTick();
-  
-  // 添加小延迟确保所有 ref 都已正确绑定
-  setTimeout(() => {
-    initAnimations();
-    setupHoverEffects();
-  }, 50);
+  initAnimations();
+
+  // 路由切换进入时，window.load 不会再触发，必须主动等图片/视频加载完成再 refresh，
+  // 否则基于 px / vh 计算的 ScrollTrigger 触发点会全部错位。
+  useScrollTriggerRefresh().refreshAfterAssetsReady();
+
+  setupHoverEffects();
 });
 
 onUnmounted(() => {
-  // 清理 Lenis
+  if (lenisRafFn) {
+    gsap.ticker.remove(lenisRafFn);
+    lenisRafFn = null;
+  }
   if (lenis.value) {
     lenis.value.destroy();
+    lenis.value = null;
   }
-  // 清理 GSAP context
+  if (mainContainerRef.value) {
+    const elementsToClear = gsap.utils.toArray([".section-5", ".section1-content", ".section3"], mainContainerRef.value);
+    if (elementsToClear.length) {
+      gsap.set(elementsToClear, { clearProps: "all" });
+    }
+  }
+
   if (ctx.value) {
     ctx.value.revert();
+    ctx.value = null;
   }
-  // 清理 resize 监听器
   if (import.meta.client) {
     window.removeEventListener('resize', handleResize);
   }
